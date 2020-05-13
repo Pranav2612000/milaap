@@ -3,6 +3,7 @@ import { Nav, NavItem, NavLink, Progress, TabContent, TabPane, ListGroup, ListGr
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import { AppSwitch } from '@coreui/react'
+import MessageView from '../../views/MessageList/index';
 
 const propTypes = {
   children: PropTypes.node,
@@ -148,6 +149,8 @@ class DefaultAside extends Component {
             </ListGroup>
           </TabPane>
           <TabPane tabId="2" className="p-3">
+                  <MessageView/>
+                  {/*
             <div className="message">
               <div className="py-3 pb-5 mr-3 float-left">
                 <div className="avatar">
@@ -232,6 +235,7 @@ class DefaultAside extends Component {
                 tempor incididunt...
               </small>
             </div>
+            */}
           </TabPane>
           <TabPane tabId="3" className="p-3">
             <h6>Settings</h6>
