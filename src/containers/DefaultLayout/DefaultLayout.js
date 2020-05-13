@@ -129,7 +129,7 @@ class DefaultLayout extends Component {
 
   render() {
     return (
-      <div className="app">
+      <div className="app aside-menu-show">
         <AppHeader fixed>
           <Suspense  fallback={this.loading()}>
             <DefaultHeader onLogout={e=>this.signOut(e)}/>
@@ -167,11 +167,11 @@ class DefaultLayout extends Component {
               </Suspense>
             </Container>
           </main>
-          <AppAside fixed>
             <Suspense fallback={this.loading()}>
+                    <aside class="aside-menu">
               <DefaultAside />
+                    </aside>
             </Suspense>
-          </AppAside>
         </div>
         <AppFooter>
           <Suspense fallback={this.loading()}>

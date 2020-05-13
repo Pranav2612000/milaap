@@ -5,6 +5,7 @@ import PropTypes from 'prop-types';
 import axios from 'axios';
 
 import { AppAsideToggler, AppNavbarBrand, AppSidebarToggler } from '@coreui/react';
+import DefaultAside from './DefaultAside';
 import logo from '../../assets/img/brand/logo.svg'
 import sygnet from '../../assets/img/brand/sygnet.svg'
 import { Button, Card, CardBody, CardHeader, Col, Form, InputGroup,InputGroupAddon, InputGroupText, Input, Modal, ModalBody, ModalFooter, ModalHeader, Row } from 'reactstrap';

@@ -39,6 +39,14 @@ class Room extends Component {
       roomName: roomName
     };
   }
+  componentDidUpdate(prevProps) {
+      if(this.props.match.params.roomname != prevProps.match.params.roomname) {
+          this.setState({
+              roomName: this.props.match.params.roomname,
+          });
+      }
+  }
+
 
   toggle() {
     this.setState({

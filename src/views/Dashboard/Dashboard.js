@@ -22,6 +22,7 @@ import {
 } from 'reactstrap';
 import { CustomTooltips } from '@coreui/coreui-plugin-chartjs-custom-tooltips';
 import { getStyle, hexToRgba } from '@coreui/coreui/dist/js/coreui-utilities'
+import DefaultAside from '../../containers/DefaultLayout/DefaultAside';
 
 class Dashboard extends Component {
   constructor(props) {
