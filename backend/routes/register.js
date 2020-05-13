@@ -15,7 +15,7 @@ router.post('/', async( req, res) => {
                 if(err) {
                         return res.status(400).json({err: "Error Registering User"});
                  }
-                 var userdata = new users({username: username, password: password});
+                 var userdata = new users({username: username});
                  userdata.save(errr => {
                          if(errr) {
                             return res.status(400).json({err: "Error Registering User"});

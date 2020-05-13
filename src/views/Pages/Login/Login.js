@@ -40,6 +40,7 @@ class Login extends Component {
                           this.setState({
                                   login: true
                           });
+                          localStorage.setItem('uname', this.state.username);
                   })
                   .catch(err => {
                           console.log(err);

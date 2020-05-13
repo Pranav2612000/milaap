@@ -23,17 +23,20 @@ import {
 import { CustomTooltips } from '@coreui/coreui-plugin-chartjs-custom-tooltips';
 import { getStyle, hexToRgba } from '@coreui/coreui/dist/js/coreui-utilities'
 
-class Dashboard extends Component {
+class Room extends Component {
   constructor(props) {
     super(props);
-
+    console.log(props.match);
+    let roomName = props.match.params.roomname;
+    console.log(roomName);
     this.toggle = this.toggle.bind(this);
     this.onRadioBtnClick = this.onRadioBtnClick.bind(this);
 
     this.state = {
       dropdownOpen: false,
       radioSelected: 2,
-      username: localStorage.getItem('uname')
+      username: localStorage.getItem('uname'),
+      roomName: roomName
     };
   }
 
@@ -55,10 +58,10 @@ class Dashboard extends Component {
 
     return (
       <div className="animated fadeIn">
-              SIMPLE DASHBOARD - {this.state.username}
+              ROOM NAME {this.state.roomName}
       </div>
     );
   }
 }
 
-export default Dashboard;
+export default Room;
