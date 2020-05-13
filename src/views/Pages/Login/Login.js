@@ -1,9 +1,55 @@
 import React, { Component } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, Redirect } from 'react-router-dom';
 import { Button, Card, CardBody, CardGroup, Col, Container, Form, Input, InputGroup, InputGroupAddon, InputGroupText, Row } from 'reactstrap';
+import axios from 'axios';
 
 class Login extends Component {
+  constructor(props) {
+          super(props);
+          this.state = {
+                  login: false,
+                  username: '',
+                  password: ''
+          };
+          this.handleUsernameChange = this.handleUsernameChange.bind(this);
+          this.handlePasswordChange = this.handlePasswordChange.bind(this);
+          this.handleSubmit = this.handleSubmit.bind(this);
+  }
+  handleUsernameChange(e) {
+          this.setState({
+                  username: e.target.value
+          });
+  }
+
+  handlePasswordChange(e) {
+          this.setState({
+                  password: e.target.value
+          });
+  }
+  handleSubmit(e) {
+          e.preventDefault();
+          var reqData = {
+                  username: this.state.username,
+                  password: this.state.password
+          }
+          axios.post(
+                  'http://localhost:5000/api/login',
+                  reqData)
+                  .then(res => {
+                          console.log(res);
+                          this.setState({
+                                  login: true
+                          });
+                  })
+                  .catch(err => {
+                          console.log(err);
+                  });
+         return;
+  }
   render() {
+    if(this.state.login) {
+            return <Redirect to="/dashboard"/>
+    }
     return (
       <div className="app flex-row align-items-center">
         <Container>
@@ -12,7 +58,7 @@ class Login extends Component {
               <CardGroup>
                 <Card className="p-4">
                   <CardBody>
-                    <Form>
+                    <Form onSubmit = {this.handleSubmit}>
                       <h1>Login</h1>
                       <p className="text-muted">Sign In to your account</p>
                       <InputGroup className="mb-3">
@@ -21,7 +67,8 @@ class Login extends Component {
                             <i className="icon-user"></i>
                           </InputGroupText>
                         </InputGroupAddon>
-                        <Input type="text" placeholder="Username" autoComplete="username" />
+                        <Input type="text" placeholder="Username" autoComplete="username" 
+                              value = {this.state.username} onChange={this.handleUsernameChange}/>
                       </InputGroup>
                       <InputGroup className="mb-4">
                         <InputGroupAddon addonType="prepend">
@@ -29,7 +76,8 @@ class Login extends Component {
                             <i className="icon-lock"></i>
                           </InputGroupText>
                         </InputGroupAddon>
-                        <Input type="password" placeholder="Password" autoComplete="current-password" />
+                        <Input type="password" placeholder="Password" autoComplete="current-password"
+                              value={this.state.password} onChange={this.handlePasswordChange}/>
                       </InputGroup>
                       <Row>
                         <Col xs="6">
