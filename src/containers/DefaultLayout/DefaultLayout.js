@@ -3,6 +3,7 @@ import { Redirect, Route, Switch } from 'react-router-dom';
 import * as router from 'react-router-dom';
 import { Container } from 'reactstrap';
 import axios from 'axios';
+import PeerHandler from './peerHandler'
 
 import {
   AppAside,
@@ -160,7 +161,10 @@ class DefaultLayout extends Component {
                         render={props => (
                           <route.component {...props} />
                         )} />
-                    ) : (null);
+                    ) : (
+                      //Here
+                      <PeerHandler />
+                      );
                   })}
                   <Redirect from="/" to="/dashboard" />
                 </Switch>
