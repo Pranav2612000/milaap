@@ -48,7 +48,6 @@ class PeerHandler extends React.Component {
       call.on("error", (err) => console.log(err));
       call.on("stream", function (stream) {
         let video = document.createElement("video");
-                video.classList.add("mx-2", "my-0")
         video.width = "200";
         video.height = "350";
         video.srcObject = stream;
@@ -93,7 +92,6 @@ class PeerHandler extends React.Component {
             self.state.calls.forEach((call) =>
               call.on("stream", function (stream) {
                 let video = document.createElement("video");
-                video.classList.add("mx-2", "my-0")
                 video.width = "200";
                 video.height = "350";
                 video.srcObject = stream;
@@ -132,7 +130,6 @@ class PeerHandler extends React.Component {
             self.state.calls.forEach((call) =>
               call.on("stream", function (stream) {
                 let video = document.createElement("video");
-                video.classList.add("mx-2", "my-0")
                 video.width = "300";
                 video.height = "450";
                 video.srcObject = stream;
