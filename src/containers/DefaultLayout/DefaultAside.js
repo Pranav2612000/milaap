@@ -5,6 +5,7 @@ import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import { AppSwitch } from '@coreui/react'
 import MessageView from '../../views/MessageList/index';
+import Controls from '../../views/Connection/Controls';
 import { Button, ButtonGroup, Badge, Card, CardBody, CardFooter, CardHeader, Col, Container, Row, Collapse, Fade } from 'reactstrap';
 
 const propTypes = {
@@ -84,25 +85,7 @@ class DefaultAside extends Component {
         </Nav>
         <TabContent activeTab={this.state.activeTab}>
           <TabPane tabId="1">
-                  <Container>
-                  <Row>
-                          <Col className='col'></Col>
-                          <Col className='col auto'>
-                            <h1>Join Video </h1>
-                          </Col>
-                          <Col className='col'></Col>
-                  </Row>
-                  <Row>
-                          <Col className='col-sm'></Col>
-                          <Col className='col-sm'>
-                <ButtonGroup>
-                  <Button className='btn btn-info'>Screen</Button>
-                  <Button className='btn btn-success'>Video</Button>
-                </ButtonGroup>
-                          </Col>
-                          <Col className='col-sm'></Col>
-                  </Row>
-                  </Container>
+                  <Controls roomName={this.state.roomName}/>
                   {/*
                   <Row>
             <Card className="text-white bg-primary w-25">
