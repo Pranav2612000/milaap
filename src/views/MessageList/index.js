@@ -30,6 +30,23 @@ export default function MessageList(props) {
 
   useEffect(() => {
     //getMessages();
+    /*
+    const interval = setInterval(() => {
+            axios.post('http://localhost:5000/api/room/getmsgs', reqData)
+                  .then(res => {
+                          console.log(res);
+                          let tempMsg = res.data.msgs;
+                          if(tempMsg == undefined) {
+                                  tempMsg = [];
+                          }
+                          let tempMsgFormatted = formatMsgs(tempMsg);
+                          console.log(tempMsgFormatted);
+                          setMessages(tempMsgFormatted);
+                  }) .catch(err => {
+                          console.log(err);
+            });
+    }, 10000);
+    */
     const reqData = {
             roomName: props.roomName
     };
@@ -38,12 +55,16 @@ export default function MessageList(props) {
           .then(res => {
                   console.log(res);
                   let tempMsg = res.data.msgs;
+                  if(tempMsg == undefined) {
+                          tempMsg = [];
+                  }
                   let tempMsgFormatted = formatMsgs(tempMsg);
                   console.log(tempMsgFormatted);
                   setMessages(tempMsgFormatted);
           }) .catch(err => {
                   console.log(err);
           });
+    //return () => clearInterval(interval);
   },[props.roomName])
 
   
