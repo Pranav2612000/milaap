@@ -1,5 +1,5 @@
 import React from "react";
-import { Button, Input, Row, Col } from "reactstrap";
+import { Button, Input, Row, Col, Jumbotron } from "reactstrap";
 import Peer from "peerjs";
 
 class PeerHandler extends React.Component {
@@ -22,8 +22,9 @@ class PeerHandler extends React.Component {
       remotePeersID: new Array(),
       calls: new Array(),
       inText: null,
+      context: null,
     };
-    this.videoRef = React.createRef();
+    // this.videoRef = React.createRef();
   }
 
   componentWillMount = () => {
@@ -46,12 +47,25 @@ class PeerHandler extends React.Component {
       call.answer();
       call.on("error", (err) => console.log(err));
       call.on("stream", function (stream) {
-        self.videoRef.current.srcObject = stream;
+        let video = document.createElement("video");
+                video.classList.add("mx-2", "my-0")
+        video.width = "200";
+        video.height = "350";
+        video.srcObject = stream;
+        video.autoplay = true;
+        video.onclick = self.switchContext;
+        document.getElementById("videos").appendChild(video);
       });
       self.setState({
         calls: [...self.state.calls, call],
       });
     });
+  };
+
+  switchContext = (e) => {
+    let context = document.getElementById("context");
+    context.srcObject = e.target.srcObject;
+    context.play();
   };
 
   shareVideo = () => {
@@ -66,7 +80,7 @@ class PeerHandler extends React.Component {
           {
             selfVideoStream: media,
             calls: self.state.remotePeers.map((peer) => {
-              self.state.selfPeer.call(peer.peer, media);
+              return self.state.selfPeer.call(peer.peer, media);
             }),
             sharedTo: self.state.remotePeers.map((peer) => {
               return peer.peer;
@@ -78,7 +92,14 @@ class PeerHandler extends React.Component {
             );
             self.state.calls.forEach((call) =>
               call.on("stream", function (stream) {
-                self.videoRef.current.srcObject = stream;
+                let video = document.createElement("video");
+                video.classList.add("mx-2", "my-0")
+                video.width = "200";
+                video.height = "350";
+                video.srcObject = stream;
+                video.autoplay = true;
+                video.onclick = self.switchContext;
+                document.getElementById("videos").appendChild(video);
               })
             );
           }
@@ -94,12 +115,10 @@ class PeerHandler extends React.Component {
         audio: true,
       })
       .then((media) => {
-        console.log(media);
         self.setState(
           {
             selfScreenStream: media,
             calls: self.state.remotePeers.map((peer) => {
-              console.log(peer);
               return self.state.selfPeer.call(peer.peer, media);
             }),
             sharedTo: self.state.remotePeers.map((peer) => {
@@ -107,13 +126,19 @@ class PeerHandler extends React.Component {
             }),
           },
           () => {
-            console.log(self.state.calls);
             self.state.calls.forEach((call) =>
               call.on("error", (err) => console.log(err))
             );
             self.state.calls.forEach((call) =>
               call.on("stream", function (stream) {
-                self.videoRef.current.srcObject = stream;
+                let video = document.createElement("video");
+                video.classList.add("mx-2", "my-0")
+                video.width = "300";
+                video.height = "450";
+                video.srcObject = stream;
+                video.autoplay = true;
+                video.onclick = self.switchContext;
+                document.getElementById("videos").appendChild(video);
               })
             );
           }
@@ -125,7 +150,6 @@ class PeerHandler extends React.Component {
     const self = this;
     conn.on("open", () => {
       conn.on("data", function (data) {
-        console.log("Recevied in connect", data);
         let share =
           self.state.selfScreenStream || self.state.selfVideoStream
             ? true
@@ -137,18 +161,16 @@ class PeerHandler extends React.Component {
             !self.state.remotePeersID.includes(peer) &&
             peer != self.state.myID
           ) {
-            console.log("PEERID:", peer);
             self.setState(
               {
                 remotePeersID: [...self.state.remotePeersID, peer],
               },
               () => {
-                console.log(self.state.remotePeersID);
                 self.connectToPeer(peer);
               }
             );
             if (share)
-              if (!(peer in self.sharedTo)) {
+              if (!self.state.sharedTo.includes(peer)) {
                 self.setState({
                   calls: [
                     ...self.state.calls,
@@ -157,7 +179,7 @@ class PeerHandler extends React.Component {
                       self.state.selfScreenStream || self.state.selfVideoStream
                     ),
                   ], // Handle both later
-                  sharedTo: [...self.sharedTo, peer],
+                  sharedTo: [...self.state.sharedTo, peer],
                 });
               }
           }
@@ -219,7 +241,10 @@ class PeerHandler extends React.Component {
         </Row>
         {/* )} */}
         <br />
-        <video ref={this.videoRef} autoPlay></video>
+        <video id="context" className="w-75" autoPlay></video>
+        <Jumbotron>
+          <Row id="videos"></Row>
+        </Jumbotron>
       </div>
     );
   }
