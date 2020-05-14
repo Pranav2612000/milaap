@@ -3,10 +3,10 @@
   display: flex;
   align-items: center;
   background: white;
-  border-top: 1px solid #eeeef1;
+  border: 1px solid #eeeef1;
   position: fixed;
-  width: calc(100% - 20px);
-  bottom: 0px;
+  width: 27%;
+  bottom: 7.5%;
 }
 
 @supports (backdrop-filter: blur(20px)) {
@@ -23,6 +23,16 @@
   font-size: 14px;
   height: 40px;
   background: none;
+}
+
+.compose-button {
+  float: left;
+  flex: 1;
+  margin-left:12%;
+  border: 1px solid grey;
+  font-size: 14px;
+  height: 40px;
+  background: lightblue;
 }
 
 .compose-input::placeholder {
