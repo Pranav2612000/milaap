@@ -14,7 +14,7 @@ export default function Compose(props) {
                     reqData)
                     .then(res => {
                             console.log(res);
-                            window.location.reload();
+                            //window.location.reload();
                     }).catch(err => {
                             console.log(err);
                     });
