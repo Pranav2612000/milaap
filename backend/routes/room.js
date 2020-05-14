@@ -70,6 +70,24 @@ router.post('/sendmessage', async(req, res) => {
         });
 });
 
+router.post('/enterroom', async (req, res) => {
+        const roomName = req.body.roomName;
+        /*
+         * Reminder that generating peerId on server side is not a good idea.
+                /* We may store previous ids in a room and use them again, but for now creating a
+                 * new id every time a user enters a room. //
+        */
+        rooms.findOne({roomName: roomName}, function(err, room) {
+                if(err) {
+                        return res.status(400).json({err: "Error. Try again."});
+                }
+                if(!room) {
+                        return res.status(400).json({err: "Error. Incorrect roomname."});
+                }
+                return res.status(200).json({msg: "Success", msgs: room._doc.msgArray});
+        });
+});
+
 router.post('/getmsgs', async (req, res) => {
         const roomName = req.body.roomName;
         rooms.findOne({roomName: roomName}, function(err, room) {

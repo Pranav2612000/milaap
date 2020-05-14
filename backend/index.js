@@ -1,5 +1,6 @@
 const express = require('express'); 
 const cors = require('cors');
+const { PeerServer } = require('peer');
 
 const connectDB = require('./config/db');
 //const rabbitDB = require('./config/rabbit');
@@ -24,6 +25,8 @@ app.use('/api/user', userRouter);
 app.use('/api/room', roomRouter);
 app.get('/', (req, res) => res.send('Hello World!'));
 
+//While deploying uncomment this line and change peerServer throughout the application to use our peerServer.
+//const peerServer = PeerServer({ port: 9000, path: '/peerserver' });
 app.listen(port, () => {
         console.log(`Server listening on port ${port}`);
 });

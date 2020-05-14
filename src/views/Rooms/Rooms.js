@@ -23,6 +23,7 @@ import {
 import { CustomTooltips } from '@coreui/coreui-plugin-chartjs-custom-tooltips';
 import { getStyle, hexToRgba } from '@coreui/coreui/dist/js/coreui-utilities'
 import DefaultAside from '../../containers/DefaultLayout/DefaultAside';
+import PeerHandler from '../../containers/DefaultLayout/peerHandler';
 
 class Room extends Component {
   constructor(props) {
@@ -68,6 +69,7 @@ class Room extends Component {
     return (
       <div className="animated fadeIn">
               ROOM NAME {this.state.roomName}
+              <PeerHandler />
       </div>
     );
   }

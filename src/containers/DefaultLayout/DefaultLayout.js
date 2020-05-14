@@ -14,6 +14,7 @@ import {
   AppSidebarForm,
   AppSidebarHeader,
   AppSidebarMinimizer,
+  AppAsideToggler,
   AppBreadcrumb2 as AppBreadcrumb,
   AppSidebarNav2 as AppSidebarNav,
 } from '@coreui/react';
@@ -25,6 +26,7 @@ import routes from '../../routes';
 const DefaultAside = React.lazy(() => import('./DefaultAside'));
 const DefaultFooter = React.lazy(() => import('./DefaultFooter'));
 const DefaultHeader = React.lazy(() => import('./DefaultHeader'));
+const InnerHeader = React.lazy(() => import('./InnerHeader'));
 function getGroupElements(rooms) {
         let groupElements = [];
         console.log(rooms);
@@ -186,8 +188,6 @@ class DefaultLayout extends Component {
             <AppSidebarMinimizer />
           </AppSidebar>
           <main className="main">
-            <AppBreadcrumb appRoutes={routes} router={router}>
-            </AppBreadcrumb>
             <Container fluid>
               <Suspense fallback={this.loading()}>
                 <Switch>
@@ -202,8 +202,7 @@ class DefaultLayout extends Component {
                           <route.component {...props} />
                         )} />
                     ) : (
-                      //Here
-                      <PeerHandler />
+                            null
                       );
                   })}
                   <Redirect from="/" to="/dashboard" />
