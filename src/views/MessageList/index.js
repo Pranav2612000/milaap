@@ -4,17 +4,47 @@ import Toolbar from '../Toolbar';
 import ToolbarButton from '../ToolbarButton';
 import Message from '../Message';
 import moment from 'moment';
+import axios from 'axios';
 
 import './MessageList.css';
 
-const MY_USER_ID = 'apple';
+const MY_USER_ID = localStorage.getItem('uname');
+
+function formatMsgs(tempMsg) {
+        let formattedMsgs = [];
+        tempMsg.forEach((val, index) => {
+                let formattedMsg = {};
+                formattedMsg.id = val.id;
+                formattedMsg.author = val.sender; 
+                formattedMsg.message = val.msg; 
+                formattedMsg.timestamp = new Date().getTime();
+                console.log(val);
+                console.log(index);
+                formattedMsgs.push(formattedMsg);
+        });
+        return formattedMsgs;
+}
 
 export default function MessageList(props) {
   const [messages, setMessages] = useState([])
 
   useEffect(() => {
-    getMessages();
-  },[])
+    //getMessages();
+    const reqData = {
+            roomName: props.roomName
+    };
+    console.log(reqData);
+    axios.post('http://localhost:5000/api/room/getmsgs', reqData)
+          .then(res => {
+                  console.log(res);
+                  let tempMsg = res.data.msgs;
+                  let tempMsgFormatted = formatMsgs(tempMsg);
+                  console.log(tempMsgFormatted);
+                  setMessages(tempMsgFormatted);
+          }) .catch(err => {
+                  console.log(err);
+          });
+  },[props.roomName])
 
   
   const getMessages = () => {

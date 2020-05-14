@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import {withRouter} from 'react-router-dom';
 import { Nav, NavItem, NavLink, Progress, TabContent, TabPane, ListGroup, ListGroupItem } from 'reactstrap';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
@@ -11,15 +12,33 @@ const propTypes = {
 
 const defaultProps = {};
 
+function getRoomFromLocation(location_string) {
+        let room = '';
+        let lastslash = location_string.lastIndexOf("/");
+        room = location_string.slice(lastslash + 1);
+        console.log(room);
+        return room;
+}
+
 class DefaultAside extends Component {
 
   constructor(props) {
     super(props);
+    console.log(props.location.pathname);
 
     this.toggle = this.toggle.bind(this);
     this.state = {
       activeTab: '1',
+      roomName: getRoomFromLocation(props.location.pathname)
     };
+  }
+  componentDidUpdate(prevProps) {
+      if(this.props.location.pathname != prevProps.location.pathname) {
+          this.setState({
+              roomName: getRoomFromLocation(this.props.location.pathname)
+          });
+          console.log(this.props.location.pathname);
+      }
   }
 
   toggle(tab) {
@@ -149,7 +168,7 @@ class DefaultAside extends Component {
             </ListGroup>
           </TabPane>
           <TabPane tabId="2" className="p-3">
-                  <MessageView/>
+                  <MessageView roomName={this.state.roomName}/>
                   {/*
             <div className="message">
               <div className="py-3 pb-5 mr-3 float-left">
@@ -317,4 +336,4 @@ class DefaultAside extends Component {
 DefaultAside.propTypes = propTypes;
 DefaultAside.defaultProps = defaultProps;
 
-export default DefaultAside;
+export default withRouter(DefaultAside);

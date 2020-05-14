@@ -5,6 +5,7 @@ const config = require('config');
 const rooms = require('../models/Rooms.model');
 const userLogins = require('../models/UserLogin.model');
 const users = require('../models/User.model');
+const shortid = require('shortid');
 
 router.post('/sendmessage', async(req, res) => {
         const sender = req.body.sender;
@@ -13,6 +14,7 @@ router.post('/sendmessage', async(req, res) => {
         const msgObject = {
                 msg: msg,
                 sender: sender,
+                id: shortid.generate(),
         };
         rooms.findOne({roomName: roomName}, function(err, room) {
                 if(err) {

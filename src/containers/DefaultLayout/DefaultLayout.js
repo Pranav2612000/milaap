@@ -146,7 +146,8 @@ class DefaultLayout extends Component {
             <AppSidebarMinimizer />
           </AppSidebar>
           <main className="main">
-            <AppBreadcrumb appRoutes={routes} router={router}/>
+            <AppBreadcrumb appRoutes={routes} router={router}>
+            </AppBreadcrumb>
             <Container fluid>
               <Suspense fallback={this.loading()}>
                 <Switch>
