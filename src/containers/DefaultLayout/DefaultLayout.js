@@ -47,6 +47,40 @@ class DefaultLayout extends Component {
           const reqData = {
                   username: localStorage.getItem('uname')
           };
+          this.state = {
+                  username: localStorage.getItem('uname'),
+                  navigation: {
+                    items: [
+                      {
+                        title: true,
+                        name: 'PMs',
+                        icon: 'icon-puzzle',
+                      },
+                      PMList,
+                      {
+                        title: true,
+                        name: 'Groups',
+                        icon: 'icon-puzzle',
+                        children: [
+                          {
+                            //title: true,
+                            name: 'No Messages Yet.',
+                            icon: 'icon-puzzle',
+                            badge: {
+                              variant: 'info',
+                              text: 'Add'
+                            },
+                            class: ''
+                          },
+                        ],
+                      },
+                      GroupList,
+                    ],
+                  }
+          };
+          if(this.state.username == undefined) {
+                  return;
+          }
           axios.post('http://localhost:5000/api/user/getrooms',
                   reqData)
                   .then(res => {
@@ -128,6 +162,11 @@ class DefaultLayout extends Component {
   }
 
   render() {
+    if(localStorage.getItem('uname') == undefined) {
+            return (
+                    <Redirect to = '/login'/>
+            )
+    }
     return (
       <div className="app aside-menu-show">
         <AppHeader fixed>
