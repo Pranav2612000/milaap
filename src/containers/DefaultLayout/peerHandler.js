@@ -243,8 +243,8 @@ class PeerHandler extends React.Component {
     return (
       <div>
         <h3>{this.state.myID}</h3>
-        <Row className="mt-4 text-center">
-          <Col xs={10}>
+        <Row className="my-4 justify-content-center">
+          <Col xs={4}>
             <Input onChange={this.inputHandler} />
           </Col>
           <Col xs={2}>
