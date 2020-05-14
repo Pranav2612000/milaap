@@ -18,7 +18,9 @@ class PeerHandler extends React.Component {
           ],
         } /* Sample servers, please use appropriate ones */,
       }),
-      remotePeer: null,
+      remotePeers: new Array(),
+      remotePeersID: new Array(),
+      calls: new Array(),
       inText: null,
     };
     this.videoRef = React.createRef();
@@ -26,32 +28,29 @@ class PeerHandler extends React.Component {
 
   componentWillMount = () => {
     const self = this;
+
     this.state.selfPeer.on("open", function (id) {
       self.setState({
         myID: id,
       });
     });
+
     this.state.selfPeer.on("connection", function (conn) {
-      self.setState({ remotePeer: conn });
+      self.peerDiscoveryHandler(conn);
     });
+
     this.state.selfPeer.on("error", function (err) {
       console.log("The following error occured: ", err);
     });
     this.state.selfPeer.on("call", function (call) {
-      self.setState(
-        {
-          call: call,
-        },
-        () => {
-          call.answer();
-          self.state.call.on("error", (err) => console.log(err));
-          call.on("stream", function (stream) {
-            // self.videoRef.current.srcObject = stream;
-            document.querySelector("video").srcObject = stream;
-            console.log(stream);
-          });
-        }
-      );
+      call.answer();
+      call.on("error", (err) => console.log(err));
+      call.on("stream", function (stream) {
+        self.videoRef.current.srcObject = stream;
+      });
+      self.setState({
+        calls: [...self.state.calls, call],
+      });
     });
   };
 
@@ -65,13 +64,23 @@ class PeerHandler extends React.Component {
       .then((media) => {
         self.setState(
           {
-            call: self.state.selfPeer.call(self.state.remotePeer.peer, media),
+            selfVideoStream: media,
+            calls: self.state.remotePeers.map((peer) => {
+              self.state.selfPeer.call(peer.peer, media);
+            }),
+            sharedTo: self.state.remotePeers.map((peer) => {
+              return peer.peer;
+            }),
           },
           () => {
-            self.state.call.on("error", (err) => console.log(err));
-            self.state.call.on("stream", function (stream) {
-              self.videoRef.current.srcObject = stream;
-            });
+            self.state.calls.forEach((call) =>
+              call.on("error", (err) => console.log(err))
+            );
+            self.state.calls.forEach((call) =>
+              call.on("stream", function (stream) {
+                self.videoRef.current.srcObject = stream;
+              })
+            );
           }
         );
       });
@@ -85,25 +94,93 @@ class PeerHandler extends React.Component {
         audio: true,
       })
       .then((media) => {
+        console.log(media);
         self.setState(
           {
-            call: self.state.selfPeer.call(self.state.remotePeer.peer, media),
+            selfScreenStream: media,
+            calls: self.state.remotePeers.map((peer) => {
+              console.log(peer);
+              return self.state.selfPeer.call(peer.peer, media);
+            }),
+            sharedTo: self.state.remotePeers.map((peer) => {
+              return peer.peer;
+            }),
           },
           () => {
-            self.state.call.on("error", (err) => console.log(err));
-            self.state.call.on("stream", function (stream) {
-              self.videoRef.current.srcObject = stream;
-            });
+            console.log(self.state.calls);
+            self.state.calls.forEach((call) =>
+              call.on("error", (err) => console.log(err))
+            );
+            self.state.calls.forEach((call) =>
+              call.on("stream", function (stream) {
+                self.videoRef.current.srcObject = stream;
+              })
+            );
           }
         );
       });
   };
 
-  connectToPeer = () => {
+  peerDiscoveryHandler = (conn) => {
     const self = this;
-    this.setState({
-      remotePeer: this.state.selfPeer.connect(this.state.inText),
+    conn.on("open", () => {
+      conn.on("data", function (data) {
+        console.log("Recevied in connect", data);
+        let share =
+          self.state.selfScreenStream || self.state.selfVideoStream
+            ? true
+            : false;
+        let rcvdPeers = data.split(" ");
+        rcvdPeers.forEach((peer) => {
+          if (
+            peer != "" &&
+            !self.state.remotePeersID.includes(peer) &&
+            peer != self.state.myID
+          ) {
+            console.log("PEERID:", peer);
+            self.setState(
+              {
+                remotePeersID: [...self.state.remotePeersID, peer],
+              },
+              () => {
+                console.log(self.state.remotePeersID);
+                self.connectToPeer(peer);
+              }
+            );
+            if (share)
+              if (!(peer in self.sharedTo)) {
+                self.setState({
+                  calls: [
+                    ...self.state.calls,
+                    self.state.selfPeer.call(
+                      peer,
+                      self.state.selfScreenStream || self.state.selfVideoStream
+                    ),
+                  ], // Handle both later
+                  sharedTo: [...self.sharedTo, peer],
+                });
+              }
+          }
+        });
+      });
+      if (self.state.remotePeers.length != 0) {
+        let myPeers = "";
+        self.state.remotePeers.forEach((peer) => {
+          myPeers += `${peer.peer} `;
+        });
+        conn.send(myPeers);
+      }
     });
+    this.setState({
+      remotePeers: [...self.state.remotePeers, conn],
+      remotePeersID: [...self.state.remotePeersID, conn.peer],
+    });
+  };
+
+  connectToPeer = (peerID) => {
+    const self = this;
+    let conn = this.state.selfPeer.connect(peerID);
+    this.peerDiscoveryHandler(conn);
   };
 
   inputHandler = (e) => {
@@ -117,29 +194,32 @@ class PeerHandler extends React.Component {
     return (
       <div>
         <h3>{this.state.myID}</h3>
-        {this.state.remotePeer ? (
-          <div className="mt-4 text-center">
-            <Button className="m-4" color="success" onClick={this.shareScreen}>
-              Share screen
+        {/* {this.state.remotePeer ? ( */}
+        <div className="mt-4 text-center">
+          <Button className="m-4" color="success" onClick={this.shareScreen}>
+            Share screen
+          </Button>
+          <Button className="m-4" color="info" onClick={this.shareVideo}>
+            Share video
+          </Button>
+        </div>
+        {/* ) : ( */}
+        <Row className="mt-4 text-center">
+          <Col xs={10}>
+            <Input onChange={this.inputHandler} />
+          </Col>
+          <Col xs={2}>
+            <Button
+              color="secondary"
+              onClick={() => self.connectToPeer(self.state.inText)}
+            >
+              Connect
             </Button>
-            <Button className="m-4" color="info" onClick={this.shareVideo}>
-              Share video
-            </Button>
-          </div>
-        ) : (
-          <Row className="mt-4 text-center">
-            <Col xs={10}>
-              <Input onChange={this.inputHandler} />
-            </Col>
-            <Col xs={2}>
-              <Button color="secondary" onClick={this.connectToPeer}>
-                Connect
-              </Button>
-            </Col>
-          </Row>
-        )}
+          </Col>
+        </Row>
+        {/* )} */}
         <br />
-        <video autoPlay></video>
+        <video ref={this.videoRef} autoPlay></video>
       </div>
     );
   }
