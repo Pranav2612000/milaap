@@ -43,7 +43,6 @@ export default function MessageList(props) {
           //If you are on a limited DataPack, Comment this code segment and the one at 
           //the end of useEffect function - (the one with return clearInterval...), to
           //prevent unnecessary multiple calls to the server
-    /*
     const interval = setInterval(() => {
             let reqData = {
                     roomName: props.roomName,
@@ -66,7 +65,6 @@ export default function MessageList(props) {
                           console.log(err);
             });
     }, 10000);
-    */
     axios.post('http://localhost:5000/api/room/getmsgs', reqData)
           .then(res => {
                   console.log(res);
@@ -82,7 +80,7 @@ export default function MessageList(props) {
                   console.log(err);
           });
     //Yes this line.
-    //return () => clearInterval(interval);
+    return () => clearInterval(interval);
   },[props.roomName])
   const renderMessages = () => {
     let i = 0;
