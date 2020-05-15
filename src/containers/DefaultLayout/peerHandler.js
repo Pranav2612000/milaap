@@ -66,7 +66,7 @@ class PeerHandler extends React.Component {
           {
             selfVideoStream: media,
             calls: self.state.remotePeers.map((peer) => {
-              self.state.selfPeer.call(peer.peer, media);
+              return self.state.selfPeer.call(peer.peer, media);
             }),
             sharedTo: self.state.remotePeers.map((peer) => {
               return peer.peer;
