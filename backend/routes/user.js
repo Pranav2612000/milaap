@@ -39,6 +39,39 @@ router.post('/adduser', async(req, res) => {
         );
         
         //Create and save new room
+        rooms.findOne({roomName: roomName}, function (err, room) {
+                if(err) {
+                    return res.status(400).json({err: "Error Creating Room"});
+                }
+                if(!room) {
+                        //Create a new room
+                        var room = new rooms({roomName: roomName, users: [host, user]});
+                        room.save(err => {
+                                if(err) {
+                                  return res.status(400).json({err: "Error Creating Room"});
+                                } else {
+                                  return res.status(200).json({msg: "Room Created successfully"});
+                                }
+                        });
+                }
+                var userArray = room._doc.users;
+                if(userArray == undefined) {
+                        return res.status(400).json({err: "Error Creating Room"});
+                }
+                userArray.push(user);
+                room._doc.users = userArray;
+                room.markModified('users');
+                room.save(err => {
+                        if(err) {
+                          return res.status(400).json({err: "Error Creating Room"});
+                        } else {
+                          return res.status(200).json({msg: "Room Created successfully"});
+                        }
+                });
+                
+                
+        });
+        /*
         var room = new rooms({roomName: roomName, users: [host, user]});
         room.save(err => {
                 if(err) {
@@ -47,6 +80,7 @@ router.post('/adduser', async(req, res) => {
                   return res.status(200).json({msg: "Room Created successfully"});
                 }
         });
+        */
 });
 
 router.post('/getrooms', async (req, res) => {

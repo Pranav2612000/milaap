@@ -3,7 +3,7 @@ import { Nav, NavItem, NavLink, Progress, TabContent, TabPane, ListGroup, ListGr
 import classNames from 'classnames';
 import { AppSwitch } from '@coreui/react'
 import MessageView from '../../views/MessageList/index';
-import { Button, ButtonGroup, Badge, Card, CardBody, CardFooter, CardHeader, Col, Container, Row, Collapse, Fade } from 'reactstrap';
+import { Jumbotron, Button, ButtonGroup, Badge, Card, CardBody, CardFooter, CardHeader, Col, Container, Row, Collapse, Fade } from 'reactstrap';
 import Peer from "peerjs";
 import axios from 'axios';
 
@@ -14,7 +14,9 @@ class Controls extends Component {
     console.log(props);
     this.state = {
             roomName: this.props.roomName,
-            remotePeer: null,
+            remotePeers: new Array(),
+            remotePeersID: new Array(),
+            calls: new Array(),
             opinfo: '',
             friendtkn: '',
     };
@@ -29,6 +31,12 @@ class Controls extends Component {
           });
       }
   }
+
+  switchContext = (e) => {
+    let context = document.getElementById("context");
+    context.srcObject = e.target.srcObject;
+    context.play();
+  };
   
   async startScreenShare() {
         const self = this;
@@ -74,69 +82,60 @@ class Controls extends Component {
                                                 audio: true,
                                               })
                                               .then((media) => {
-                                                self.setState({
-                                                        call: call,
-                                                       },
-                                                        () => {
-                                                          call.answer(media);
-                                                          self.state.call.on("error", (err) => console.log(err));
-                                                          call.on("stream", function (stream) {
-                                                            // self.videoRef.current.srcObject = stream;
-                                                            document.querySelector("video").srcObject = stream;
-                                                            console.log(stream);
-                                                          });
-                                                        }
-                                                );
+                                                      call.answer(media);
+                                                      call.on("error", (err) => console.log(err));
+                                                      call.on("stream", function (stream) {
+                                                        let video = document.createElement("video");
+                                                        video.width = "200";
+                                                        video.height = "350";
+                                                        video.srcObject = stream;
+                                                        video.autoplay = true;
+                                                        video.onclick = self.switchContext;
+                                                        document.getElementById("videos").appendChild(video);
+                                                      });
+                                                      self.setState({
+                                                        calls: [...self.state.calls, call],
+                                                      });
                                               });
                                         });
                                 } else if(res.data.connected > 1) {
-                                        /*
-                                        peer.on('call', function(call) {
-                                                self.setState({
-                                                        call: call,
-                                                       },
-                                                        () => {
-                                                          call.answer();
-                                                          self.state.call.on("error", (err) => console.log(err));
-                                                          call.on("stream", function (stream) {
-                                                            // self.videoRef.current.srcObject = stream;
-                                                            document.querySelector("video").srcObject = stream;
-                                                            console.log(stream);
-                                                          });
-                                                        }
-                                                );
-                                        });
-                                        */
                                         let onlineArray = res.data.online;
                                         var connIndex = -1;
                                         onlineArray.forEach((val, index) => {
-                                                if(val.username != localStorage.getItem("uname")) {
-                                                        connIndex = index;
+                                                if(val.username == localStorage.getItem("uname")) {
+                                                        //connIndex = index;
+                                                        return;
                                                 }
+                                                var friendtkn = onlineArray[index].tkn;
+                                                console.log(friendtkn);
+                                                navigator.mediaDevices
+                                                     .getDisplayMedia({
+                                                        video: { width: 1024, height: 576 },
+                                                        audio: true,
+                                                      })
+                                                      .then((media) => {
+                                                        var thiscall = peer.call(friendtkn, media);
+                                                        self.setState(
+                                                          {
+                                                            //call: peer.call(friendtkn, media),//to be updated appropriately
+                                                            calls: [...self.state.calls, thiscall],
+                                                          },
+                                                          () => {
+                                                            thiscall.on("error", (err) => console.log(err));
+                                                            thiscall.on("stream", function (stream) {
+                                                                let video = document.createElement("video");
+                                                                video.width = "200";
+                                                                video.height = "350";
+                                                                video.srcObject = stream;
+                                                                video.autoplay = true;
+                                                                video.onclick = self.switchContext;
+                                                                document.getElementById("videos").appendChild(video);
+                                                              //self.videoRef.current.srcObject = stream;
+                                                            });
+                                                          }
+                                                        );
+                                                });
                                         });
-                                        var friendtkn = onlineArray[connIndex].tkn;
-                                            console.log(friendtkn);
-//                                            const self = this;
-                                            navigator.mediaDevices
-                                              .getDisplayMedia({
-                                                video: { width: 1024, height: 576 },
-                                                audio: true,
-                                              })
-                                              .then((media) => {
-                                                self.setState(
-                                                  {
-                                                    call: peer.call(friendtkn, media),
-                                                  },
-                                                  () => {
-                                                    self.state.call.on("error", (err) => console.log(err));
-                                                    self.state.call.on("stream", function (stream) {
-                                                      //self.videoRef.current.srcObject = stream;
-                                                      document.querySelector("video").srcObject = stream;
-                                                      console.log(stream);
-                                                    });
-                                                  }
-                                                );
-                                              });
                                 }
                         }).catch(err => {
                                 console.log(err);
@@ -188,52 +187,60 @@ class Controls extends Component {
                                                 audio: true,
                                               })
                                               .then((media) => {
-                                                self.setState({
-                                                        call: call,
-                                                       },
-                                                        () => {
-                                                          call.answer(media);
-                                                          self.state.call.on("error", (err) => console.log(err));
-                                                          call.on("stream", function (stream) {
-                                                            // self.videoRef.current.srcObject = stream;
-                                                            console.log(stream);
-                                                            document.querySelector("video").srcObject = stream;
-                                                          });
-                                                        }
-                                                );
+                                                      call.answer(media);
+                                                      call.on("error", (err) => console.log(err));
+                                                      call.on("stream", function (stream) {
+                                                        let video = document.createElement("video");
+                                                        video.width = "200";
+                                                        video.height = "350";
+                                                        video.srcObject = stream;
+                                                        video.autoplay = true;
+                                                        video.onclick = self.switchContext;
+                                                        document.getElementById("videos").appendChild(video);
+                                                      });
+                                                      self.setState({
+                                                        calls: [...self.state.calls, call],
+                                                      });
                                               });
                                         });
                                 } else if(res.data.connected > 1) {
                                         let onlineArray = res.data.online;
                                         var connIndex = -1;
                                         onlineArray.forEach((val, index) => {
-                                                if(val.username != localStorage.getItem("uname")) {
-                                                        connIndex = index;
+                                                if(val.username == localStorage.getItem("uname")) {
+                                                        //connIndex = index;
+                                                        return;
                                                 }
+                                                var friendtkn = onlineArray[index].tkn;
+                                                console.log(friendtkn);
+                                                navigator.mediaDevices
+                                                     .getUserMedia({
+                                                        video: { width: 1024, height: 576 },
+                                                        audio: true,
+                                                      })
+                                                      .then((media) => {
+                                                        var thiscall = peer.call(friendtkn, media);
+                                                        self.setState(
+                                                          {
+                                                            //call: peer.call(friendtkn, media),//to be updated appropriately
+                                                            calls: [...self.state.calls, thiscall],
+                                                          },
+                                                          () => {
+                                                            thiscall.on("error", (err) => console.log(err));
+                                                            thiscall.on("stream", function (stream) {
+                                                                let video = document.createElement("video");
+                                                                video.width = "200";
+                                                                video.height = "350";
+                                                                video.srcObject = stream;
+                                                                video.autoplay = true;
+                                                                video.onclick = self.switchContext;
+                                                                document.getElementById("videos").appendChild(video);
+                                                              //self.videoRef.current.srcObject = stream;
+                                                            });
+                                                          }
+                                                        );
+                                                });
                                         });
-                                        var friendtkn = onlineArray[connIndex].tkn;
-                                        console.log(friendtkn);
-//                                            const self = this;
-                                            navigator.mediaDevices
-                                              .getUserMedia({
-                                                video: { width: 1024, height: 576 },
-                                                audio: true,
-                                              })
-                                              .then((media) => {
-                                                self.setState(
-                                                  {
-                                                    call: peer.call(friendtkn, media),
-                                                  },
-                                                  () => {
-                                                    self.state.call.on("error", (err) => console.log(err));
-                                                    self.state.call.on("stream", function (stream) {
-                                                      //self.videoRef.current.srcObject = stream;
-                                                            document.querySelector("video").srcObject = stream;
-                                                            console.log(stream);
-                                                    });
-                                                  }
-                                                );
-                                              });
                                 }
                         }).catch(err => {
                                 console.log(err);

@@ -16,6 +16,7 @@ import {
   DropdownItem,
   DropdownMenu,
   DropdownToggle,
+  Jumbotron,
   Progress,
   Row,
   Table,
@@ -69,6 +70,11 @@ class Room extends Component {
     return (
       <div className="animated fadeIn">
               ROOM NAME {this.state.roomName}
+              <video id="context" className="w-75" autoPlay></video>
+                <Jumbotron>
+                  <Row id="videos"></Row>
+                </Jumbotron>
+              
               <video autoPlay></video>
               {/*<PeerHandler />*/}
       </div>
