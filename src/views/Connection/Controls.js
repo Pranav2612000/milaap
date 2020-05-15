@@ -102,7 +102,8 @@ class Controls extends Component {
                                                       call.on("error", (err) => {
                                                               console.log("An error occured");
                                                               console.log(err);
-                                                              self.startConnection(call.peer, peer, self);
+                                                              call.close();
+                                                              //self.startConnection(call.peer, peer, self);
                                                       });
                                                       call.on("stream", function (stream) {
                                                         stream.onremovetrack = function(evt) {
@@ -114,7 +115,7 @@ class Controls extends Component {
                                                         console.log(tracks[0]);
                                                         console.log(track.remote);
                                                         track.addEventListener('ended', () => {
-                                                                console.log("your strm ended. Please show this");
+                                                                console.log("his strm ended. Please show this");
                                                                 //self.startConnection(call.peer, peer, self);
                                                         })
                                                         track.addEventListener('mute', () => {
