@@ -11,12 +11,13 @@ class Controls extends Component {
 
   constructor(props) {
     super(props);
-    console.log(props);
+    //console.log(props);
     this.state = {
             roomName: this.props.roomName,
             remotePeers: new Array(),
             remotePeersID: new Array(),
             calls: new Array(),
+            connectedPeers: new Array(),
             opinfo: '',
             friendtkn: '',
     };
@@ -40,7 +41,7 @@ class Controls extends Component {
   
   async startScreenShare() {
         const self = this;
-        console.log(this.state.roomName);
+        //console.log(this.state.roomName);
         self.setState({
                 opinfo: 'getting token'
         });
@@ -59,7 +60,7 @@ class Controls extends Component {
         });
         await peer.on('open', function(id) {
                 tkn = id;
-                console.log(id);
+                //console.log(id);
                 self.setState({
                         opinfo: 'token rcvd:- ' + tkn 
                 });
@@ -68,13 +69,14 @@ class Controls extends Component {
                         tkn: tkn,
                         username: localStorage.getItem('uname')
                 };
-                console.log(reqData);
+                //console.log(reqData);
                 //Send the generated token to express server
                 axios.post('http://localhost:5000/api/room/goonline',
                         reqData)
                         .then(res => {
-                                console.log(res);
+                                //console.log(res);
                                 if(res.data.connected == 1) {
+                                        console.log("Waiting for connections....");
                                         peer.on('call', function(call) {
                                             navigator.mediaDevices
                                               .getDisplayMedia({
@@ -82,9 +84,46 @@ class Controls extends Component {
                                                 audio: true,
                                               })
                                               .then((media) => {
+                                                      console.log("Connected to " + call.peer);
+                                                      console.log(media);
+                                                      console.log(media.getTracks());
+                                                      var tracks = media.getTracks();
+                                                      var track = tracks[0];
+                                                      console.log(tracks[0]);
+                                                      console.log(track.remote);
+                                                      track.addEventListener('ended', () => {
+                                                              console.log("ended. Please show this");
+                                                              track.enabled = false;
+                                                              track.stop();
+                                                              media.removeTrack(track);
+                                                      })
+                                                      track.addEventListener('mute', () => {
+                                                              console.log("muted. Please show this");
+                                                      })
+                                                      //call.on("error", (err) => console.log(err));
+
                                                       call.answer(media);
-                                                      call.on("error", (err) => console.log(err));
+                                                      call.on("error", (err) => {
+                                                              console.log("An error occured");
+                                                              console.log(err);
+                                                      });
                                                       call.on("stream", function (stream) {
+                                                        stream.onremovetrack = function(evt) {
+                                                                console.log("Track removed");
+                                                                console.log(evt);
+                                                        }
+                                                        var tracks = stream.getTracks();
+                                                        var track = tracks[0];
+                                                        console.log(tracks[0]);
+                                                        console.log(track.remote);
+                                                        track.addEventListener('ended', () => {
+                                                                console.log("ended. Please show this");
+                                                        })
+                                                        track.addEventListener('mute', () => {
+                                                                console.log("muted. Please show this");
+                                                        })
+                                                        console.log(stream.getTracks());
+                                                        console.log("Received stream from " + call.peer);
                                                         let video = document.createElement("video");
                                                         video.width = "200";
                                                         video.height = "350";
@@ -99,6 +138,67 @@ class Controls extends Component {
                                               });
                                         });
                                 } else if(res.data.connected > 1) {
+                                        console.log("Waiting for connections....");
+                                        peer.on('call', function(call) {
+                                            navigator.mediaDevices
+                                              .getDisplayMedia({
+                                                video: { width: 1024, height: 576 },
+                                                audio: true,
+                                              })
+                                              .then((media) => {
+                                                      console.log("Connected to " + call.peer);
+                                                      console.log(media);
+                                                      console.log(media.getTracks());
+                                                      var tracks = media.getTracks();
+                                                      var track = tracks[0];
+                                                      console.log(tracks[0]);
+                                                      console.log(track.remote);
+                                                      track.addEventListener('ended', () => {
+                                                              console.log("ended. Please show this");
+                                                              track.enabled = false;
+                                                              track.stop();
+                                                              media.removeTrack(track);
+                                                      })
+                                                      track.addEventListener('mute', () => {
+                                                              console.log("muted. Please show this");
+                                                      })
+                                                      //call.on("error", (err) => console.log(err));
+
+                                                      call.answer(media);
+                                                      call.on("error", (err) => {
+                                                              console.log("An error occured");
+                                                              console.log(err);
+                                                      });
+                                                      call.on("stream", function (stream) {
+                                                        stream.onremovetrack = function(evt) {
+                                                                console.log("Track removed");
+                                                                console.log(evt);
+                                                        }
+                                                        var tracks = stream.getTracks();
+                                                        var track = tracks[0];
+                                                        console.log(tracks[0]);
+                                                        console.log(track.remote);
+                                                        track.addEventListener('ended', () => {
+                                                                console.log("ended. Please show this");
+                                                        })
+                                                        track.addEventListener('mute', () => {
+                                                                console.log("muted. Please show this");
+                                                        })
+                                                        console.log(stream.getTracks());
+                                                        console.log("Received stream from " + call.peer);
+                                                        let video = document.createElement("video");
+                                                        video.width = "200";
+                                                        video.height = "350";
+                                                        video.srcObject = stream;
+                                                        video.autoplay = true;
+                                                        video.onclick = self.switchContext;
+                                                        document.getElementById("videos").appendChild(video);
+                                                      });
+                                                      self.setState({
+                                                        calls: [...self.state.calls, call],
+                                                      });
+                                              });
+                                        });
                                         let onlineArray = res.data.online;
                                         var connIndex = -1;
                                         onlineArray.forEach((val, index) => {
@@ -106,14 +206,30 @@ class Controls extends Component {
                                                         //connIndex = index;
                                                         return;
                                                 }
+                                                console.log("Connecting to " + onlineArray[index].tkn);
                                                 var friendtkn = onlineArray[index].tkn;
-                                                console.log(friendtkn);
+                                                //console.log(friendtkn);
                                                 navigator.mediaDevices
                                                      .getDisplayMedia({
                                                         video: { width: 1024, height: 576 },
                                                         audio: true,
                                                       })
                                                       .then((media) => {
+                                                        console.log(media);
+                                                        console.log(media.getTracks());
+                                                        var tracks = media.getTracks();
+                                                        var track = tracks[0];
+                                                        console.log(tracks[0]);
+                                                        console.log(track.remote);
+                                                        track.addEventListener('ended', () => {
+                                                                console.log("ended. Please show this");
+                                                                track.enabled = false;
+                                                                track.stop();
+                                                                media.removeTrack(track);
+                                                        })
+                                                        track.addEventListener('mute', () => {
+                                                                console.log("muted. Please show this");
+                                                        })
                                                         var thiscall = peer.call(friendtkn, media);
                                                         self.setState(
                                                           {
@@ -121,8 +237,26 @@ class Controls extends Component {
                                                             calls: [...self.state.calls, thiscall],
                                                           },
                                                           () => {
-                                                            thiscall.on("error", (err) => console.log(err));
+                                                            thiscall.on("error", (err) => {
+                                                                    console.log("Connection failed for " + onlineArray[index].tkn);
+                                                                    console.log(err)
+                                                            });
                                                             thiscall.on("stream", function (stream) {
+                                                                stream.onremovetrack = function(evt) {
+                                                                        console.log("Track removed");
+                                                                        console.log(evt);
+                                                                }
+                                                                var tracks = stream.getTracks();
+                                                                var track = tracks[0];
+                                                                console.log(track.remote);
+                                                                track.addEventListener('ended', () => {
+                                                                        console.log("ended. Please show this");
+                                                                })
+                                                                track.addEventListener('mute', () => {
+                                                                        console.log("muted. Please show this");
+                                                                })
+                                                                console.log(stream.getTracks());
+                                                                console.log("Connected & stream received from" + onlineArray[index].tkn);
                                                                 let video = document.createElement("video");
                                                                 video.width = "200";
                                                                 video.height = "350";
@@ -145,7 +279,7 @@ class Controls extends Component {
   }
   async startVideo() {
         const self = this;
-        console.log(this.state.roomName);
+        //console.log(this.state.roomName);
         self.setState({
                 opinfo: 'getting token'
         });
@@ -164,7 +298,7 @@ class Controls extends Component {
         });
         await peer.on('open', function(id) {
                 tkn = id;
-                console.log(id);
+                //console.log(id);
                 self.setState({
                         opinfo: 'token rcvd:- ' + tkn 
                 });
@@ -173,12 +307,12 @@ class Controls extends Component {
                         tkn: tkn,
                         username: localStorage.getItem('uname')
                 };
-                console.log(reqData);
+                //console.log(reqData);
                 //Send the generated token to express server
                 axios.post('http://localhost:5000/api/room/goonline',
                         reqData)
                         .then(res => {
-                                console.log(res);
+                                //console.log(res);
                                 if(res.data.connected == 1) {
                                         peer.on('call', function(call) {
                                             navigator.mediaDevices
@@ -212,7 +346,7 @@ class Controls extends Component {
                                                         return;
                                                 }
                                                 var friendtkn = onlineArray[index].tkn;
-                                                console.log(friendtkn);
+                                                //console.log(friendtkn);
                                                 navigator.mediaDevices
                                                      .getUserMedia({
                                                         video: { width: 1024, height: 576 },
