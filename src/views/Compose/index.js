@@ -15,6 +15,8 @@ export default function Compose(props) {
                     .then(res => {
                             console.log(res);
                             //window.location.reload();
+                            props.callback(res.data.msg);
+                            setMsg('');
                     }).catch(err => {
                             console.log(err);
                     });

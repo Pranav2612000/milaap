@@ -11,11 +11,6 @@ router.post('/sendmessage', async(req, res) => {
         const sender = req.body.sender;
         const msg = req.body.msg;
         const roomName = req.body.roomName;
-        const msgObject = {
-                msg: msg,
-                sender: sender,
-                id: shortid.generate(),
-        };
         rooms.findOne({roomName: roomName}, function(err, room) {
                 if(err) {
                         return res.status(400).json({err: "Error. Try again."});
@@ -25,12 +20,26 @@ router.post('/sendmessage', async(req, res) => {
                 }
                 console.log({...room});
                 let msgArray = room._doc.msgArray;
-
+                let msgObject;
                 if(msgArray == undefined) {
                         msgArray = [];
+                        msgObject = {
+                                msg: msg,
+                                sender: sender,
+                                id: 0,
+                        };
+                } else {
+                        msgObject = {
+                                msg: msg,
+                                sender: sender,
+                                id: msgArray[msgArray.length - 1].id + 1,
+                        };
                 }
                 //Use RabbitMQ for improvements.
                 if(msgArray.length > 20) {
+                        //If number of messages is greater than 20, pop the oldest one.
+                        //We store only the latest 20 messages for now.
+                        
                         //msgArray.shift();
                         rooms.updateOne(
                             { roomName: roomName },
@@ -46,6 +55,7 @@ router.post('/sendmessage', async(req, res) => {
                         );
                 }
                 //msgArray.push(msgObject);
+                //Add the new message to the message array everytime irrespective of the number of messages.
                 rooms.updateOne(
                     { roomName: roomName },
                         { $push: {msgArray: msgObject}},
@@ -64,7 +74,7 @@ router.post('/sendmessage', async(req, res) => {
                         if(err) {
                           return res.status(400).json({err: "Error Updating Room"});
                         } else {
-                          return res.status(200).json({msg: "Room Created successfully"});
+                                return res.status(200).json({status: "Success", msg: msgObject});
                         }
                 });
         });
@@ -90,6 +100,11 @@ router.post('/enterroom', async (req, res) => {
 
 router.post('/getmsgs', async (req, res) => {
         const roomName = req.body.roomName;
+        let lastMsgId = req.body.lastMsgId; // requesting for id 0, should send msg with id 0
+        if(lastMsgId == undefined) {
+                lastMsgId = 0;
+        }
+        lastMsgId = parseInt(lastMsgId);
         rooms.findOne({roomName: roomName}, function(err, room) {
                 if(err) {
                         return res.status(400).json({err: "Error. Try again."});
@@ -97,7 +112,22 @@ router.post('/getmsgs', async (req, res) => {
                 if(!room) {
                         return res.status(400).json({err: "Error. Incorrect roomname."});
                 }
-                return res.status(200).json({msg: "Success", msgs: room._doc.msgArray});
+                let msgArray = room._doc.msgArray;
+                if(msgArray == undefined) {
+                        msgArray = [];
+                        return res.status(200).json({msg: "Success", msgs: msgArray});
+                }
+                let reqIndex = 0;
+                let i;
+                for(i = 0; i < msgArray.length; i++) {
+                        if(msgArray[i].id >= lastMsgId) {
+                                break;
+                        }
+                        reqIndex++;
+                }
+                let newMsgArray = msgArray.splice(reqIndex);
+                //return res.status(200).json({msg: "Success", msgs: room._doc.msgArray});
+                return res.status(200).json({msg: "Success", msgs: newMsgArray});
         });
 });
 

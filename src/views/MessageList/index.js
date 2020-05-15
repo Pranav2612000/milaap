@@ -18,8 +18,6 @@ function formatMsgs(tempMsg) {
                 formattedMsg.author = val.sender; 
                 formattedMsg.message = val.msg; 
                 formattedMsg.timestamp = new Date().getTime();
-                console.log(val);
-                console.log(index);
                 formattedMsgs.push(formattedMsg);
         });
         return formattedMsgs;
@@ -27,14 +25,31 @@ function formatMsgs(tempMsg) {
 
 export default function MessageList(props) {
   const [messages, setMessages] = useState([])
+  const [lastMsgId, setLastMsgId] = useState(0);
 
+  let getReqData = function() {
+          return {
+            roomName: props.roomName,
+            lastMsgId: lastMsgId
+          }
+  }
   useEffect(() => {
     //getMessages();
+    console.log(lastMsgId);
+    let reqData = {
+            roomName: props.roomName,
+            lastMsgId: lastMsgId
+    };
           //If you are on a limited DataPack, Comment this code segment and the one at 
           //the end of useEffect function - (the one with return clearInterval...), to
           //prevent unnecessary multiple calls to the server
     /*
     const interval = setInterval(() => {
+            let reqData = {
+                    roomName: props.roomName,
+                    lastMsgId: lastMsgId 
+            };
+            console.log(reqData);
             axios.post('http://localhost:5000/api/room/getmsgs', reqData)
                   .then(res => {
                           console.log(res);
@@ -43,17 +58,15 @@ export default function MessageList(props) {
                                   tempMsg = [];
                           }
                           let tempMsgFormatted = formatMsgs(tempMsg);
-                          console.log(tempMsgFormatted);
-                          setMessages(tempMsgFormatted);
+                          console.log(tempMsgFormatted[tempMsgFormatted.length - 1].id);
+                          setLastMsgId(tempMsgFormatted[tempMsgFormatted.length - 1].id);
+                          let newMsgs = messages.concat(tempMsgFormatted);
+                          setMessages(newMsgs);
                   }) .catch(err => {
                           console.log(err);
             });
     }, 10000);
     */
-    const reqData = {
-            roomName: props.roomName
-    };
-    console.log(reqData);
     axios.post('http://localhost:5000/api/room/getmsgs', reqData)
           .then(res => {
                   console.log(res);
@@ -62,82 +75,15 @@ export default function MessageList(props) {
                           tempMsg = [];
                   }
                   let tempMsgFormatted = formatMsgs(tempMsg);
-                  console.log(tempMsgFormatted);
                   setMessages(tempMsgFormatted);
+                  console.log(tempMsgFormatted[tempMsgFormatted.length - 1].id);
+                  setLastMsgId(tempMsgFormatted[tempMsgFormatted.length - 1].id);
           }) .catch(err => {
                   console.log(err);
           });
     //Yes this line.
     //return () => clearInterval(interval);
   },[props.roomName])
-
-  
-  const getMessages = () => {
-     var tempMessages = [
-        {
-          id: 1,
-          author: 'apple',
-          message: 'Hello world! This is a long message that will hopefully get wrapped by our message bubble component! We will see how well it works.',
-          timestamp: new Date().getTime()
-        },
-        {
-          id: 2,
-          author: 'orange',
-          message: 'It looks like it wraps exactly as it is supposed to. Lets see what a reply looks like!',
-          timestamp: new Date().getTime()
-        },
-        {
-          id: 3,
-          author: 'orange',
-          message: 'Hello world! This is a long message that will hopefully get wrapped by our message bubble component! We will see how well it works.',
-          timestamp: new Date().getTime()
-        },
-        {
-          id: 4,
-          author: 'apple',
-          message: 'It looks like it wraps exactly as it is supposed to. Lets see what a reply looks like!',
-          timestamp: new Date().getTime()
-        },
-        {
-          id: 5,
-          author: 'apple',
-          message: 'Hello world! This is a long message that will hopefully get wrapped by our message bubble component! We will see how well it works.',
-          timestamp: new Date().getTime()
-        },
-        {
-          id: 6,
-          author: 'apple',
-          message: 'It looks like it wraps exactly as it is supposed to. Lets see what a reply looks like!',
-          timestamp: new Date().getTime()
-        },
-        {
-          id: 7,
-          author: 'orange',
-          message: 'Hello world! This is a long message that will hopefully get wrapped by our message bubble component! We will see how well it works.',
-          timestamp: new Date().getTime()
-        },
-        {
-          id: 8,
-          author: 'orange',
-          message: 'It looks like it wraps exactly as it is supposed to. Lets see what a reply looks like!',
-          timestamp: new Date().getTime()
-        },
-        {
-          id: 9,
-          author: 'apple',
-          message: 'Hello world! This is a long message that will hopefully get wrapped by our message bubble component! We will see how well it works.',
-          timestamp: new Date().getTime()
-        },
-        {
-          id: 10,
-          author: 'orange',
-          message: 'It looks like it wraps exactly as it is supposed to. Lets see what a reply looks like!',
-          timestamp: new Date().getTime()
-        },
-      ]
-      setMessages([...messages, ...tempMessages])
-  }
-
   const renderMessages = () => {
     let i = 0;
     let messageCount = messages.length;
@@ -196,6 +142,13 @@ export default function MessageList(props) {
 
     return tempMessages;
   }
+  const updateMsg = (msgObject) => {
+    let newMsgs = [msgObject];
+    let newFormattedMsg = formatMsgs(newMsgs);
+    newMsgs = messages.concat(newFormattedMsg);
+    setMessages(newMsgs);
+    return;
+  }
 
     return(
       <div className="message-list">
@@ -222,6 +175,7 @@ export default function MessageList(props) {
           <ToolbarButton key="emoji" icon="ion-ios-happy" />
         ]}
           roomName = {props.roomName}
+          callback = {updateMsg}
         />
 
       </div>
