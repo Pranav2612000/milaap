@@ -23,6 +23,7 @@ class Controls extends Component {
     };
     this.startVideo = this.startVideo.bind(this);
     this.startScreenShare = this.startScreenShare.bind(this);
+    this.startConnection = this.startConnection.bind(this);
   }
 
   componentDidUpdate(prevProps) {
@@ -86,19 +87,14 @@ class Controls extends Component {
                                               .then((media) => {
                                                       console.log("Connected to " + call.peer);
                                                       console.log(media);
-                                                      console.log(media.getTracks());
                                                       var tracks = media.getTracks();
                                                       var track = tracks[0];
-                                                      console.log(tracks[0]);
-                                                      console.log(track.remote);
                                                       track.addEventListener('ended', () => {
-                                                              console.log("ended. Please show this");
-                                                              track.enabled = false;
-                                                              track.stop();
-                                                              media.removeTrack(track);
+                                                              console.log(" my stream ended. Please show this");
+                                                              //self.startConnection(call.peer, peer, self);
                                                       })
                                                       track.addEventListener('mute', () => {
-                                                              console.log("muted. Please show this");
+                                                              console.log(" my stream muted. Please show this");
                                                       })
                                                       //call.on("error", (err) => console.log(err));
 
@@ -106,6 +102,7 @@ class Controls extends Component {
                                                       call.on("error", (err) => {
                                                               console.log("An error occured");
                                                               console.log(err);
+                                                              self.startConnection(call.peer, peer, self);
                                                       });
                                                       call.on("stream", function (stream) {
                                                         stream.onremovetrack = function(evt) {
@@ -117,12 +114,13 @@ class Controls extends Component {
                                                         console.log(tracks[0]);
                                                         console.log(track.remote);
                                                         track.addEventListener('ended', () => {
-                                                                console.log("ended. Please show this");
+                                                                console.log("your strm ended. Please show this");
+                                                                //self.startConnection(call.peer, peer, self);
                                                         })
                                                         track.addEventListener('mute', () => {
-                                                                console.log("muted. Please show this");
+                                                                console.log("your strm muted. Please show this");
                                                         })
-                                                        console.log(stream.getTracks());
+                                                        //console.log(stream.getTracks());
                                                         console.log("Received stream from " + call.peer);
                                                         let video = document.createElement("video");
                                                         video.width = "200";
@@ -148,19 +146,13 @@ class Controls extends Component {
                                               .then((media) => {
                                                       console.log("Connected to " + call.peer);
                                                       console.log(media);
-                                                      console.log(media.getTracks());
                                                       var tracks = media.getTracks();
                                                       var track = tracks[0];
-                                                      console.log(tracks[0]);
-                                                      console.log(track.remote);
                                                       track.addEventListener('ended', () => {
-                                                              console.log("ended. Please show this");
-                                                              track.enabled = false;
-                                                              track.stop();
-                                                              media.removeTrack(track);
+                                                              console.log(" my stream ended. Please show this");
                                                       })
                                                       track.addEventListener('mute', () => {
-                                                              console.log("muted. Please show this");
+                                                              console.log(" my stream muted. Please show this");
                                                       })
                                                       //call.on("error", (err) => console.log(err));
 
@@ -176,15 +168,12 @@ class Controls extends Component {
                                                         }
                                                         var tracks = stream.getTracks();
                                                         var track = tracks[0];
-                                                        console.log(tracks[0]);
-                                                        console.log(track.remote);
                                                         track.addEventListener('ended', () => {
-                                                                console.log("ended. Please show this");
+                                                                console.log("your strm ended. Please show this");
                                                         })
                                                         track.addEventListener('mute', () => {
-                                                                console.log("muted. Please show this");
+                                                                console.log("your strm muted. Please show this");
                                                         })
-                                                        console.log(stream.getTracks());
                                                         console.log("Received stream from " + call.peer);
                                                         let video = document.createElement("video");
                                                         video.width = "200";
@@ -207,68 +196,7 @@ class Controls extends Component {
                                                         return;
                                                 }
                                                 console.log("Connecting to " + onlineArray[index].tkn);
-                                                var friendtkn = onlineArray[index].tkn;
-                                                //console.log(friendtkn);
-                                                navigator.mediaDevices
-                                                     .getDisplayMedia({
-                                                        video: { width: 1024, height: 576 },
-                                                        audio: true,
-                                                      })
-                                                      .then((media) => {
-                                                        console.log(media);
-                                                        console.log(media.getTracks());
-                                                        var tracks = media.getTracks();
-                                                        var track = tracks[0];
-                                                        console.log(tracks[0]);
-                                                        console.log(track.remote);
-                                                        track.addEventListener('ended', () => {
-                                                                console.log("ended. Please show this");
-                                                                track.enabled = false;
-                                                                track.stop();
-                                                                media.removeTrack(track);
-                                                        })
-                                                        track.addEventListener('mute', () => {
-                                                                console.log("muted. Please show this");
-                                                        })
-                                                        var thiscall = peer.call(friendtkn, media);
-                                                        self.setState(
-                                                          {
-                                                            //call: peer.call(friendtkn, media),//to be updated appropriately
-                                                            calls: [...self.state.calls, thiscall],
-                                                          },
-                                                          () => {
-                                                            thiscall.on("error", (err) => {
-                                                                    console.log("Connection failed for " + onlineArray[index].tkn);
-                                                                    console.log(err)
-                                                            });
-                                                            thiscall.on("stream", function (stream) {
-                                                                stream.onremovetrack = function(evt) {
-                                                                        console.log("Track removed");
-                                                                        console.log(evt);
-                                                                }
-                                                                var tracks = stream.getTracks();
-                                                                var track = tracks[0];
-                                                                console.log(track.remote);
-                                                                track.addEventListener('ended', () => {
-                                                                        console.log("ended. Please show this");
-                                                                })
-                                                                track.addEventListener('mute', () => {
-                                                                        console.log("muted. Please show this");
-                                                                })
-                                                                console.log(stream.getTracks());
-                                                                console.log("Connected & stream received from" + onlineArray[index].tkn);
-                                                                let video = document.createElement("video");
-                                                                video.width = "200";
-                                                                video.height = "350";
-                                                                video.srcObject = stream;
-                                                                video.autoplay = true;
-                                                                video.onclick = self.switchContext;
-                                                                document.getElementById("videos").appendChild(video);
-                                                              //self.videoRef.current.srcObject = stream;
-                                                            });
-                                                          }
-                                                        );
-                                                });
+                                                self.startConnection(onlineArray[index].tkn, peer, self);
                                         });
                                 }
                         }).catch(err => {
@@ -276,6 +204,65 @@ class Controls extends Component {
                         });
         });
         return;
+  }
+  async startConnection(friendtkn, peer, self) {
+        //console.log(friendtkn);
+        navigator.mediaDevices
+             .getDisplayMedia({
+                video: { width: 1024, height: 576 },
+                audio: true,
+              })
+              .then((media) => {
+                console.log(media);
+                var tracks = media.getTracks();
+                var track = tracks[0];
+                track.addEventListener('ended', () => {
+                        console.log("My stream ended. Please show this");
+                        //self.startConnection(friendtkn, peer, self);
+                })
+                track.addEventListener('mute', () => {
+                        console.log("My stream muted. Please show this");
+                })
+                var thiscall = peer.call(friendtkn, media);
+                self.setState(
+                  {
+                    //call: peer.call(friendtkn, media),//to be updated appropriately
+                    calls: [...self.state.calls, thiscall],
+                  },
+                  () => {
+                    thiscall.on("error", (err) => {
+                            console.log("Connection failed for " + friendtkn);
+                            console.log(err)
+                            self.startConnection(friendtkn, peer, self);
+                    });
+                    thiscall.on("stream", function (stream) {
+                        stream.onremovetrack = function(evt) {
+                                console.log("Track removed");
+                                console.log(evt);
+                        }
+                        var tracks = stream.getTracks();
+                        var track = tracks[0];
+                        console.log(track.remote);
+                        track.addEventListener('ended', () => {
+                                console.log("ended. Please show this");
+                        })
+                        track.addEventListener('mute', () => {
+                                console.log("muted. Please show this");
+                        })
+                        console.log(stream.getTracks());
+                        console.log("Connected & stream received from" + friendtkn);
+                        let video = document.createElement("video");
+                        video.width = "200";
+                        video.height = "350";
+                        video.srcObject = stream;
+                        video.autoplay = true;
+                        video.onclick = self.switchContext;
+                        document.getElementById("videos").appendChild(video);
+                      //self.videoRef.current.srcObject = stream;
+                    });
+                  }
+                );
+        });
   }
   async startVideo() {
         const self = this;
