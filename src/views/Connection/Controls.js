@@ -48,6 +48,7 @@ class Controls extends Component {
     };
     this.startScreenShare = this.startScreenShare.bind(this);
     this.startConnection = this.startConnection.bind(this);
+    this.sendCallEndedSignal = this.sendCallEndedSignal.bind(this);
   }
 
   componentDidUpdate(prevProps) {
@@ -99,10 +100,6 @@ class Controls extends Component {
                         tkn: tkn,
                         username: localStorage.getItem('uname')
                 };
-                //console.log(reqData);
-                //Send the generated token to express server
-                //
-                //
                 axios.post('http://localhost:5000/api/room/goonline',
                         reqData)
                         .then(res => {
@@ -308,6 +305,19 @@ class Controls extends Component {
         document.getElementById("videos").appendChild(video);
   }
 
+  sendCallEndedSignal() {
+          const reqData = {
+                  username: localStorage.getItem("uname"),
+                  roomName: this.state.roomName, 
+          };
+          axios.post("http://localhost:5000/api/room/exitstream", reqData)
+          .then(res => {
+                  console.log(res.data);
+          }).catch(err => {
+                  console.log(err);
+          });
+  }
+
   render() {
     // eslint-disable-next-line
     return (
@@ -328,6 +338,10 @@ class Controls extends Component {
               </Button>
               <Button className="btn btn-success" onClick={this.startScreenShare.bind(this, "video")}>
                 Video
+              </Button>
+              <Button className="btn btn-danger" onClick={this.sendCallEndedSignal}>
+                End Call
+                <i class="icon-call-end icons"></i>
               </Button>
             </ButtonGroup>
           </Col>

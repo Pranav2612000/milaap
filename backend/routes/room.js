@@ -143,7 +143,8 @@ router.post("/exitstream", async (req, res) => {
     }
     let onlineArray = room._doc.online;
     if (onlineArray == undefined) {
-      return res.status(200).json({ msg: "Already exited" });
+            onlineArray = [];
+            return res.status(200).json({ msg: "Already exited", online: onlineArray });
     }
     var indexToBeDeleted = -1;
     onlineArray.forEach((val, index) => {
@@ -153,7 +154,7 @@ router.post("/exitstream", async (req, res) => {
     });
     console.log(indexToBeDeleted);
     if (indexToBeDeleted == -1) {
-      return res.status(200).json({ msg: "Already exited" });
+            return res.status(200).json({ msg: "Already exited", online: onlineArray});
     } else {
       onlineArray.splice(indexToBeDeleted, 1);
       console.log(onlineArray);
@@ -164,7 +165,7 @@ router.post("/exitstream", async (req, res) => {
         if (err) {
           return res.status(400).json({ err: "Error Exiting Video" });
         } else {
-          return res.status(200).json({ msg: "Room Exited successfully" });
+                return res.status(200).json({ msg: "Room Exited successfully", online: onlineArray });
         }
       });
     }
