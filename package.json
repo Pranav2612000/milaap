@@ -32,6 +32,7 @@
     "react-app-polyfill": "^1.0.1",
     "react-chartjs-2": "^2.7.6",
     "react-dom": "^16.8.6",
+    "react-notifications-component": "^2.4.0",
     "react-router-config": "^5.0.1",
     "react-router-dom": "^5.2.0",
     "react-test-renderer": "^16.8.6",

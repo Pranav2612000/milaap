@@ -1,0 +1,9 @@
+.video-group > .row {
+  overflow-x: auto;
+  white-space: nowrap;
+  flex-wrap: nowrap;
+}
+.video-group > .row > ul > li {
+  display: inline-block;
+  float: none;
+}

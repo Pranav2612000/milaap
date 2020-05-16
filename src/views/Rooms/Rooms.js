@@ -1,5 +1,6 @@
-import React, { Component, lazy, Suspense } from 'react';
-import { Bar, Line } from 'react-chartjs-2';
+import React, { Component, lazy, Suspense } from "react";
+import { store } from 'react-notifications-component';
+import { Bar, Line } from "react-chartjs-2";
 import {
   Badge,
   Button,
@@ -20,11 +21,11 @@ import {
   Progress,
   Row,
   Table,
-} from 'reactstrap';
-import { CustomTooltips } from '@coreui/coreui-plugin-chartjs-custom-tooltips';
-import { getStyle, hexToRgba } from '@coreui/coreui/dist/js/coreui-utilities'
-import DefaultAside from '../../containers/DefaultLayout/DefaultAside';
-import PeerHandler from '../../containers/DefaultLayout/peerHandler';
+} from "reactstrap";
+import { CustomTooltips } from "@coreui/coreui-plugin-chartjs-custom-tooltips";
+import { getStyle, hexToRgba } from "@coreui/coreui/dist/js/coreui-utilities";
+import DefaultAside from "../../containers/DefaultLayout/DefaultAside";
+import PeerHandler from "../../containers/DefaultLayout/peerHandler";
 
 class Room extends Component {
   constructor(props) {
@@ -38,18 +39,34 @@ class Room extends Component {
     this.state = {
       dropdownOpen: false,
       radioSelected: 2,
-      username: localStorage.getItem('uname'),
-      roomName: roomName
+      username: localStorage.getItem("uname"),
+      roomName: roomName,
     };
   }
   componentDidUpdate(prevProps) {
-      if(this.props.match.params.roomname != prevProps.match.params.roomname) {
-          this.setState({
-              roomName: this.props.match.params.roomname,
+    if (this.props.match.params.roomname != prevProps.match.params.roomname) {
+      this.setState(
+        {
+          roomName: this.props.match.params.roomname,
+        },
+        () => {
+          store.addNotification({
+            title: "Room changed",
+            message: `Entered ${this.state.roomName} `,
+            type: "success",
+            insert: "top",
+            container: "top-right",
+            animationIn: ["animated", "fadeIn"],
+            animationOut: ["animated", "fadeOut"],
+            dismiss: {
+              duration: 3000,
+              onScreen: true,
+            },
           });
-      }
+        }
+      );
+    }
   }
-
 
   toggle() {
     this.setState({
@@ -63,20 +80,20 @@ class Room extends Component {
     });
   }
 
-  loading = () => <div className="animated fadeIn pt-1 text-center">Loading...</div>
+  loading = () => (
+    <div className="animated fadeIn pt-1 text-center">Loading...</div>
+  );
 
   render() {
-
     return (
       <div className="animated fadeIn">
-              ROOM NAME {this.state.roomName}
-              <video id="context" className="w-75" autoPlay></video>
-                <Jumbotron>
-                  <Row id="videos"></Row>
-                </Jumbotron>
-              
-              <video autoPlay></video>
-              {/*<PeerHandler />*/}
+        ROOM NAME {this.state.roomName}
+        <video id="context" className="w-75" autoPlay></video>
+        <Jumbotron>
+          <Row id="videos"></Row>
+        </Jumbotron>
+        <video autoPlay></video>
+        {/*<PeerHandler />*/}
       </div>
     );
   }
