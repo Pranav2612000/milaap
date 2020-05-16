@@ -1,5 +1,5 @@
 .message-list-container {
   padding: 10px;
   padding-bottom: 70px;
-  /*height: 480px;*/
+  max-height: 70vh;
 }

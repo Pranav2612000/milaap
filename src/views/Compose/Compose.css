@@ -5,8 +5,8 @@
   background: white;
   border: 1px solid #eeeef1;
   position: fixed;
-  width: 27%;
-  bottom: 7.5%;
+  width: 30%;
+  bottom: 10px;
 }
 
 @supports (backdrop-filter: blur(20px)) {
@@ -20,18 +20,21 @@
 .compose-input {
   flex: 1;
   border: none;
+  float: left;
   font-size: 14px;
   height: 40px;
   background: none;
+  width: 20vw;
 }
 
 .compose-button {
-  float: left;
+  float: right;
   flex: 1;
   margin-left:12%;
   border: 1px solid grey;
   font-size: 14px;
   height: 40px;
+  width: 30px;
   background: lightblue;
 }
 
