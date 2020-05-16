@@ -45,7 +45,7 @@ class Controls extends Component {
             connectedPeers: new Array(),
             opinfo: '',
             friendtkn: '',
-            currentStreamsRef: new Array();
+            currentStreamsRef: new Array(),
     };
     this.startScreenShare = this.startScreenShare.bind(this);
     this.startConnection = this.startConnection.bind(this);
