@@ -205,6 +205,15 @@ router.post('/goonline', async (req, res) => {
                                 }
                         });
                         if(indexOfCurrentUser != -1) {
+                                //Return the current entry in array.
+                                return res.status(200).json({
+                                        msg: "Waiting for others", 
+                                        connected: onlineArray.length, 
+                                        online: onlineArray,
+                                        changePeer: true,
+                                        peerId: onlineArray[indexOfCurrentUser].tkn
+                                });
+                                /*
                                 onlineArray[indexOfCurrentUser] = onlinePersonObj;
                                 room._doc.online = onlineArray;
                                 room.markModified('online');
@@ -215,6 +224,7 @@ router.post('/goonline', async (req, res) => {
                                                 return res.status(200).json({msg: "Waiting for others", connected: onlineArray.length, online: onlineArray});
                                         }
                                 });
+                                */
                         } else {
                                 rooms.updateOne({roomName: roomName}, {$addToSet: { online: onlinePersonObj}}, function(err, result) {
                                         if(err) {
