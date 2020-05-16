@@ -1,6 +1,7 @@
 import React from "react";
 import { Button, Input, Row, Col, Jumbotron } from "reactstrap";
 import Peer from "peerjs";
+import { Redirect } from "react-router-dom";
 
 class PeerHandler extends React.Component {
   constructor() {
@@ -16,20 +17,31 @@ class PeerHandler extends React.Component {
               username: "veddandekar6@gmail.com",
             },
           ],
-        } /* Sample servers, please use appropriate ones */,
+        },
       }),
       remotePeers: new Array(),
       remotePeersID: new Array(),
       calls: new Array(),
       inText: null,
       context: null,
+      remoteStreams: [],
+      remoteStreamsRef: [],
     };
-    // this.videoRef = React.createRef();
   }
+
+  componentDidUpdate = () => {
+    const self = this;
+    self.state.remoteStreamsRef.map((ref, i) => {
+      ref.current.srcObject = self.state.remoteStreams[i];
+    });
+  };
+
+  test = () => {
+    console.log("test");
+  };
 
   componentWillMount = () => {
     const self = this;
-
     this.state.selfPeer.on("open", function (id) {
       self.setState({
         myID: id,
@@ -47,13 +59,11 @@ class PeerHandler extends React.Component {
       call.answer();
       call.on("error", (err) => console.log(err));
       call.on("stream", function (stream) {
-        let video = document.createElement("video");
-        video.width = "200";
-        video.height = "350";
-        video.srcObject = stream;
-        video.autoplay = true;
-        video.onclick = self.switchContext;
-        document.getElementById("videos").appendChild(video);
+        let ref = React.createRef();
+        self.setState({
+          remoteStreams: [...self.state.remoteStreams, stream],
+          remoteStreamsRef: [...self.state.remoteStreamsRef, ref],
+        });
       });
       self.setState({
         calls: [...self.state.calls, call],
@@ -69,6 +79,16 @@ class PeerHandler extends React.Component {
 
   shareVideo = () => {
     const self = this;
+    if (self.state.selfVideoStream) {
+      const tracks = self.state.selfVideoStream.getTracks();
+      tracks.forEach(function (track) {
+        track.stop();
+      });
+      self.setState({
+        selfVideoStream: null,
+      });
+      return;
+    }
     navigator.mediaDevices
       .getUserMedia({
         video: { width: 1024, height: 576 },
@@ -91,13 +111,11 @@ class PeerHandler extends React.Component {
             );
             self.state.calls.forEach((call) =>
               call.on("stream", function (stream) {
-                let video = document.createElement("video");
-                video.width = "200";
-                video.height = "350";
-                video.srcObject = stream;
-                video.autoplay = true;
-                video.onclick = self.switchContext;
-                document.getElementById("videos").appendChild(video);
+                let ref = React.createRef();
+                self.setState({
+                  remoteStreams: [...self.state.remoteStreams, stream],
+                  remoteStreamsRef: [...self.state.remoteStreamsRef, ref],
+                });
               })
             );
           }
@@ -107,6 +125,16 @@ class PeerHandler extends React.Component {
 
   shareScreen = () => {
     const self = this;
+    if (self.state.selfScreenStream) {
+      const tracks = self.state.selfScreenStream.getTracks();
+      tracks.forEach(function (track) {
+        track.stop();
+      });
+      self.setState({
+        selfScreenStream: null,
+      });
+      return;
+    }
     navigator.mediaDevices
       .getDisplayMedia({
         video: { width: 1024, height: 576 },
@@ -129,13 +157,11 @@ class PeerHandler extends React.Component {
             );
             self.state.calls.forEach((call) =>
               call.on("stream", function (stream) {
-                let video = document.createElement("video");
-                video.width = "300";
-                video.height = "450";
-                video.srcObject = stream;
-                video.autoplay = true;
-                video.onclick = self.switchContext;
-                document.getElementById("videos").appendChild(video);
+                let ref = React.createRef();
+                self.setState({
+                  remoteStreams: [...self.state.remoteStreams, stream],
+                  remoteStreamsRef: [...self.state.remoteStreamsRef, ref],
+                });
               })
             );
           }
@@ -168,21 +194,11 @@ class PeerHandler extends React.Component {
                 self.connectToPeer(peer);
               }
             );
-            if (share)
-              if (!self.state.sharedTo.includes(peer)) {
-                self.setState({
-                  calls: [
-                    ...self.state.calls,
-                    self.state.selfPeer.call(
-                      peer,
-                      self.state.selfScreenStream || self.state.selfVideoStream
-                    ),
-                  ], // Handle both later
-                  sharedTo: [...self.state.sharedTo, peer],
-                });
-              }
           }
         });
+      });
+      conn.on("close", () => {
+        console.log("Connection closed gracefully");
       });
       if (self.state.remotePeers.length != 0) {
         let myPeers = "";
@@ -190,6 +206,20 @@ class PeerHandler extends React.Component {
           myPeers += `${peer.peer} `;
         });
         conn.send(myPeers);
+      }
+      if (self.state.selfVideoStream || self.state.selfScreenStream) {
+        if (!self.state.sharedTo.includes(conn.peer)) {
+          self.setState({
+            calls: [
+              ...self.state.calls,
+              self.state.selfPeer.call(
+                conn.peer,
+                self.state.selfScreenStream || self.state.selfVideoStream
+              ),
+            ], // Handle both later
+            sharedTo: [...self.state.sharedTo, conn.peer],
+          });
+        }
       }
     });
     this.setState({
@@ -215,18 +245,8 @@ class PeerHandler extends React.Component {
     return (
       <div>
         <h3>{this.state.myID}</h3>
-        {/* {this.state.remotePeer ? ( */}
-        <div className="mt-4 text-center">
-          <Button className="m-4" color="success" onClick={this.shareScreen}>
-            Share screen
-          </Button>
-          <Button className="m-4" color="info" onClick={this.shareVideo}>
-            Share video
-          </Button>
-        </div>
-        {/* ) : ( */}
-        <Row className="mt-4 text-center">
-          <Col xs={10}>
+        <Row className="my-4 justify-content-center">
+          <Col xs={4}>
             <Input onChange={this.inputHandler} />
           </Col>
           <Col xs={2}>
@@ -234,15 +254,38 @@ class PeerHandler extends React.Component {
               color="secondary"
               onClick={() => self.connectToPeer(self.state.inText)}
             >
-              Connect
+              Invite
             </Button>
           </Col>
         </Row>
-        {/* )} */}
+        <div className="mt-4 text-center">
+          <Button className="m-4" color="success" onClick={this.shareScreen}>
+            {self.state.selfScreenStream
+              ? "Stop sharing screen"
+              : "Share screen"}
+          </Button>
+          <Button className="m-4" color="info" onClick={this.shareVideo}>
+            {self.state.selfVideoStream ? "Stop sharing video" : "Share video"}
+          </Button>
+        </div>
         <br />
-        <video id="context" className="w-75" autoPlay></video>
+        <video id="context" autoPlay></video>
         <Jumbotron>
-          <Row id="videos"></Row>
+          <Row>
+            {self.state.remoteStreamsRef.map((ref) => {
+              return (
+                <Col key={ref} xs={4} md={3} lg={4}>
+                  <video
+                    ref={ref}
+                    onClick={self.switchContext}
+                    width="350"
+                    height="200"
+                    autoPlay
+                  />
+                </Col>
+              );
+            })}
+          </Row>
         </Jumbotron>
       </div>
     );
