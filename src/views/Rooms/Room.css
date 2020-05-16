@@ -13,7 +13,7 @@
   bottom: 5vh;
 }
 
-#videos > video{
+#videos > video {
   display: inline-block;
   float: none;
   margin-left: 10px;

@@ -1,6 +1,6 @@
 import React, { Component, lazy, Suspense } from "react";
-import './Room.css'
-import { store } from 'react-notifications-component';
+import "./Room.css";
+import { store } from "react-notifications-component";
 import { Bar, Line } from "react-chartjs-2";
 import {
   Badge,
@@ -62,7 +62,7 @@ class Room extends Component {
             animationOut: ["animated", "fadeOut"],
             dismiss: {
               duration: 3000,
-              pauseOnHover: true
+              pauseOnHover: true,
             },
           });
         }
@@ -92,7 +92,7 @@ class Room extends Component {
         {/* ROOM NAME {this.state.roomName} */}
         <video id="context" autoPlay></video>
         {/* <Jumbotron> */}
-          <Row  className="m-0 p-0" id="videos"></Row>
+        <Row className="m-0 p-0" id="videos"></Row>
         {/* </Jumbotron> */}
         {/* <video autoPlay></video> */}
         {/*<PeerHandler />*/}
