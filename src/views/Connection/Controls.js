@@ -28,7 +28,8 @@ import {
   Collapse,
   Fade,
 } from "reactstrap";
-import Peer from "peerjs";
+//import Peer from "../../dependencies/peerjs/index.d.ts";
+import Peer from"peerjs"
 import axios from "axios";
 
 class Controls extends Component {
