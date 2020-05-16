@@ -173,7 +173,6 @@ class DefaultLayout extends Component {
     }
     return (
       <React.Fragment>
-        <ReactNotification />
         <div className="app">
           <AppHeader fixed>
             <Suspense fallback={this.loading()}>
@@ -181,6 +180,7 @@ class DefaultLayout extends Component {
             </Suspense>
           </AppHeader>
           <div className="app-body">
+          <ReactNotification />
             <AppSidebar fixed display="lg">
               <AppSidebarHeader />
               <AppSidebarForm />

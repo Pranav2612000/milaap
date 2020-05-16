@@ -1,0 +1,21 @@
+#context {
+  margin-top: 5vh;
+  max-width: 85vw;
+  max-height: 80vh;
+}
+
+#videos {
+  position: fixed;
+  overflow-x: auto;
+  white-space: nowrap;
+  flex-wrap: nowrap;
+  width: 85vw;
+  bottom: 5vh;
+}
+
+#videos > video{
+  display: inline-block;
+  float: none;
+  margin-left: 10px;
+  margin-bottom: -110px;
+}

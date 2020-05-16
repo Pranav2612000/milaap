@@ -1,4 +1,5 @@
 import React, { Component, lazy, Suspense } from "react";
+import './Room.css'
 import { store } from 'react-notifications-component';
 import { Bar, Line } from "react-chartjs-2";
 import {
@@ -13,6 +14,7 @@ import {
   CardHeader,
   CardTitle,
   Col,
+  Container,
   Dropdown,
   DropdownItem,
   DropdownMenu,
@@ -54,13 +56,13 @@ class Room extends Component {
             title: "Room changed",
             message: `Entered ${this.state.roomName} `,
             type: "success",
-            insert: "top",
+            // insert: "top",
             container: "top-right",
             animationIn: ["animated", "fadeIn"],
             animationOut: ["animated", "fadeOut"],
             dismiss: {
               duration: 3000,
-              onScreen: true,
+              pauseOnHover: true
             },
           });
         }
@@ -86,15 +88,15 @@ class Room extends Component {
 
   render() {
     return (
-      <div className="animated fadeIn">
-        ROOM NAME {this.state.roomName}
-        <video id="context" className="w-75" autoPlay></video>
-        <Jumbotron>
-          <Row id="videos"></Row>
-        </Jumbotron>
-        <video autoPlay></video>
+      <Container className="m-0 p-0 animated fadeIn">
+        {/* ROOM NAME {this.state.roomName} */}
+        <video id="context" autoPlay></video>
+        {/* <Jumbotron> */}
+          <Row  className="m-0 p-0" id="videos"></Row>
+        {/* </Jumbotron> */}
+        {/* <video autoPlay></video> */}
         {/*<PeerHandler />*/}
-      </div>
+      </Container>
     );
   }
 }
