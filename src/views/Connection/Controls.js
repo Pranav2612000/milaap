@@ -45,6 +45,7 @@ class Controls extends Component {
             connectedPeers: new Array(),
             opinfo: '',
             friendtkn: '',
+            currentStreamsRef: new Array();
     };
     this.startScreenShare = this.startScreenShare.bind(this);
     this.startConnection = this.startConnection.bind(this);
@@ -60,9 +61,12 @@ class Controls extends Component {
   }
 
   switchContext = (e) => {
+          console.log('switching disabled for testing.');
+          /*
     let context = document.getElementById("context");
     context.srcObject = e.target.srcObject;
     context.play();
+    */
   };
 
   async startScreenShare(type) {
