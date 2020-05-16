@@ -1,5 +1,7 @@
 import React, { Component } from "react";
 import { store } from "react-notifications-component";
+import { AwesomeButtonProgress } from 'react-awesome-button';
+import "react-awesome-button/dist/styles.css";
 import {
   Nav,
   NavItem,
@@ -31,6 +33,7 @@ import {
 //import Peer from "../../dependencies/peerjs/index.d.ts";
 import Peer from"peerjs"
 import axios from "axios";
+import './Controls.css'
 
 class Controls extends Component {
   constructor(props) {
@@ -66,12 +69,9 @@ class Controls extends Component {
     context.play();
   };
 
-  async startScreenShare(type) {
+  async startScreenShare(type, next) {
         const self = this;
         //console.log(this.state.roomName);
-        self.setState({
-                opinfo: 'getting token'
-        });
         var tkn;
 
         //Get a new peerId.
@@ -92,10 +92,8 @@ class Controls extends Component {
         //Upload the PeerID to the server, get an old ID, if exists to be used
         await peer.on('open', function(id) {
                 tkn = id;
-                //console.log(id);
-                self.setState({
-                        opinfo: 'token rcvd:- ' + tkn 
-                });
+                console.log(tkn)
+                next()
                 const reqData = {
                         roomName: self.state.roomName,
                         tkn: tkn,
@@ -306,7 +304,7 @@ class Controls extends Component {
         document.getElementById("videos").appendChild(video);
   }
 
-  sendCallEndedSignal() {
+  sendCallEndedSignal(next) {
           const reqData = {
                   username: localStorage.getItem("uname"),
                   roomName: this.state.roomName, 
@@ -314,6 +312,7 @@ class Controls extends Component {
           axios.post("http://localhost:5000/api/room/exitstream", reqData)
           .then(res => {
                   console.log(res.data);
+                  next();
           }).catch(err => {
                   console.log(err);
           });
@@ -321,20 +320,18 @@ class Controls extends Component {
 
   render() {
     // eslint-disable-next-line
+    const self = this;
     return (
       <Container>
         <Row>
-          <Col className="col"></Col>
-          <Col className="col auto">
-            <h1>Join Video </h1>
+          <Col className="text-center col auto">
+            <h2>Enter Call</h2>
           </Col>
-          <Col className="col"></Col>
         </Row>
         <Row>
-          <Col className="col-sm"></Col>
           <Col className="col-sm">
             <ButtonGroup>
-              <Button className="btn btn-info" onClick={this.startScreenShare.bind(this, "screen")}>
+              {/* <Button className="btn btn-info" onClick={this.startScreenShare.bind(this, "screen")}>
                 Screen
               </Button>
               <Button className="btn btn-success" onClick={this.startScreenShare.bind(this, "video")}>
@@ -343,7 +340,28 @@ class Controls extends Component {
               <Button className="btn btn-danger" onClick={this.sendCallEndedSignal}>
                 End Call
                 <i class="icon-call-end icons"></i>
-              </Button>
+              </Button> */}
+              <AwesomeButtonProgress
+  type="primary"
+  size="medium"
+  action={(element, next) => {this.startScreenShare("video", next)}}
+>
+  <i class="icon-user icons"></i><span> Video</span>
+</AwesomeButtonProgress>
+<AwesomeButtonProgress
+  type="secondary"
+  size="medium"
+  action={(element, next) => this.startScreenShare("screen", next)}
+>
+  <i class="icon-screen-desktop icons"></i><span> Screen</span>
+</AwesomeButtonProgress>
+<AwesomeButtonProgress
+  type="primary"
+  size="medium"
+  action={(element, next) => {this.sendCallEndedSignal(next);}}
+>
+  <i class="icon-call-end icons"></i><span> End Call</span>
+</AwesomeButtonProgress>
             </ButtonGroup>
           </Col>
           <Col className="col-sm"></Col>
