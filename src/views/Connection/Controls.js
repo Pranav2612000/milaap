@@ -236,6 +236,7 @@ class Controls extends Component {
     // triggered when our stream being sent ends.
     track.addEventListener("ended", () => {
       console.log("My stream ended. Please show this");
+      thiscall.close();
       //self.startConnection(friendtkn, peer, self);
     });
 
