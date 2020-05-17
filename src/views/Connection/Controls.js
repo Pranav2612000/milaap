@@ -52,6 +52,8 @@ class Controls extends Component {
     this.startScreenShare = this.startScreenShare.bind(this);
     this.startConnection = this.startConnection.bind(this);
     this.sendCallEndedSignal = this.sendCallEndedSignal.bind(this);
+    
+          /* TODO:  Move Call to appropriate position, and replace by generalized call.*/
     axios
       .post("http://localhost:5000/api/room/getActive", {
         roomName: this.props.roomName,
@@ -60,6 +62,9 @@ class Controls extends Component {
         console.log("EHREEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE", res);
         if (!res.data.active.length) return;
         this.setState({ active: res.data.active });
+      })
+      .catch(err => {
+              console.log(err);
       });
   }
 
@@ -76,6 +81,9 @@ class Controls extends Component {
             roomName: this.props.roomName,
             active: res.data.active,
           });
+        })
+        .catch(err => {
+                console.log(err);
         });
     }
   }
