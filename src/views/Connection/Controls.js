@@ -187,7 +187,7 @@ class Controls extends Component {
           self.setState({
             myMediaStreamObj: media,
           });
-          self.createVideoElement(self, this.state.myMediaStreamObj);
+          self.createVideoElement(self, this.state.myMediaStreamObj, true);
           return media;
         });
     } else if (type == "video") {
@@ -202,7 +202,7 @@ class Controls extends Component {
           self.setState({
             myMediaStreamObj: media,
           });
-          self.createVideoElement(self, this.state.myMediaStreamObj);
+          self.createVideoElement(self, this.state.myMediaStreamObj, true);
           return media;
         });
     }
@@ -333,10 +333,11 @@ class Controls extends Component {
   }
 
   // Creates a new video element to show the stream passed to it.
-  createVideoElement(self, stream) {
+  createVideoElement(self, stream, loopback) {
     let video = document.createElement("video");
     video.width = "200";
     video.height = "350";
+    video.muted = loopback;
     video.srcObject = stream;
     video.autoplay = true;
     video.onclick = self.switchContext;
