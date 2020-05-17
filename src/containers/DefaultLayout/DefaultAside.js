@@ -85,7 +85,7 @@ class DefaultAside extends Component {
         </Nav>
         <TabContent activeTab={this.state.activeTab}>
           <TabPane tabId="1">
-                  <Controls roomName={this.state.roomName}/>
+                  <Controls roomName={this.state.roomName} videoHandler={this.props.videoHandler}/>
                   {/*
                   <Row>
             <Card className="text-white bg-primary w-25">

@@ -52,8 +52,8 @@ class Controls extends Component {
     this.startScreenShare = this.startScreenShare.bind(this);
     this.startConnection = this.startConnection.bind(this);
     this.sendCallEndedSignal = this.sendCallEndedSignal.bind(this);
-    
-          /* TODO:  Move Call to appropriate position, and replace by generalized call.*/
+
+    /* TODO:  Move Call to appropriate position, and replace by generalized call.*/
     axios
       .post("http://localhost:5000/api/room/getActive", {
         roomName: this.props.roomName,
@@ -63,8 +63,8 @@ class Controls extends Component {
         if (!res.data.active.length) return;
         this.setState({ active: res.data.active });
       })
-      .catch(err => {
-              console.log(err);
+      .catch((err) => {
+        console.log(err);
       });
   }
 
@@ -82,8 +82,8 @@ class Controls extends Component {
             active: res.data.active,
           });
         })
-        .catch(err => {
-                console.log(err);
+        .catch((err) => {
+          console.log(err);
         });
     }
   }
@@ -102,13 +102,7 @@ class Controls extends Component {
       },
     });
   };
-
-  switchContext = (e) => {
-    let context = document.getElementById("context");
-    context.srcObject = e.target.srcObject;
-    context.play();
-  };
-
+  
   async startScreenShare(type, next) {
     const self = this;
     //console.log(this.state.roomName);
@@ -334,13 +328,14 @@ class Controls extends Component {
 
   // Creates a new video element to show the stream passed to it.
   createVideoElement(self, stream) {
-    let video = document.createElement("video");
-    video.width = "200";
-    video.height = "350";
-    video.srcObject = stream;
-    video.autoplay = true;
-    video.onclick = self.switchContext;
-    document.getElementById("videos").appendChild(video);
+    // let video = document.createElement("video");
+    // video.width = "200";
+    // video.height = "350";
+    // video.srcObject = stream;
+    // video.autoplay = true;
+    // video.onclick = self.switchContext;
+    // document.getElementById("videos").appendChild(video);
+    this.props.videoHandler.addNewVideo(stream);
   }
 
   sendCallEndedSignal(next) {

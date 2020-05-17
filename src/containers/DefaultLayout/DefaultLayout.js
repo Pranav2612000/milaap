@@ -93,6 +93,7 @@ class DefaultLayout extends Component {
         let GroupList = getGroupElements(rooms);
         console.log({ ...GroupList });
         this.setState({
+          videos: new Array(),
           navigation: {
             items: [
               {
@@ -159,9 +160,23 @@ class DefaultLayout extends Component {
       },
     };
   }
+
+  addNewVideo = (videoElement) => {
+    this.setState({
+      videos: [...this.state.videos, videoElement],
+    });
+  };
+
+  organiseVideo = (videos) => {
+    this.setState({
+      videos: [...videos],
+    });
+  };
+
   loading = () => (
     <div className="animated fadeIn pt-1 text-center">Loading...</div>
   );
+
   signOut(e) {
     e.preventDefault();
     this.props.history.push("/login");
@@ -205,7 +220,16 @@ class DefaultLayout extends Component {
                           path={route.path}
                           exact={route.exact}
                           name={route.name}
-                          render={(props) => <route.component {...props} />}
+                          render={(props) => (
+                            <route.component
+                              {...props}
+                              videoHandler={{
+                                videos: this.state.videos || new Array(),
+                                addNewVideo: this.addNewVideo,
+                                organiseVideo: this.organiseVideo,
+                              }}
+                            />
+                          )}
                         />
                       ) : null;
                     })}
@@ -216,7 +240,13 @@ class DefaultLayout extends Component {
             </main>
             <Suspense fallback={this.loading()}>
               <aside class="aside-menu" display="md" fixed>
-                <DefaultAside />
+                <DefaultAside
+                  videoHandler={{
+                    videos: this.state.videos || new Array(),
+                    addNewVideo: this.addNewVideo,
+                    organiseVideo: this.organiseVideo,
+                  }}
+                />
               </aside>
             </Suspense>
           </div>

@@ -7,15 +7,32 @@
 #videos {
   position: fixed;
   overflow-x: auto;
+  overflow-y: hidden;
   white-space: nowrap;
   flex-wrap: nowrap;
   width: 85vw;
-  bottom: 5vh;
+  bottom: 4vh;
 }
 
-#videos > video {
-  display: inline-block;
-  float: none;
-  margin-left: 10px;
-  margin-bottom: -110px;
+.horizontal{
+  position: fixed;
+  margin: -10vh;
+  overflow-y: none;
+  padding-bottom: -10vh;
+  padding-left: 6vw;
+}
+.smooth-dnd-draggable-wrapper {
+  border-bottom: 2px solid black;
+}
+
+.dragClass {
+  background-color: rgba(35, 48, 51, 0.3);
+  transform: scaleY(0.3);
+  margin-bottom: -400px;
+}
+
+.dropPlaceholder {
+  background-color: rgba(116, 129, 133, 0.15);
+  padding: 2000px;
+  /* transform: scaleY(0.7); */
 }
