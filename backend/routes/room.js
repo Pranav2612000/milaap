@@ -98,6 +98,23 @@ router.post("/enterroom", async (req, res) => {
   });
 });
 
+//, inCall: room._doc.online
+
+router.post("/getActive", async (req, res) => {
+  const roomName = req.body.roomName;
+  rooms.findOne({ roomName: roomName }, function (err, room) {
+    if (err) {
+      return res.status(400).json({ err: "Error. Try again." });
+    }
+    if (!room) {
+      return res.status(400).json({ err: "Error. Incorrect roomname." });
+    }
+    return res
+      .status(200)
+      .json({ msg: "Success", active: room._doc.online || [] });
+  });
+});
+
 router.post("/getmsgs", async (req, res) => {
   const roomName = req.body.roomName;
   let lastMsgId = req.body.lastMsgId; // requesting for id 0, should send msg with id 0
@@ -143,8 +160,10 @@ router.post("/exitstream", async (req, res) => {
     }
     let onlineArray = room._doc.online;
     if (onlineArray == undefined) {
-            onlineArray = [];
-            return res.status(200).json({ msg: "Already exited", online: onlineArray });
+      onlineArray = [];
+      return res
+        .status(200)
+        .json({ msg: "Already exited", online: onlineArray });
     }
     var indexToBeDeleted = -1;
     onlineArray.forEach((val, index) => {
@@ -154,7 +173,9 @@ router.post("/exitstream", async (req, res) => {
     });
     console.log(indexToBeDeleted);
     if (indexToBeDeleted == -1) {
-            return res.status(200).json({ msg: "Already exited", online: onlineArray});
+      return res
+        .status(200)
+        .json({ msg: "Already exited", online: onlineArray });
     } else {
       onlineArray.splice(indexToBeDeleted, 1);
       console.log(onlineArray);
@@ -165,7 +186,9 @@ router.post("/exitstream", async (req, res) => {
         if (err) {
           return res.status(400).json({ err: "Error Exiting Video" });
         } else {
-                return res.status(200).json({ msg: "Room Exited successfully", online: onlineArray });
+          return res
+            .status(200)
+            .json({ msg: "Room Exited successfully", online: onlineArray });
         }
       });
     }
@@ -187,33 +210,39 @@ router.post("/goonline", async (req, res) => {
     onlinePersonObj.username = username;
     onlinePersonObj.tkn = tkn;
     //First person online
-        if(room._doc.online == undefined) {
-                //Update online array and return; 
-                rooms.updateOne({roomName: roomName}, {$addToSet: { online: onlinePersonObj}}, function(err, result) {
-                        if(err) {
-                                return res.status(400).json({err: err});
-                        } else {
-                                return res.status(200).json({msg: "Waiting for others", connected: 1});
-                        }
-                });
+    if (room._doc.online == undefined) {
+      //Update online array and return;
+      rooms.updateOne(
+        { roomName: roomName },
+        { $addToSet: { online: onlinePersonObj } },
+        function (err, result) {
+          if (err) {
+            return res.status(400).json({ err: err });
           } else {
-                let onlineArray = room._doc.online;
-                var indexOfCurrentUser = -1;
-                onlineArray.forEach((val, index) => {
-                        if(val.username == username) {
-                                indexOfCurrentUser = index;
-                        }
-                });
-                if(indexOfCurrentUser != -1) {
-                        //Return the current entry in array.
-                        return res.status(200).json({
-                                msg: "Waiting for others", 
-                                connected: onlineArray.length, 
-                                online: onlineArray,
-                                changePeer: true,
-                                peerId: onlineArray[indexOfCurrentUser].tkn
-                        });
-                                /*
+            return res
+              .status(200)
+              .json({ msg: "Waiting for others", connected: 1 });
+          }
+        }
+      );
+    } else {
+      let onlineArray = room._doc.online;
+      var indexOfCurrentUser = -1;
+      onlineArray.forEach((val, index) => {
+        if (val.username == username) {
+          indexOfCurrentUser = index;
+        }
+      });
+      if (indexOfCurrentUser != -1) {
+        //Return the current entry in array.
+        return res.status(200).json({
+          msg: "Waiting for others",
+          connected: onlineArray.length,
+          online: onlineArray,
+          changePeer: true,
+          peerId: onlineArray[indexOfCurrentUser].tkn,
+        });
+        /*
                                 onlineArray[indexOfCurrentUser] = onlinePersonObj;
                                 room._doc.online = onlineArray;
                                 room.markModified('online');
@@ -225,20 +254,24 @@ router.post("/goonline", async (req, res) => {
                                         }
                                 });
                                 */
-                } else {
-                        rooms.updateOne({roomName: roomName}, {$addToSet: { online: onlinePersonObj}}, function(err, result) {
-                                if(err) {
-                                        return res.status(400).json({err: err});
-                                } else {
-                                        return res.status(200).json({
-                                                msg: "Waiting for others",
-                                                connected: onlineArray.length + 1,
-                                                online: onlineArray,
-                                        });
-                                }
-                        });
-                }
+      } else {
+        rooms.updateOne(
+          { roomName: roomName },
+          { $addToSet: { online: onlinePersonObj } },
+          function (err, result) {
+            if (err) {
+              return res.status(400).json({ err: err });
+            } else {
+              return res.status(200).json({
+                msg: "Waiting for others",
+                connected: onlineArray.length + 1,
+                online: onlineArray,
+              });
+            }
           }
+        );
+      }
+    }
   });
 });
 module.exports = router;

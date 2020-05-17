@@ -180,7 +180,7 @@ class DefaultLayout extends Component {
             </Suspense>
           </AppHeader>
           <div className="app-body">
-          <ReactNotification />
+            <ReactNotification />
             <AppSidebar fixed display="lg">
               <AppSidebarHeader />
               <AppSidebarForm />
