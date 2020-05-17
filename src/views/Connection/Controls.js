@@ -245,7 +245,7 @@ class Controls extends Component {
     track.addEventListener("ended", () => {
       console.log("My stream ended. Please show this");
       thiscall.close();
-      sendRequestToEndCall();
+      self.sendRequestToEndCall();
       //self.startConnection(friendtkn, peer, self);
     });
 
