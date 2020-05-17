@@ -102,12 +102,11 @@ class Controls extends Component {
       },
     });
   };
-  
+
   async startScreenShare(type, next) {
     const self = this;
     //console.log(this.state.roomName);
     var tkn;
-
     //Get a new peerId.
     var peer = new Peer({
       config: {
@@ -131,31 +130,81 @@ class Controls extends Component {
         roomName: self.state.roomName,
         tkn: tkn,
         username: localStorage.getItem("uname"),
+        type: type
       };
       axios
         .post("http://localhost:5000/api/room/goonline", reqData)
         .then((res) => {
           //console.log(res);
-          if (res.data.connected == 1) {
-            self.getMyMediaStream(self, type).then((media) => {
-              self.waitForConnections(self, peer);
+          if(res.data.changePeer) {
+            peer.destroy();
+            peer = new Peer(res.data.peerId, {
+              config: {
+                iceServers: [
+                  { urls: "stun:stun.l.google.com:19302" },
+                  {
+                    url: "turn:numb.viagenie.ca",
+                    credential: "HWeF3pu@u2RfeYD",
+                    username: "veddandekar6@gmail.com",
+                  },
+                ],
+              } /* Sample servers, please use appropriate ones */,
             });
-          } else if (res.data.connected > 1) {
-            self.getMyMediaStream(self, type).then((media) => {
-              self.waitForConnections(self, peer);
+            self.setState({
+                    myPeer: peer
+            });
+            console.log('here');
+            console.log(peer.disconnected);
+            //peer.disconnect();
+            peer.on("open", function(id) {
+                    console.log("using older id: " + id);
+                    if (res.data.connected == 1) {
+                      self.getMyMediaStream(self, type).then((media) => {
+                        self.waitForConnections(self, peer);
+                      });
+                    } else if (res.data.connected > 1) {
+                      self.getMyMediaStream(self, type).then((media) => {
+                        self.waitForConnections(self, peer);
 
-              //Array of users online with their peerIDs to make requests to all.
-              let onlineArray = res.data.online;
-              console.log(media);
-              onlineArray.forEach((val, index) => {
-                if (val.username == localStorage.getItem("uname")) {
-                  //Display my screen without creating a connection.
-                  return;
-                }
-                console.log("Connecting to " + onlineArray[index].tkn);
-                self.startConnection(self, onlineArray[index].tkn, peer);
-              });
+                        //Array of users online with their peerIDs to make requests to all.
+                        let onlineArray = res.data.online;
+                        console.log(media);
+                        onlineArray.forEach((val, index) => {
+                          if (val.username == localStorage.getItem("uname")) {
+                            //Display my screen without creating a connection.
+                            return;
+                          }
+                          console.log("Connecting to " + onlineArray[index].tkn);
+                          self.startConnection(self, onlineArray[index].tkn, peer);
+                        });
+                      });
+                    }
             });
+          } else {
+                  self.setState({
+                          myPeer: peer
+                  });
+                  if (res.data.connected == 1) {
+                    self.getMyMediaStream(self, type).then((media) => {
+                      self.waitForConnections(self, peer);
+                    });
+                  } else if (res.data.connected > 1) {
+                    self.getMyMediaStream(self, type).then((media) => {
+                      self.waitForConnections(self, peer);
+
+                      //Array of users online with their peerIDs to make requests to all.
+                      let onlineArray = res.data.online;
+                      console.log(media);
+                      onlineArray.forEach((val, index) => {
+                        if (val.username == localStorage.getItem("uname")) {
+                          //Display my screen without creating a connection.
+                          return;
+                        }
+                        console.log("Connecting to " + onlineArray[index].tkn);
+                        self.startConnection(self, onlineArray[index].tkn, peer);
+                      });
+                    });
+                  }
           }
         })
         .catch((err) => {
@@ -181,7 +230,7 @@ class Controls extends Component {
           self.setState({
             myMediaStreamObj: media,
           });
-          self.createVideoElement(self, this.state.myMediaStreamObj);
+          self.createVideoElement(self, media);
           return media;
         });
     } else if (type == "video") {
@@ -196,7 +245,7 @@ class Controls extends Component {
           self.setState({
             myMediaStreamObj: media,
           });
-          self.createVideoElement(self, this.state.myMediaStreamObj);
+          self.createVideoElement(self, media);
           return media;
         });
     }
@@ -210,6 +259,11 @@ class Controls extends Component {
     //console.log(friendtkn);
     var mediaa = self.state.myMediaStreamObj;
     self.sendMediaStream(self, peer, mediaa, friendtkn, false);
+    var connectedPeers = self.state.connectedPeers;
+    connectedPeers.push(friendtkn);
+    self.setState({
+          connectedPeers: connectedPeers 
+    });
   }
 
   // Function to wait for incoming requests onf 'peer' and handle them.
@@ -218,6 +272,11 @@ class Controls extends Component {
     var mediaa = self.state.myMediaStreamObj;
     peer.on("call", function (call) {
       self.sendMediaStream(self, peer, mediaa, null, true, call);
+      var connectedPeers = self.state.connectedPeers;
+      connectedPeers.push(call.peer);
+      self.setState({
+              connectedPeers: connectedPeers 
+      });
     });
   }
 

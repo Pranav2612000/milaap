@@ -83,9 +83,14 @@ class Room extends Component {
   }
 
   switchContext = (e) => {
-    let context = document.getElementById("context");
-    context.srcObject = e.target.srcObject;
-    context.play();
+    try {
+            let context = document.getElementById("context");
+            context.srcObject = e.target.srcObject;
+            context.play();
+    }
+    catch(err) {
+            console.log("The selected stream is old");
+    }
   };
 
   toggle() {

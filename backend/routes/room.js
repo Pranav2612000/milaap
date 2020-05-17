@@ -198,6 +198,7 @@ router.post("/goonline", async (req, res) => {
   const tkn = req.body.tkn;
   const roomName = req.body.roomName;
   const username = req.body.username;
+  const type = req.body.type;
   rooms.findOne({ roomName: roomName }, function (err, room) {
     if (err) {
       return res.status(400).json({ err: "Error. Try again." });
@@ -209,6 +210,7 @@ router.post("/goonline", async (req, res) => {
     let onlinePersonObj = {};
     onlinePersonObj.username = username;
     onlinePersonObj.tkn = tkn;
+    onlinePersonObj.type = type;
     //First person online
     if (room._doc.online == undefined) {
       //Update online array and return;
@@ -221,7 +223,7 @@ router.post("/goonline", async (req, res) => {
           } else {
             return res
               .status(200)
-              .json({ msg: "Waiting for others", connected: 1 });
+                          .json({ msg: "Waiting for others", connected: 1, type: type});
           }
         }
       );
@@ -229,7 +231,7 @@ router.post("/goonline", async (req, res) => {
       let onlineArray = room._doc.online;
       var indexOfCurrentUser = -1;
       onlineArray.forEach((val, index) => {
-        if (val.username == username) {
+        if (val.username == username && val.type == type) {
           indexOfCurrentUser = index;
         }
       });
@@ -241,19 +243,8 @@ router.post("/goonline", async (req, res) => {
           online: onlineArray,
           changePeer: true,
           peerId: onlineArray[indexOfCurrentUser].tkn,
+          type: type
         });
-        /*
-                                onlineArray[indexOfCurrentUser] = onlinePersonObj;
-                                room._doc.online = onlineArray;
-                                room.markModified('online');
-                                room.save(err => {
-                                        if(err) {
-                                          return res.status(400).json({err: "Error Connecting"});
-                                        } else {
-                                                return res.status(200).json({msg: "Waiting for others", connected: onlineArray.length, online: onlineArray});
-                                        }
-                                });
-                                */
       } else {
         rooms.updateOne(
           { roomName: roomName },
@@ -266,6 +257,7 @@ router.post("/goonline", async (req, res) => {
                 msg: "Waiting for others",
                 connected: onlineArray.length + 1,
                 online: onlineArray,
+                type: type
               });
             }
           }
