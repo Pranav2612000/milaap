@@ -245,6 +245,7 @@ class Controls extends Component {
     track.addEventListener("ended", () => {
       console.log("My stream ended. Please show this");
       thiscall.close();
+      sendRequestToEndCall();
       //self.startConnection(friendtkn, peer, self);
     });
 
@@ -357,6 +358,22 @@ class Controls extends Component {
         console.log(err);
       });
   }
+
+  sendRequestToEndCall() {
+    const reqData = {
+      username: localStorage.getItem("uname"),
+      roomName: this.state.roomName,
+    };
+    axios
+      .post("http://localhost:5000/api/room/exitstream", reqData)
+      .then((res) => {
+        console.log(res.data);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }
+
   render() {
     // eslint-disable-next-line
     console.log(this.state.active);
