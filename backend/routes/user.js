@@ -47,30 +47,36 @@ router.post('/adduser', async (req, res) => {
         if (!room) {
             //Create a new room
             var room = new rooms({ roomName: roomName, users: [host, user] });
-            room.save(err => {
+            room.save((err) => {
                 if (err) {
                     return res.status(400).json({ err: "Error Creating Room" });
                 } else {
+                    console.log(room);
+                    io.emit('newRoom', req.data);
                     return res.status(200).json({ msg: "Room Created successfully" });
                 }
             });
         }
-        var userArray = room._doc.users;
-        if (userArray == undefined) {
-            return res.status(400).json({ err: "Error Creating Room" });
-        }
-        userArray.push(user);
-        room._doc.users = userArray;
-        room.markModified('users');
-        room.save(err => {
-            if (err) {
+        else {
+
+            var userArray = room._doc.users;
+            if (userArray == undefined) {
                 return res.status(400).json({ err: "Error Creating Room" });
-            } else {
-                io.emit('userJoined', req.body);
-                console.log(room._doc.users);
-                return res.status(200).json({ msg: "Room Created successfully" });
             }
-        });
+            userArray.push(user);
+            room._doc.users = userArray;
+            room.markModified('users');
+            room.save(err => {
+                if (err) {
+                    return res.status(400).json({ err: "Error Creating Room" });
+                } else {
+                    io.emit('userJoined', req.body);
+                    io.emit('newRoom', req.data);
+                    console.log(room._doc.users);
+                    return res.status(200).json({ msg: "Room Created successfully" });
+                }
+            });
+        }
 
 
     });
