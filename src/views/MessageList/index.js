@@ -5,9 +5,10 @@ import ToolbarButton from "../ToolbarButton";
 import Message from "../Message";
 import moment from "moment";
 import axios from "axios";
-
+import socketIOClient from "socket.io-client";
 import "./MessageList.css";
 
+const socket = socketIOClient("http://localhost:5000/");
 const MY_USER_ID = localStorage.getItem("uname");
 
 function formatMsgs(tempMsg) {
@@ -33,13 +34,42 @@ export default function MessageList(props) {
       lastMsgId: lastMsgId,
     };
   };
+  const fetchMessages = (reqData) => {
+    axios
+      .post("http://localhost:5000/api/room/getmsgs", reqData)
+      .then((res) => {
+        console.log(res);
+        let tempMsg = res.data.msgs;
+        if (tempMsg == undefined) {
+          tempMsg = [];
+        }
+        let tempMsgFormatted = formatMsgs(tempMsg);
+        setMessages(tempMsgFormatted);
+        console.log(tempMsgFormatted[tempMsgFormatted.length - 1].id);
+        setLastMsgId(tempMsgFormatted[tempMsgFormatted.length - 1].id);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }
   useEffect(() => {
     //getMessages();
     console.log(lastMsgId);
-    let reqData = {
+    var reqData = {
       roomName: props.roomName,
       lastMsgId: lastMsgId,
     };
+
+    fetchMessages(reqData);
+    socket.on("newMessage", (data) => {
+      console.log(data);
+      var reqData = {
+        roomName: props.roomName,
+        lastMsgId: lastMsgId,
+      };
+      console.log("New Message Arrived");
+      fetchMessages(reqData);
+    })
     //If you are on a limited DataPack, Comment this code segment and the one at
     //the end of useEffect function - (the one with return clearInterval...), to
     //prevent unnecessary multiple calls to the server
@@ -67,22 +97,7 @@ export default function MessageList(props) {
             });
     }, 10000);
     */
-    axios
-      .post("http://localhost:5000/api/room/getmsgs", reqData)
-      .then((res) => {
-        console.log(res);
-        let tempMsg = res.data.msgs;
-        if (tempMsg == undefined) {
-          tempMsg = [];
-        }
-        let tempMsgFormatted = formatMsgs(tempMsg);
-        setMessages(tempMsgFormatted);
-        console.log(tempMsgFormatted[tempMsgFormatted.length - 1].id);
-        setLastMsgId(tempMsgFormatted[tempMsgFormatted.length - 1].id);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
+
     //Yes this line.
     //return () => clearInterval(interval);
   }, [props.roomName]);
@@ -158,13 +173,13 @@ export default function MessageList(props) {
     <div className="message-list">
       <Toolbar
         title={props.roomName}
-        /*
-          rightItems={[
-            <ToolbarButton key="info" icon="ion-ios-information-circle-outline" />,
-            <ToolbarButton key="video" icon="ion-ios-videocam" />,
-            <ToolbarButton key="phone" icon="ion-ios-call" />
-          ]}
-                 */
+      /*
+        rightItems={[
+          <ToolbarButton key="info" icon="ion-ios-information-circle-outline" />,
+          <ToolbarButton key="video" icon="ion-ios-videocam" />,
+          <ToolbarButton key="phone" icon="ion-ios-call" />
+        ]}
+               */
       />
 
       <div className="message-list-container">{renderMessages()}</div>

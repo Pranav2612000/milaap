@@ -1,7 +1,9 @@
+import socketIOClient from "socket.io-client";
 import React, { Component } from "react";
 import { store } from "react-notifications-component";
 import { AwesomeButtonProgress } from "react-awesome-button";
 import "react-awesome-button/dist/styles.css";
+
 import {
   Nav,
   NavItem,
@@ -35,8 +37,23 @@ import {
 import Peer from "peerjs";
 import axios from "axios";
 import "./Controls.css";
+const socket = socketIOClient("http://localhost:5000/");
 
 class Controls extends Component {
+  getActive = () => {
+    axios
+      .post("http://localhost:5000/api/room/getActive", {
+        roomName: this.props.roomName,
+      })
+      .then((res) => {
+        console.log("EHREEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE", res);
+        if (!res.data.active.length) return;
+        this.setState({ active: res.data.active });
+      })
+      .catch(err => {
+        console.log(err);
+      });
+  }
   constructor(props) {
     super(props);
     this.state = {
@@ -52,20 +69,28 @@ class Controls extends Component {
     this.startScreenShare = this.startScreenShare.bind(this);
     this.startConnection = this.startConnection.bind(this);
     this.sendCallEndedSignal = this.sendCallEndedSignal.bind(this);
-    
-          /* TODO:  Move Call to appropriate position, and replace by generalized call.*/
-    axios
-      .post("http://localhost:5000/api/room/getActive", {
-        roomName: this.props.roomName,
-      })
-      .then((res) => {
-        console.log("EHREEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE", res);
-        if (!res.data.active.length) return;
-        this.setState({ active: res.data.active });
-      })
-      .catch(err => {
-              console.log(err);
-      });
+
+    /* TODO:  Move Call to appropriate position, and replace by generalized call.*/
+    this.getActive();
+
+    socket.on("userJoined", data => {
+      console.clear();
+      console.log("NEW USER JOINED :)");
+      console.log(data);
+      this.getActive();
+    });
+    socket.on("userOnline", data => {
+      console.clear();
+      console.log("NEW USER ONLINE :)");
+      console.log(data);
+      this.getActive();
+    });
+    socket.on("userExit", data => {
+      console.clear();
+      console.log("USER EXITED :(");
+      console.log(data);
+      this.getActive();
+    });
   }
 
   componentDidUpdate(prevProps) {
@@ -83,9 +108,12 @@ class Controls extends Component {
           });
         })
         .catch(err => {
-                console.log(err);
+          console.log(err);
         });
     }
+
+
+
   }
 
   createNotif = (title, msg, type) => {
@@ -480,13 +508,13 @@ class Controls extends Component {
         <ListGroup flush>
           {this.state.active
             ? this.state.active.map((user) => {
-                return (
-                  <ListGroupItem key={Math.random()}>
-                    <Spinner type="grow" size="sm" variant="success" />
-                    {user.username}
-                  </ListGroupItem>
-                );
-              })
+              return (
+                <ListGroupItem key={Math.random()}>
+                  <Spinner type="grow" size="sm" variant="success" />
+                  {user.username}
+                </ListGroupItem>
+              );
+            })
             : " "}
         </ListGroup>
       </Container>
