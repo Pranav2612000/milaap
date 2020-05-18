@@ -5,6 +5,7 @@ import axios from "axios";
 export default function Compose(props) {
   const [msg, setMsg] = useState("");
   async function sendMessage() {
+    if (msg === "") return;
     const reqData = {
       sender: localStorage.getItem("uname"),
       msg: msg,
@@ -29,7 +30,13 @@ export default function Compose(props) {
         className="compose-input"
         placeholder="Type a message, @name"
         value={msg}
-        onChange={(e) => setMsg(e.target.value)}
+        onKeyDown={e => {
+          if (e.keyCode === 13)
+            sendMessage();
+        }}
+        onChange={(e) => {
+          setMsg(e.target.value)
+        }}
       />
       <button className="compose-button primary" onClick={sendMessage}>
         Send
