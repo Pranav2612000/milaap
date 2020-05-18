@@ -6,6 +6,7 @@ const rooms = require("../models/Rooms.model");
 const userLogins = require("../models/UserLogin.model");
 const users = require("../models/User.model");
 const shortid = require("shortid");
+var io = require('../index');
 
 router.post("/sendmessage", async (req, res) => {
   const sender = req.body.sender;
@@ -74,6 +75,10 @@ router.post("/sendmessage", async (req, res) => {
       if (err) {
         return res.status(400).json({ err: "Error Updating Room" });
       } else {
+
+        //the data being sent will be chnaged later as per requirements
+
+        io.emit("newMessage", req.data);
         return res.status(200).json({ status: "Success", msg: msgObject });
       }
     });
@@ -186,6 +191,7 @@ router.post("/exitstream", async (req, res) => {
         if (err) {
           return res.status(400).json({ err: "Error Exiting Video" });
         } else {
+          io.emit("userExit", req.body);
           return res
             .status(200)
             .json({ msg: "Room Exited successfully", online: onlineArray });
@@ -219,6 +225,7 @@ router.post("/goonline", async (req, res) => {
           if (err) {
             return res.status(400).json({ err: err });
           } else {
+            io.emit('userOnline', req.body);
             return res
               .status(200)
               .json({ msg: "Waiting for others", connected: 1 });
@@ -235,6 +242,7 @@ router.post("/goonline", async (req, res) => {
       });
       if (indexOfCurrentUser != -1) {
         //Return the current entry in array.
+        io.emit('userOnline', req.body);
         return res.status(200).json({
           msg: "Waiting for others",
           connected: onlineArray.length,
@@ -262,6 +270,7 @@ router.post("/goonline", async (req, res) => {
             if (err) {
               return res.status(400).json({ err: err });
             } else {
+              io.emit('userOnline', req.body);
               return res.status(200).json({
                 msg: "Waiting for others",
                 connected: onlineArray.length + 1,

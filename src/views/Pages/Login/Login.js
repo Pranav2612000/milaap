@@ -49,7 +49,6 @@ class Login extends Component {
     return;
   }
   render() {
-    console.log(this.state.login);
     return (
       <>
         {this.state.login === true && <Redirect to="/dashboard" />}
