@@ -26,6 +26,8 @@ class PeerHandler extends React.Component {
       context: null,
       remoteStreams: [],
       remoteStreamsRef: [],
+      paused: false,
+      muted: false,
     };
   }
 
@@ -92,7 +94,7 @@ class PeerHandler extends React.Component {
     navigator.mediaDevices
       .getUserMedia({
         video: { width: 1024, height: 576 },
-        audio: true,
+        audio: false,
       })
       .then((media) => {
         self.setState(
@@ -166,8 +168,9 @@ class PeerHandler extends React.Component {
             );
           }
         );
-      }).catch(err => {
-              console.log(err);
+      })
+      .catch((err) => {
+        console.log(err);
       });
   };
 
@@ -240,6 +243,23 @@ class PeerHandler extends React.Component {
     });
   };
 
+  handlepause = () => {
+    if (this.state.selfVideoStream) {
+      const tracks = this.state.selfVideoStream.getTracks();
+      if (!this.state.paused) {
+        tracks[0].enabled = false;
+        this.setState({
+          paused: true,
+        });
+      } else {
+        tracks[0].enabled = true;
+        this.setState({
+          paused: false,
+        });
+      }
+    }
+  };
+
   render() {
     const self = this;
     return (
@@ -270,6 +290,10 @@ class PeerHandler extends React.Component {
         </div>
         <br />
         <video id="context" autoPlay></video>
+        <Button className="m-4" color="info" onClick={this.handlepause}>
+          {self.state.paused ? "Start" : "Pause"}
+        </Button>
+
         <Jumbotron>
           <Row>
             {self.state.remoteStreamsRef.map((ref) => {

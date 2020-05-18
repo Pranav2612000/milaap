@@ -19,8 +19,12 @@ import * as firebase from "firebase/app";
 import "firebase/auth";
 import firebaseConfig from "../../../firebaseConfig";
 import axios from "axios";
+import {auth} from 'firebase'
+import './login.scss'
 
 const firebaseApp = firebase.initializeApp(firebaseConfig);
+const firebaseAppAuth = firebaseApp.auth();
+var providers =  new firebase.auth.GoogleAuthProvider();
 
 let flag = 0;
 
@@ -33,16 +37,37 @@ class Login extends Component {
       password: "",
       user: "",
       signOut: "",
-      signInWithGoogle,
+      // signInWithGoogle,
     };
     this.handleUsernameChange = this.handleUsernameChange.bind(this);
     this.handlePasswordChange = this.handlePasswordChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
-    this.handleSubmitFireBase = this.handleSubmitFireBase.bind(this);
+    // this.handleSubmitFireBase = this.handleSubmitFireBase.bind(this);
+    this.signInWithGoogle = this.signInWithGoogle.bind(this);
+
   }
+
+
+
+
   handleUsernameChange(e) {
     this.setState({
       username: e.target.value,
+    });
+  }
+  
+  signInWithGoogle () {
+    firebase.auth().signInWithPopup(providers).then( (res) => {
+    var user = res.user
+    if(user){
+      this.setState({
+        login : true,
+        username : user.displayName
+      })
+      localStorage.setItem("uname", this.state.username);
+    }
+    }).catch(function(error){
+      console.log(error)
     });
   }
 
@@ -71,26 +96,26 @@ class Login extends Component {
       });
     return;
   }
-  handleSubmitFireBase(e) {
-    e.preventDefault();
-    var reqData = {
-      username: this.state.username,
-      password: this.state.password,
-    };
-    axios
-      .post("http://localhost:5000/api/login", reqData)
-      .then((res) => {
-        console.log(res);
-        this.setState({
-          login: true,
-        });
-        localStorage.setItem("uname", this.state.username);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-    return;
-  }
+  // handleSubmitFireBase(e) {
+  //   e.preventDefault();
+  //   var reqData = {
+  //     username: this.state.username,
+  //     password: this.state.password,
+  //   };
+  //   axios
+  //     .post("http://localhost:5000/api/login", reqData)
+  //     .then((res) => {
+  //       console.log(res);
+  //       this.setState({
+  //         login: true,
+  //       });
+  //       localStorage.setItem("uname", this.state.username);
+  //     })
+  //     .catch((err) => {
+  //       console.log(err);
+  //     });
+  //   return;
+  // }
   render() {
     if (this.state.login) {
       return <Redirect to="/dashboard" />;
@@ -147,24 +172,22 @@ class Login extends Component {
                         </Col>
                       </Row>
                     </Form>
-                    <Form onSubmit={this.handleSubmitFireBase}>
+                    {/* <Form onSubmit={this.handleSubmitFireBase}> */}
                       <Row>
                         <Col xs="6">
-                          <Button color="primary" className="px-4">
-                            Google Logo
-                          </Button>
+                        {/* <button class="loginBtn loginBtn--google" onClick = {this.signInWithGoogle}>
+                              Login with Google
+                        </button> */}
+                        <div class="google-btn">
+                  <div class="google-icon-wrapper">
+                  <img class="google-icon" src="https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg"/>
+                       </div>
+                  <button class="btn-text" onClick = {this.signInWithGoogle}>Sign in with google</button>
+                  </div>
                         </Col>
-                        <Col xs="6" className="text-right">
-                          <Button
-                            color="link"
-                            className="px-0"
-                            onClick={signInWithGoogle}
-                          >
-                            Login Via Google
-                          </Button>
-                        </Col>
+                        
                       </Row>
-                    </Form>
+                    
                   </CardBody>
                 </Card>
                 <Card
@@ -201,17 +224,10 @@ class Login extends Component {
   }
 }
 
-const firebaseAppAuth = firebaseApp.auth();
 
-const providers = {
-  googleProvider: new firebase.auth.GoogleAuthProvider(),
-};
-
-const signInWithGoogle = () => {
-  firebase.auth().signInWithPopup(new firebase.auth.GoogleAuthProvider());
-};
 
 export default withFirebaseAuth({
   providers,
   firebaseAppAuth,
 })(Login);
+
