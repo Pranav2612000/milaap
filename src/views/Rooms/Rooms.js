@@ -70,7 +70,7 @@ class Room extends Component {
       <div className="animated fadeIn">
               ROOM NAME {this.state.roomName}
               <video autoPlay></video>
-              {/*<PeerHandler />*/}
+              <PeerHandler />
       </div>
     );
   }
