@@ -156,6 +156,7 @@ router.post("/getmsgs", async (req, res) => {
 router.post("/exitstream", async (req, res) => {
   const roomName = req.body.roomName;
   const username = req.body.username;
+  var idToBeDestroyed = [];
   rooms.findOne({ roomName: roomName }, function (err, room) {
     if (err) {
       return res.status(400).json({ err: "Error. Try again." });
@@ -167,22 +168,27 @@ router.post("/exitstream", async (req, res) => {
     if (onlineArray == undefined) {
       onlineArray = [];
       return res
-        .status(200)
-        .json({ msg: "Already exited", online: onlineArray });
+        .status(200).json({ msg: "Already exited", online: onlineArray, idToBeDestroyed: idToBeDestroyed });
     }
-    var indexToBeDeleted = -1;
+    var indicesToBeDeleted = []; // TODO: A peer can be present only 2 times- for audio, video
+                                       //so this can be optimized to stop if we get two elements.
     onlineArray.forEach((val, index) => {
       if (val.username == username) {
-        indexToBeDeleted = index;
+        //indexToBeDeleted = index;
+        indicesToBeDeleted.unshift(index);
+        idToBeDestroyed.unshift(val.tkn);
       }
     });
-    console.log(indexToBeDeleted);
-    if (indexToBeDeleted == -1) {
+    console.log(indicesToBeDeleted);
+    console.log(onlineArray);
+    if (indicesToBeDeleted == []) {
       return res
-        .status(200)
-        .json({ msg: "Already exited", online: onlineArray });
+        .status(200).json({ msg: "Already exited", online: onlineArray, idToBeDestroyed: idToBeDestroyed });
     } else {
-      onlineArray.splice(indexToBeDeleted, 1);
+      indicesToBeDeleted.forEach((val, index) => {
+        onlineArray.splice(val, 1);
+        console.log(onlineArray);
+      });
       console.log(onlineArray);
       room._doc.online = onlineArray;
       room.markModified("online");
@@ -193,8 +199,7 @@ router.post("/exitstream", async (req, res) => {
         } else {
           io.emit("userExit", req.body);
           return res
-            .status(200)
-            .json({ msg: "Room Exited successfully", online: onlineArray });
+            .status(200).json({ msg: "Room Exited successfully", online: onlineArray , idToBeDestroyed: idToBeDestroyed});
         }
       });
     }

@@ -57,6 +57,7 @@ class Controls extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      myIds: new Array(),
       roomName: this.props.roomName,
       //Use Sets instead of Arrays to prevent duplicates.
       remotePeers: new Array(),
@@ -91,6 +92,7 @@ class Controls extends Component {
       console.log(data);
       this.getActive();
     });
+    this.endCall = this.endCall.bind(this);
   }
 
   componentDidUpdate(prevProps) {
@@ -159,6 +161,9 @@ class Controls extends Component {
         ],
       } /* Sample servers, please use appropriate ones */,
     });
+    self.setState({
+            myIds: [...self.state.myIds, peer]
+    });
 
     //Upload the PeerID to the server, get an old ID, if exists to be used
     await peer.on("open", function (id) {
@@ -190,7 +195,8 @@ class Controls extends Component {
               } /* Sample servers, please use appropriate ones */,
             });
             self.setState({
-                    myPeer: peer
+                    myPeer: peer,
+                    myIds: [...self.state.myIds, peer]
             });
             console.log('here');
             console.log(peer.disconnected);
@@ -460,10 +466,29 @@ class Controls extends Component {
       .post("http://localhost:5000/api/room/exitstream", reqData)
       .then((res) => {
         console.log(res.data);
+        var idToBeDestroyed = res.data.idToBeDestroyed;
+        this.state.myIds.forEach((val, index) => {
+                val.destroy();
+        });
       })
       .catch((err) => {
         console.log(err);
       });
+  }
+
+  endCall(next) {
+          this.sendRequestToEndCall();
+          next();
+          if(this.state.myMediaStreamObj) {
+                  this.state.myMediaStreamObj.getTracks().forEach(track => {
+                          console.log(track);
+                          track.stop()
+                  });
+                  this.state.myMediaStreamObj.getTracks().forEach(track => {
+                          this.state.myMediaStreamObj.removeTrack(track);
+                  });
+          }
+          //Add by appropriate UI changes which clears the screen.
   }
 
   render() {
@@ -497,7 +522,7 @@ class Controls extends Component {
             type="primary"
             size="medium"
             action={(element, next) => {
-              this.sendCallEndedSignal(next);
+              this.endCall(next);
             }}
           >
             <i class="icon-call-end icons"></i>
