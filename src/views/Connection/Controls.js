@@ -50,10 +50,10 @@ class Controls extends Component {
         if (!res.data.active.length) return;
         this.setState({ active: res.data.active });
       })
-      .catch(err => {
+      .catch((err) => {
         console.log(err);
       });
-  }
+  };
   constructor(props) {
     super(props);
     this.state = {
@@ -74,19 +74,19 @@ class Controls extends Component {
     /* TODO:  Move Call to appropriate position, and replace by generalized call.*/
     this.getActive();
 
-    socket.on("userJoined", data => {
+    socket.on("userJoined", (data) => {
       console.clear();
       console.log("NEW USER JOINED :)");
       console.log(data);
       this.getActive();
     });
-    socket.on("userOnline", data => {
+    socket.on("userOnline", (data) => {
       console.clear();
       console.log("NEW USER ONLINE :)");
       console.log(data);
       this.getActive();
     });
-    socket.on("userExit", data => {
+    socket.on("userExit", (data) => {
       console.clear();
       console.log("USER EXITED :(");
       console.log(data);
@@ -109,13 +109,10 @@ class Controls extends Component {
             active: res.data.active,
           });
         })
-        .catch(err => {
+        .catch((err) => {
           console.log(err);
         });
     }
-
-
-
   }
 
   createNotif = (title, msg, type) => {
@@ -135,12 +132,11 @@ class Controls extends Component {
 
   switchContext = (e) => {
     try {
-            let context = document.getElementById("context");
-            context.srcObject = e.target.srcObject;
-            context.play();
-    }
-    catch(err) {
-            console.log("The selected stream is old");
+      let context = document.getElementById("context");
+      context.srcObject = e.target.srcObject;
+      context.play();
+    } catch (err) {
+      console.log("The selected stream is old");
     }
   };
 
@@ -162,25 +158,24 @@ class Controls extends Component {
       } /* Sample servers, please use appropriate ones */,
     });
     self.setState({
-            myIds: [...self.state.myIds, peer]
+      myIds: [...self.state.myIds, peer],
     });
 
     //Upload the PeerID to the server, get an old ID, if exists to be used
     await peer.on("open", function (id) {
       tkn = id;
       console.log(tkn);
-      next();
       const reqData = {
         roomName: self.state.roomName,
         tkn: tkn,
         username: localStorage.getItem("uname"),
-        type: type
+        type: type,
       };
       axios
         .post("http://localhost:5000/api/room/goonline", reqData)
         .then((res) => {
           //console.log(res);
-          if(res.data.changePeer) {
+          if (res.data.changePeer) {
             peer.destroy();
             peer = new Peer(res.data.peerId, {
               config: {
@@ -195,65 +190,68 @@ class Controls extends Component {
               } /* Sample servers, please use appropriate ones */,
             });
             self.setState({
-                    myPeer: peer,
-                    myIds: [...self.state.myIds, peer]
+              myPeer: peer,
+              myIds: [...self.state.myIds, peer],
             });
-            console.log('here');
+            console.log("here");
             console.log(peer.disconnected);
             //peer.disconnect();
-            peer.on("open", function(id) {
-                    console.log("using older id: " + id);
-                    if (res.data.connected == 1) {
-                      self.getMyMediaStream(self, type).then((media) => {
-                        self.waitForConnections(self, peer);
-                      });
-                    } else if (res.data.connected > 1) {
-                      self.getMyMediaStream(self, type).then((media) => {
-                        self.waitForConnections(self, peer);
+            peer.on("open", function (id) {
+              console.log("using older id: " + id);
+              if (res.data.connected == 1) {
+                self.getMyMediaStream(self, type).then((media) => {
+                  self.waitForConnections(self, peer);
+                });
+              } else if (res.data.connected > 1) {
+                self.getMyMediaStream(self, type).then((media) => {
+                  self.waitForConnections(self, peer);
 
-                        //Array of users online with their peerIDs to make requests to all.
-                        let onlineArray = res.data.online;
-                        console.log(media);
-                        onlineArray.forEach((val, index) => {
-                          if (val.username == localStorage.getItem("uname")) {
-                            //Display my screen without creating a connection.
-                            return;
-                          }
-                          console.log("Connecting to " + onlineArray[index].tkn);
-                          self.startConnection(self, onlineArray[index].tkn, peer);
-                        });
-                      });
+                  //Array of users online with their peerIDs to make requests to all.
+                  let onlineArray = res.data.online;
+                  console.log(media);
+                  onlineArray.forEach((val, index) => {
+                    if (val.username == localStorage.getItem("uname")) {
+                      //Display my screen without creating a connection.
+                      return;
                     }
-            });
-          } else {
-                  self.setState({
-                          myPeer: peer
+                    console.log("Connecting to " + onlineArray[index].tkn);
+                    self.startConnection(self, onlineArray[index].tkn, peer);
                   });
-                  if (res.data.connected == 1) {
-                    self.getMyMediaStream(self, type).then((media) => {
-                      self.waitForConnections(self, peer);
-                    });
-                  } else if (res.data.connected > 1) {
-                    self.getMyMediaStream(self, type).then((media) => {
-                      self.waitForConnections(self, peer);
+                });
+              }
+            });
+            next();
+          } else {
+            self.setState({
+              myPeer: peer,
+            });
+            if (res.data.connected == 1) {
+              self.getMyMediaStream(self, type).then((media) => {
+                self.waitForConnections(self, peer);
+              });
+            } else if (res.data.connected > 1) {
+              self.getMyMediaStream(self, type).then((media) => {
+                self.waitForConnections(self, peer);
 
-                      //Array of users online with their peerIDs to make requests to all.
-                      let onlineArray = res.data.online;
-                      console.log(media);
-                      onlineArray.forEach((val, index) => {
-                        if (val.username == localStorage.getItem("uname")) {
-                          //Display my screen without creating a connection.
-                          return;
-                        }
-                        console.log("Connecting to " + onlineArray[index].tkn);
-                        self.startConnection(self, onlineArray[index].tkn, peer);
-                      });
-                    });
+                //Array of users online with their peerIDs to make requests to all.
+                let onlineArray = res.data.online;
+                console.log(media);
+                onlineArray.forEach((val, index) => {
+                  if (val.username == localStorage.getItem("uname")) {
+                    //Display my screen without creating a connection.
+                    return;
                   }
+                  console.log("Connecting to " + onlineArray[index].tkn);
+                  self.startConnection(self, onlineArray[index].tkn, peer);
+                });
+              });
+            }
+            next();
           }
         })
         .catch((err) => {
           console.log(err);
+          next(false, "Failed");
         });
     });
   }
@@ -307,7 +305,7 @@ class Controls extends Component {
     var connectedPeers = self.state.connectedPeers;
     connectedPeers.push(friendtkn);
     self.setState({
-          connectedPeers: connectedPeers 
+      connectedPeers: connectedPeers,
     });
   }
 
@@ -320,7 +318,7 @@ class Controls extends Component {
       var connectedPeers = self.state.connectedPeers;
       connectedPeers.push(call.peer);
       self.setState({
-              connectedPeers: connectedPeers 
+        connectedPeers: connectedPeers,
       });
     });
   }
@@ -441,7 +439,7 @@ class Controls extends Component {
     document.getElementById("videos").appendChild(video);
   }
 
-  sendCallEndedSignal(next) {
+  sendCallEndedSignal() {
     const reqData = {
       username: localStorage.getItem("uname"),
       roomName: this.state.roomName,
@@ -450,14 +448,13 @@ class Controls extends Component {
       .post("http://localhost:5000/api/room/exitstream", reqData)
       .then((res) => {
         console.log(res.data);
-        next();
       })
       .catch((err) => {
         console.log(err);
       });
   }
 
-  sendRequestToEndCall() {
+  sendRequestToEndCall(next) {
     const reqData = {
       username: localStorage.getItem("uname"),
       roomName: this.state.roomName,
@@ -468,32 +465,34 @@ class Controls extends Component {
         console.log(res.data);
         var idToBeDestroyed = res.data.idToBeDestroyed;
         this.state.myIds.forEach((val, index) => {
-                val.destroy();
+          val.destroy();
         });
+        next();
       })
       .catch((err) => {
         console.log(err);
+        next(false, "Error");
       });
   }
 
   endCall(next) {
-          this.sendRequestToEndCall();
-          next();
-          if(this.state.myMediaStreamObj) {
-                  this.state.myMediaStreamObj.getTracks().forEach(track => {
-                          console.log(track);
-                          track.stop()
-                  });
-                  this.state.myMediaStreamObj.getTracks().forEach(track => {
-                          this.state.myMediaStreamObj.removeTrack(track);
-                  });
-          }
-          //Add by appropriate UI changes which clears the screen.
+    this.sendRequestToEndCall(next);
+    if (this.state.myMediaStreamObj) {
+      this.state.myMediaStreamObj.getTracks().forEach((track) => {
+        console.log(track);
+        track.stop();
+      });
+      this.state.myMediaStreamObj.getTracks().forEach((track) => {
+        this.state.myMediaStreamObj.removeTrack(track);
+      });
+      this.setState({
+        myMediaStreamObj: null,
+      });
+    }
+    //Add by appropriate UI changes which clears the screen.
   }
 
   render() {
-    // eslint-disable-next-line
-    console.log(this.state.active);
     const self = this;
     return (
       <Container>
@@ -521,6 +520,8 @@ class Controls extends Component {
           <AwesomeButtonProgress
             type="primary"
             size="medium"
+            //visible={!self.state.calls.length} //use this if we want it completely hidden until needed instead
+            disabled={!self.state.myMediaStreamObj}
             action={(element, next) => {
               this.endCall(next);
             }}
@@ -533,13 +534,13 @@ class Controls extends Component {
         <ListGroup flush>
           {this.state.active
             ? this.state.active.map((user) => {
-              return (
-                <ListGroupItem key={Math.random()}>
-                  <Spinner type="grow" size="sm" variant="success" />
-                  {user.username}
-                </ListGroupItem>
-              );
-            })
+                return (
+                  <ListGroupItem key={Math.random()}>
+                    <Spinner type="grow" size="sm" variant="success" />
+                    {user.username}
+                  </ListGroupItem>
+                );
+              })
             : " "}
         </ListGroup>
       </Container>
