@@ -34,7 +34,10 @@ export default function MessageList(props) {
       lastMsgId: lastMsgId,
     };
   };
-  const fetchMessages = (reqData) => {
+  const fetchMessages = () => {
+    var reqData = getReqData();
+    console.clear();
+    console.log(reqData);
     axios
       .post("http://localhost:5000/api/room/getmsgs", reqData)
       .then((res) => {
@@ -55,20 +58,14 @@ export default function MessageList(props) {
   useEffect(() => {
     //getMessages();
     console.log(lastMsgId);
-    var reqData = {
-      roomName: props.roomName,
-      lastMsgId: lastMsgId,
-    };
-
-    fetchMessages(reqData);
+    if (props.roomName !== "dashboard")
+      fetchMessages();
     socket.on("newMessage", (data) => {
       console.log(data);
-      var reqData = {
-        roomName: props.roomName,
-        lastMsgId: lastMsgId,
-      };
+      var reqData = getReqData();
       console.log("New Message Arrived");
-      fetchMessages(reqData);
+      if (props.roomName !== "dashboard")
+        fetchMessages(reqData);
     })
     //If you are on a limited DataPack, Comment this code segment and the one at
     //the end of useEffect function - (the one with return clearInterval...), to
