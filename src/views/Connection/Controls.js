@@ -72,25 +72,29 @@ class Controls extends Component {
     this.sendCallEndedSignal = this.sendCallEndedSignal.bind(this);
 
     /* TODO:  Move Call to appropriate position, and replace by generalized call.*/
-    this.getActive();
+    if (this.state.roomName !== "dashboard")
+      this.getActive();
 
     socket.on("userJoined", (data) => {
       console.clear();
       console.log("NEW USER JOINED :)");
       console.log(data);
-      this.getActive();
+      if (this.state.roomName !== "dashboard")      //YET TO BE TESTED
+        this.getActive();
     });
     socket.on("userOnline", (data) => {
       console.clear();
       console.log("NEW USER ONLINE :)");
       console.log(data);
-      this.getActive();
+      if (this.state.roomName !== "dashboard")
+        this.getActive();
     });
     socket.on("userExit", (data) => {
       console.clear();
       console.log("USER EXITED :(");
       console.log(data);
-      this.getActive();
+      if (this.state.roomName !== "dashboard")
+        this.getActive();
     });
     this.endCall = this.endCall.bind(this);
   }

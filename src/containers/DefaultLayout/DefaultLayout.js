@@ -3,9 +3,9 @@ import { Redirect, Route, Switch } from "react-router-dom";
 import * as router from "react-router-dom";
 import { Container } from "reactstrap";
 import axios from "axios";
-import ReactNotification from "react-notifications-component";
 import socketIOClient from "socket.io-client";
 import PeerHandler from "./peerHandler";
+import ReactNotification, { store } from "react-notifications-component";
 import {
   AppAside,
   AppFooter,
@@ -45,7 +45,7 @@ function getGroupElements(rooms) {
   return groupElements;
 }
 class DefaultLayout extends Component {
-  getRooms = (rooms) => {
+  getRooms = () => {
 
     const reqData = {
       username: localStorage.getItem("uname"),
@@ -54,7 +54,7 @@ class DefaultLayout extends Component {
       .post("http://localhost:5000/api/user/getrooms", reqData)
       .then((res) => {
         console.log(res);
-        rooms = res.data.rooms;
+        var rooms = res.data.rooms;
         let PMList = {};
         let GroupList = getGroupElements(rooms);
         console.log({ ...GroupList });
@@ -179,6 +179,25 @@ class DefaultLayout extends Component {
     this.props.history.push("/login");
   }
 
+  componentDidMount() {
+    if (this.props.location.state !== undefined) {
+      store.addNotification({
+        title: `Hi ${this.props.location.state}`,
+        message: `Welcome to Dashboard`,
+        type: "success",
+        // insert: "top",
+        container: "top-right",
+        animationIn: ["animated", "fadeIn"],
+        animationOut: ["animated", "fadeOut"],
+        dismiss: {
+          duration: 3000,
+          pauseOnHover: true,
+        },
+      });
+    }
+
+
+  }
   render() {
     if (localStorage.getItem("uname") == undefined) {
       return <Redirect to="/login" />;

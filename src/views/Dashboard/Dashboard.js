@@ -1,5 +1,6 @@
 import React, { Component, lazy, Suspense } from 'react';
 import { Bar, Line } from 'react-chartjs-2';
+
 import {
   Badge,
   Button,
@@ -37,7 +38,6 @@ class Dashboard extends Component {
       username: localStorage.getItem('uname')
     };
   }
-
   toggle() {
     this.setState({
       dropdownOpen: !this.state.dropdownOpen,
@@ -55,9 +55,11 @@ class Dashboard extends Component {
   render() {
 
     return (
-      <div className="animated fadeIn">
-              SIMPLE DASHBOARD - {this.state.username}
-      </div>
+      <>
+        <div className="animated fadeIn ">
+          SIMPLE DASHBOARD - {this.state.username}
+        </div>
+      </>
     );
   }
 }
