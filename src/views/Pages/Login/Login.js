@@ -2,10 +2,12 @@ import React, { Component } from 'react';
 import { Link, Redirect } from 'react-router-dom';
 import { Button, Card, CardBody, CardGroup, Col, Container, Form, Input, InputGroup, InputGroupAddon, InputGroupText, Row } from 'reactstrap';
 import axios from 'axios';
-
+import ReactNotification, { store } from "react-notifications-component";
 class Login extends Component {
+
   constructor(props) {
     super(props);
+
     this.state = {
       login: false,
       username: '',
@@ -14,6 +16,25 @@ class Login extends Component {
     this.handleUsernameChange = this.handleUsernameChange.bind(this);
     this.handlePasswordChange = this.handlePasswordChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
+  }
+  componentDidMount() {
+    if (this.props.location.register === true) {
+      console.log(this.props.location);
+
+      store.addNotification({
+        title: "You are Successfully Registered",
+        message: `Login to go to Dashboard`,
+        type: "success",
+        // insert: "top",
+        container: "top-right",
+        animationIn: ["animated", "fadeIn"],
+        animationOut: ["animated", "fadeOut"],
+        dismiss: {
+          duration: 3000,
+          pauseOnHover: true,
+        },
+      });
+    }
   }
   handleUsernameChange(e) {
     this.setState({
@@ -41,18 +62,36 @@ class Login extends Component {
         this.setState({
           login: true
         });
-
       })
       .catch(err => {
         console.log(err);
+
+        store.addNotification({
+          title: "Invalid Username or Password",
+          message: `Please Try Again`,
+          type: "danger",
+          // insert: "top",
+          container: "top-right",
+          animationIn: ["animated", "fadeIn"],
+          animationOut: ["animated", "fadeOut"],
+          dismiss: {
+            duration: 3000,
+            pauseOnHover: true,
+          },
+        });
+
+
+
       });
     return;
   }
   render() {
     return (
       <>
-        {this.state.login === true && <Redirect to="/dashboard" />}
-        <div className="app flex-row align-items-center">
+
+        {this.state.login === true && <Redirect to={{ pathname: "/dashboard", state: this.state.username }} />}
+        <div className="app flex-row align-items-center" >
+          <ReactNotification />
           <Container>
             <Row className="justify-content-center">
               <Col md="8">
@@ -107,7 +146,7 @@ class Login extends Component {
               </Col>
             </Row>
           </Container>
-        </div>
+        </div >
       </>
     );
   }
