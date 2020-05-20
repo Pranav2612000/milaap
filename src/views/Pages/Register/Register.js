@@ -10,6 +10,7 @@ class Register extends Component {
 			username: '',
 			password: '',
 			repassword: '',
+			match: true,
 			redirect: false
 		};
 		this.handleUsernameChange = this.handleUsernameChange.bind(this);
@@ -98,6 +99,8 @@ class Register extends Component {
 												<Input type="password" placeholder="Password" autoComplete="new-password"
 													value={this.state.password} onChange={this.handlePasswordChange} />
 											</InputGroup>
+											{this.state.match ? <></> : (<h6 style={{color:"red"}}>Passwords Don't Match</h6>)}
+											
 											<InputGroup className="mb-4">
 												<InputGroupAddon addonType="prepend">
 													<InputGroupText>
@@ -105,7 +108,14 @@ class Register extends Component {
 													</InputGroupText>
 												</InputGroupAddon>
 												<Input type="password" placeholder="Repeat password" autoComplete="new-password"
-													value={this.state.repassword} onChange={this.handleRepasswordChange} />
+													value={this.state.repassword}
+													onKeyUp={() => this.setState({ match: (this.state.repassword === this.state.password) })}
+													onChange={(e) => {
+														this.handleRepasswordChange(e);
+													}
+
+													}
+												/>
 											</InputGroup>
 											<Button color="success" block>Create Account</Button>
 										</Form>
