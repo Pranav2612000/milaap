@@ -3,9 +3,9 @@ import { Redirect, Route, Switch } from "react-router-dom";
 import * as router from "react-router-dom";
 import { Container } from "reactstrap";
 import axios from "axios";
-// import ReactNotification from "react-notifications-component";
+import socketIOClient from "socket.io-client";
 import PeerHandler from "./peerHandler";
-
+import ReactNotification, { store } from "react-notifications-component";
 import {
   AppAside,
   AppFooter,
@@ -24,6 +24,7 @@ import {
 // routes config
 import routes from "../../routes";
 
+const socket = socketIOClient("http://localhost:5000/");
 const DefaultAside = React.lazy(() => import("./DefaultAside"));
 const DefaultFooter = React.lazy(() => import("./DefaultFooter"));
 const DefaultHeader = React.lazy(() => import("./DefaultHeader"));
@@ -44,51 +45,16 @@ function getGroupElements(rooms) {
   return groupElements;
 }
 class DefaultLayout extends Component {
-  constructor(props) {
-    super(props);
-    let rooms;
+  getRooms = () => {
+
     const reqData = {
       username: localStorage.getItem("uname"),
     };
-    this.state = {
-      username: localStorage.getItem("uname"),
-      navigation: {
-        items: [
-          {
-            title: true,
-            name: "PMs",
-            icon: "icon-puzzle",
-          },
-          PMList,
-          {
-            title: true,
-            name: "Rooms",
-            icon: "icon-puzzle",
-            children: [
-              {
-                //title: true,
-                name: "No Messages Yet.",
-                icon: "icon-puzzle",
-                badge: {
-                  variant: "info",
-                  text: "Add",
-                },
-                class: "",
-              },
-            ],
-          },
-          GroupList,
-        ],
-      },
-    };
-    if (this.state.username == undefined) {
-      return;
-    }
     axios
       .post("http://localhost:5000/api/user/getrooms", reqData)
       .then((res) => {
         console.log(res);
-        rooms = res.data.rooms;
+        var rooms = res.data.rooms;
         let PMList = {};
         let GroupList = getGroupElements(rooms);
         console.log({ ...GroupList });
@@ -126,6 +92,46 @@ class DefaultLayout extends Component {
       .catch((err) => {
         console.log(err);
       });
+  }
+  constructor(props) {
+    super(props);
+    var rooms;
+
+    this.state = {
+      username: localStorage.getItem("uname"),
+      navigation: {
+        items: [
+          {
+            title: true,
+            name: "PMs",
+            icon: "icon-puzzle",
+          },
+          PMList,
+          {
+            title: true,
+            name: "Rooms",
+            icon: "icon-puzzle",
+            children: [
+              {
+                //title: true,
+                name: "No Messages Yet.",
+                icon: "icon-puzzle",
+                badge: {
+                  variant: "info",
+                  text: "Add",
+                },
+                class: "",
+              },
+            ],
+          },
+          GroupList,
+        ],
+      },
+    };
+    if (this.state.username == undefined) {
+      return;
+    }
+    this.getRooms();
     let PMList = {};
     let GroupList = getGroupElements(rooms);
     this.state = {
@@ -158,6 +164,12 @@ class DefaultLayout extends Component {
         ],
       },
     };
+    socket.on("newRoom", (data) => {
+      console.log("ROOM ADDED");
+      console.log(data);
+      this.getRooms();
+    })
+
   }
   loading = () => (
     <div className="animated fadeIn pt-1 text-center">Loading...</div>
@@ -183,6 +195,8 @@ class DefaultLayout extends Component {
         },
       });
     }
+
+
   }
   render() {
     if (localStorage.getItem("uname") == undefined) {
@@ -197,7 +211,7 @@ class DefaultLayout extends Component {
             </Suspense>
           </AppHeader>
           <div className="app-body">
-            {/* <ReactNotification /> */}
+            <ReactNotification />
             <AppSidebar fixed display="lg">
               <AppSidebarHeader />
               <AppSidebarForm />
