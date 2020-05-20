@@ -4,35 +4,13 @@ import { store } from "react-notifications-component";
 import { AwesomeButtonProgress } from "react-awesome-button";
 import "react-awesome-button/dist/styles.css";
 
-import {
-  Nav,
-  NavItem,
-  NavLink,
-  Progress,
-  TabContent,
-  TabPane,
-  ListGroup,
-  ListGroupItem,
-  Spinner,
-} from "reactstrap";
+import { Nav, NavItem, NavLink, Progress, TabContent, TabPane, ListGroup,
+  ListGroupItem, Spinner } from "reactstrap";
 import classNames from "classnames";
 import { AppSwitch } from "@coreui/react";
 import MessageView from "../../views/MessageList/index";
-import {
-  Jumbotron,
-  Button,
-  ButtonGroup,
-  Badge,
-  Card,
-  CardBody,
-  CardFooter,
-  CardHeader,
-  Col,
-  Container,
-  Row,
-  Collapse,
-  Fade,
-} from "reactstrap";
+import { Jumbotron, Button, ButtonGroup, Badge, Card, CardBody, CardFooter,
+  CardHeader, Col, Container, Row, Collapse, Fade, } from "reactstrap";
 //import Peer from "../../dependencies/peerjs/index.d.ts";
 import Peer from "peerjs";
 import axios from "axios";
@@ -48,7 +26,7 @@ class Controls extends Component {
       .then((res) => {
         console.log("EHREEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE", res);
         if (!res.data.active.length) return;
-        this.setState({ active: res.data.active });
+        //this.setState({ active: res.data.active });
       })
       .catch((err) => {
         console.log(err);
@@ -57,13 +35,14 @@ class Controls extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      myIds: new Array(),
+      myIds: new Set(),
+      myPeers: new Set(),
       roomName: this.props.roomName,
       //Use Sets instead of Arrays to prevent duplicates.
-      remotePeers: new Array(),
-      remotePeersID: new Array(),
+      remotePeers: new Set(),
+      remotePeersID: new Set(),
       calls: new Array(),
-      connectedPeers: new Array(),
+      connectedPeers: new Set(),
       opinfo: "",
       friendtkn: "",
     };
@@ -75,19 +54,16 @@ class Controls extends Component {
     this.getActive();
 
     socket.on("userJoined", (data) => {
-      console.clear();
       console.log("NEW USER JOINED :)");
       console.log(data);
       this.getActive();
     });
     socket.on("userOnline", (data) => {
-      console.clear();
       console.log("NEW USER ONLINE :)");
       console.log(data);
       this.getActive();
     });
     socket.on("userExit", (data) => {
-      console.clear();
       console.log("USER EXITED :(");
       console.log(data);
       this.getActive();
@@ -140,12 +116,8 @@ class Controls extends Component {
     }
   };
 
-  async startScreenShare(type, next) {
-    const self = this;
-    //console.log(this.state.roomName);
-    var tkn;
-    //Get a new peerId.
-    var peer = new Peer({
+  createPeer(id) {
+    var peer = new Peer(id, {
       config: {
         iceServers: [
           { urls: "stun:stun.l.google.com:19302" },
@@ -157,14 +129,18 @@ class Controls extends Component {
         ],
       } /* Sample servers, please use appropriate ones */,
     });
-    self.setState({
-      myIds: [...self.state.myIds, peer],
-    });
+    return peer;
+  }
 
-    //Upload the PeerID to the server, get an old ID, if exists to be used
+  async startScreenShare(type, next) {
+    const self = this;
+    var tkn;
+    //Get a new peerId.
+    var peer = self.createPeer();
+
+    //Upload the PeerID to the server, get an old ID, if it exists to be used
     await peer.on("open", function (id) {
       tkn = id;
-      console.log(tkn);
       const reqData = {
         roomName: self.state.roomName,
         tkn: tkn,
@@ -174,78 +150,46 @@ class Controls extends Component {
       axios
         .post("http://localhost:5000/api/room/goonline", reqData)
         .then((res) => {
-          //console.log(res);
+          console.log(res);
+          var onlineArray = res.data.online;
           if (res.data.changePeer) {
             peer.destroy();
-            peer = new Peer(res.data.peerId, {
-              config: {
-                iceServers: [
-                  { urls: "stun:stun.l.google.com:19302" },
-                  {
-                    url: "turn:numb.viagenie.ca",
-                    credential: "HWeF3pu@u2RfeYD",
-                    username: "veddandekar6@gmail.com",
-                  },
-                ],
-              } /* Sample servers, please use appropriate ones */,
-            });
+            peer = self.createPeer(res.data.changePeer);
+                  /*
             self.setState({
               myPeer: peer,
               myIds: [...self.state.myIds, peer],
             });
-            console.log("here");
+            */
             console.log(peer.disconnected);
-            //peer.disconnect();
-            peer.on("open", function (id) {
-              console.log("using older id: " + id);
-              if (res.data.connected == 1) {
-                self.getMyMediaStream(self, type).then((media) => {
-                  self.waitForConnections(self, peer);
-                });
-              } else if (res.data.connected > 1) {
-                self.getMyMediaStream(self, type).then((media) => {
-                  self.waitForConnections(self, peer);
-
-                  //Array of users online with their peerIDs to make requests to all.
-                  let onlineArray = res.data.online;
-                  console.log(media);
-                  onlineArray.forEach((val, index) => {
-                    if (val.username == localStorage.getItem("uname")) {
-                      //Display my screen without creating a connection.
-                      return;
-                    }
-                    console.log("Connecting to " + onlineArray[index].tkn);
-                    self.startConnection(self, onlineArray[index].tkn, peer);
-                  });
-                });
-              }
-            });
+            console.log("Using old Id");
+            console.log(peer.connections);
+            if(peer.disconnected) {
+                    peer.reconnect();
+                    console.log("peer was disconnected, reconnecting...");
+                    peer.on("open", function (id) {
+                      console.log('reconnected');
+                      console.log("My token: " + id); 
+                      console.log("using older id: " + id);
+                      self.setUpConnections(self, peer, id, type, onlineArray);
+                    });
+            } else {
+                      peer.reconnect();
+                      self.setUpConnections(self, peer, id, type, onlineArray);
+            }
             next();
           } else {
+            console.log("My token: " + id); 
+            var peers = self.state.myPeers;
+            var myIDs = self.state.myIds;
+            peers.add(peer);
+            myIDs.add(id);
             self.setState({
-              myPeer: peer,
+              myPeers: peers,
+              myIds: myIDs
             });
-            if (res.data.connected == 1) {
-              self.getMyMediaStream(self, type).then((media) => {
-                self.waitForConnections(self, peer);
-              });
-            } else if (res.data.connected > 1) {
-              self.getMyMediaStream(self, type).then((media) => {
-                self.waitForConnections(self, peer);
-
-                //Array of users online with their peerIDs to make requests to all.
-                let onlineArray = res.data.online;
-                console.log(media);
-                onlineArray.forEach((val, index) => {
-                  if (val.username == localStorage.getItem("uname")) {
-                    //Display my screen without creating a connection.
-                    return;
-                  }
-                  console.log("Connecting to " + onlineArray[index].tkn);
-                  self.startConnection(self, onlineArray[index].tkn, peer);
-                });
-              });
-            }
+            console.log(self.state);
+            self.setUpConnections(self, peer, id, type, onlineArray);
             next();
           }
         })
@@ -256,10 +200,25 @@ class Controls extends Component {
     });
   }
 
-  // Experimental : To be tested thoroughly
+  setUpConnections(self, peer, id, type, onlineArray) {
+        self.getMyMediaStream(self, type).then((media) => {
+          // Wait for new incoming connections.
+          self.waitForConnections(self, peer);
+
+          // Make requests to currently online users.
+          onlineArray.forEach((val, index) => {
+            if (val.username == localStorage.getItem("uname")) {
+              //Display my screen without creating a connection.
+              return;
+            }
+            console.log("Connecting to " + onlineArray[index].tkn);
+            self.startConnection(self, onlineArray[index].tkn, peer);
+          });
+        });
+  }
+
   // Function to get the media stream for the user and store it in state so that it
   // can be used multiple times without requiring permission.
-  // Maybe the same function can be used to toggle between stream and video.
   async getMyMediaStream(self, type) {
     if (type == "screen") {
       //TODO: Add try catch to handle case when user denies access
@@ -273,7 +232,7 @@ class Controls extends Component {
           self.setState({
             myMediaStreamObj: media,
           });
-          self.createVideoElement(self, media);
+          self.createVideoElement(self, media, "me");
           return media;
         });
     } else if (type == "video") {
@@ -288,7 +247,7 @@ class Controls extends Component {
           self.setState({
             myMediaStreamObj: media,
           });
-          self.createVideoElement(self, media);
+          self.createVideoElement(self, media, "me");
           return media;
         });
     }
@@ -297,16 +256,18 @@ class Controls extends Component {
   // Asynchronous function to start a connection to peer with ID friendtkn.
   // The media stream to be used is chosen from this.state.myMediaStreamObj
   async startConnection(self, friendtkn, peer) {
-    console.log(friendtkn);
     console.log("starting connection with " + friendtkn);
     //console.log(friendtkn);
     var mediaa = self.state.myMediaStreamObj;
+    console.log(mediaa);
     self.sendMediaStream(self, peer, mediaa, friendtkn, false);
+    /*
     var connectedPeers = self.state.connectedPeers;
-    connectedPeers.push(friendtkn);
+    connectedPeers.add(friendtkn);
     self.setState({
       connectedPeers: connectedPeers,
     });
+    */
   }
 
   // Function to wait for incoming requests onf 'peer' and handle them.
@@ -315,11 +276,43 @@ class Controls extends Component {
     var mediaa = self.state.myMediaStreamObj;
     peer.on("call", function (call) {
       self.sendMediaStream(self, peer, mediaa, null, true, call);
+      /* This logic just hides the duplicate connections. For better performance. 
+       * Duplicate connections should be closed. */
+      //calls.add(thiscall);
+            /*
+      var calls = self.state.calls;
+      console.log(calls);
+      var duplicateCall = false;
+      calls.forEach((val, index) => {
+              console.log('checking with ' + val.peer);
+              if(val.peer == call.peer) {
+                      duplicateCall = val;
+                      return;
+              }
+      });
+      if(duplicateCall) {
+              console.log('closing a duplicate call.');
+              console.log(duplicateCall.peer);
+        //      calls.delete(duplicateCall);
+              duplicateCall.close();
+      }
+      //calls.add(call);
+      console.log(calls);
+      self.setState(
+        {
+          //call: peer.call(friendtkn, media),//to be updated appropriately
+          calls: [...self.state.calls, call],
+          //calls: calls,
+        },
+      );
+            */
+      /*
       var connectedPeers = self.state.connectedPeers;
-      connectedPeers.push(call.peer);
+      connectedPeers.add(call.peer);
       self.setState({
         connectedPeers: connectedPeers,
       });
+      */
     });
   }
 
@@ -332,7 +325,6 @@ class Controls extends Component {
       console.log("Connected to " + friendtkn);
       this.createNotif("Member joined", `${friendtkn} joined the call`, "info");
     }
-    console.log(media);
     var tracks = media.getTracks();
     var track = tracks[0];
     var thiscall = call;
@@ -356,15 +348,8 @@ class Controls extends Component {
     } else {
       thiscall = peer.call(friendtkn, media);
     }
-    self.setState(
-      {
-        //call: peer.call(friendtkn, media),//to be updated appropriately
-        calls: [...self.state.calls, thiscall],
-      },
-      () => {
-        self.addHandlersToCall(self, thiscall, friendtkn, peer, isAnswer);
-      }
-    );
+    self.addHandlersToCall(self, thiscall, friendtkn, peer, isAnswer);
+    console.log('exit4d');
   }
 
   // Add Event handlers to the thiscall call - error, stream used as of now.
@@ -376,19 +361,51 @@ class Controls extends Component {
       console.log(friendtkn);
       console.log(err);
       thiscall.close();
+      //self.startConnection(self, friendtkn, peer); 
+
 
       // If an error is observed, we automatically send another request to start connection,
       // to provide reliability. Since, we dont want both the receiver and sender of the stream
       // to send new calls, only the receiver initiates a new connection.
       if (!isAnswer) {
         console.log(friendtkn);
-        self.startConnection(self, friendtkn, peer);
+        //self.startConnection(self, friendtkn, peer);
       }
     });
 
     // Triggered when receiving a stream from peer.
     thiscall.on("stream", function (stream) {
       console.log("stream received from" + thiscall.peer);
+      var calls = self.state.calls;
+      console.log(calls);
+      var duplicateCall = false;
+      var duplicateCallIndex = -1;
+      calls.forEach((val, index) => {
+              console.log('checking with ' + val.peer);
+              if(val.peer == thiscall.peer) {
+                      duplicateCallIndex = index;
+                      duplicateCall = val;
+                      return;
+              }
+      });
+      if(duplicateCall) {
+              console.log('closing a duplicate call.');
+              console.log(duplicateCall.peer);
+        //      calls.delete(duplicateCall);
+              //calls.splice(duplicateCallIndex, 1);
+              return;
+              //duplicateCall.close();
+      }
+      //calls.add(call);
+      console.log(calls);
+      console.log(thiscall);
+      self.setState(
+        {
+          //call: peer.call(friendtkn, media),//to be updated appropriately
+          calls: [...calls, thiscall],
+          //calls: calls,
+        },
+      );
       self.createStream(self, stream, friendtkn);
     });
   }
@@ -405,7 +422,7 @@ class Controls extends Component {
       console.log(evt);
     };
 
-    console.log(track.remote);
+    //console.log(track.remote);
 
     // These handlers being added are to the incoming stream we are receiving, while
     // the handlers added before were to the stream which we were sending.
@@ -423,15 +440,17 @@ class Controls extends Component {
 
     console.log(stream.getTracks());
 
-    self.createVideoElement(self, stream);
+    self.createVideoElement(self, stream, friendtkn);
 
     //self.videoRef.current.srcObject = stream;
   }
 
   // Creates a new video element to show the stream passed to it.
-  createVideoElement(self, stream) {
+  createVideoElement(self, stream, friendtkn) {
+    console.trace();
     let video = document.createElement("video");
     video.width = "200";
+    video.id = friendtkn;
     video.height = "350";
     video.srcObject = stream;
     video.autoplay = true;
