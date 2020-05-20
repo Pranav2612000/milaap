@@ -88,15 +88,11 @@ class Room extends Component {
 
   render() {
     return (
-      <Container className="m-0 p-0 animated fadeIn">
-        {/* ROOM NAME {this.state.roomName} */}
-        <video id="context" autoPlay></video>
-        {/* <Jumbotron> */}
-        <Row className="m-0 p-0" id="videos"></Row>
-        {/* </Jumbotron> */}
-        {/* <video autoPlay></video> */}
-        {/*<PeerHandler />*/}
-      </Container>
+      <div className="animated fadeIn">
+        ROOM NAME {this.state.roomName}
+        <video autoPlay></video>
+        <PeerHandler />
+      </div>
     );
   }
 }
