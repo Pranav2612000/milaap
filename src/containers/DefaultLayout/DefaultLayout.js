@@ -46,7 +46,6 @@ function getGroupElements(rooms) {
 }
 class DefaultLayout extends Component {
   getRooms = () => {
-
     const reqData = {
       username: localStorage.getItem("uname"),
     };
@@ -92,7 +91,7 @@ class DefaultLayout extends Component {
       .catch((err) => {
         console.log(err);
       });
-  }
+  };
   constructor(props) {
     super(props);
     var rooms;
@@ -168,8 +167,7 @@ class DefaultLayout extends Component {
       console.log("ROOM ADDED");
       console.log(data);
       this.getRooms();
-    })
-
+    });
   }
   loading = () => (
     <div className="animated fadeIn pt-1 text-center">Loading...</div>
@@ -195,8 +193,6 @@ class DefaultLayout extends Component {
         },
       });
     }
-
-
   }
   render() {
     if (localStorage.getItem("uname") == undefined) {
@@ -246,7 +242,7 @@ class DefaultLayout extends Component {
               </Container>
             </main>
             <Suspense fallback={this.loading()}>
-              <aside class="aside-menu" display="md" fixed>
+              <aside class="aside-menu" display="md">
                 <DefaultAside />
               </aside>
             </Suspense>

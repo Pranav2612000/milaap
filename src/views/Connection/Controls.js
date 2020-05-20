@@ -72,29 +72,27 @@ class Controls extends Component {
     this.sendCallEndedSignal = this.sendCallEndedSignal.bind(this);
 
     /* TODO:  Move Call to appropriate position, and replace by generalized call.*/
-    if (this.state.roomName !== "dashboard")
-      this.getActive();
+    if (this.state.roomName !== "dashboard") this.getActive();
 
     socket.on("userJoined", (data) => {
       console.clear();
       console.log("NEW USER JOINED :)");
       console.log(data);
-      if (this.state.roomName !== "dashboard")      //YET TO BE TESTED
+      if (this.state.roomName !== "dashboard")
+        //YET TO BE TESTED
         this.getActive();
     });
     socket.on("userOnline", (data) => {
       console.clear();
       console.log("NEW USER ONLINE :)");
       console.log(data);
-      if (this.state.roomName !== "dashboard")
-        this.getActive();
+      if (this.state.roomName !== "dashboard") this.getActive();
     });
     socket.on("userExit", (data) => {
       console.clear();
       console.log("USER EXITED :(");
       console.log(data);
-      if (this.state.roomName !== "dashboard")
-        this.getActive();
+      if (this.state.roomName !== "dashboard") this.getActive();
     });
     this.endCall = this.endCall.bind(this);
   }
@@ -535,13 +533,16 @@ class Controls extends Component {
           </AwesomeButtonProgress>
         </Row>
         <br />
+        <h3>Members</h3>
         <ListGroup flush>
           {this.state.active
             ? this.state.active.map((user) => {
                 return (
                   <ListGroupItem key={Math.random()}>
-                    <Spinner type="grow" size="sm" variant="success" />
-                    {user.username}
+                    <Row>
+                      <Spinner type="grow" size="sm" variant="success" />
+                      {user.username}
+                    </Row>
                   </ListGroupItem>
                 );
               })

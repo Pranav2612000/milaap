@@ -1,12 +1,34 @@
-import React, { Component } from 'react';
-import {withRouter} from 'react-router-dom';
-import { Nav, NavItem, NavLink, Progress, TabContent, TabPane, ListGroup, ListGroupItem } from 'reactstrap';
-import PropTypes from 'prop-types';
-import classNames from 'classnames';
-import { AppSwitch } from '@coreui/react'
-import MessageView from '../../views/MessageList/index';
-import Controls from '../../views/Connection/Controls';
-import { Button, ButtonGroup, Badge, Card, CardBody, CardFooter, CardHeader, Col, Container, Row, Collapse, Fade } from 'reactstrap';
+import React, { Component } from "react";
+import { withRouter } from "react-router-dom";
+import {
+  Nav,
+  NavItem,
+  NavLink,
+  Progress,
+  TabContent,
+  TabPane,
+  ListGroup,
+  ListGroupItem,
+} from "reactstrap";
+import PropTypes from "prop-types";
+import classNames from "classnames";
+import { AppSwitch } from "@coreui/react";
+import MessageView from "../../views/MessageList/index";
+import Controls from "../../views/Connection/Controls";
+import {
+  Button,
+  ButtonGroup,
+  Badge,
+  Card,
+  CardBody,
+  CardFooter,
+  CardHeader,
+  Col,
+  Container,
+  Row,
+  Collapse,
+  Fade,
+} from "reactstrap";
 
 const propTypes = {
   children: PropTypes.node,
@@ -15,32 +37,31 @@ const propTypes = {
 const defaultProps = {};
 
 function getRoomFromLocation(location_string) {
-        let room = '';
-        let lastslash = location_string.lastIndexOf("/");
-        room = location_string.slice(lastslash + 1);
-        console.log(room);
-        return room;
+  let room = "";
+  let lastslash = location_string.lastIndexOf("/");
+  room = location_string.slice(lastslash + 1);
+  console.log(room);
+  return room;
 }
 
 class DefaultAside extends Component {
-
   constructor(props) {
     super(props);
     console.log(props.location.pathname);
 
     this.toggle = this.toggle.bind(this);
     this.state = {
-      activeTab: '1',
-      roomName: getRoomFromLocation(props.location.pathname)
+      activeTab: "1",
+      roomName: getRoomFromLocation(props.location.pathname),
     };
   }
   componentDidUpdate(prevProps) {
-      if(this.props.location.pathname != prevProps.location.pathname) {
-          this.setState({
-              roomName: getRoomFromLocation(this.props.location.pathname)
-          });
-          console.log(this.props.location.pathname);
-      }
+    if (this.props.location.pathname != prevProps.location.pathname) {
+      this.setState({
+        roomName: getRoomFromLocation(this.props.location.pathname),
+      });
+      console.log(this.props.location.pathname);
+    }
   }
 
   toggle(tab) {
@@ -52,7 +73,6 @@ class DefaultAside extends Component {
   }
 
   render() {
-
     // eslint-disable-next-line
     const { children, ...attributes } = this.props;
 
@@ -60,33 +80,40 @@ class DefaultAside extends Component {
       <React.Fragment>
         <Nav tabs>
           <NavItem>
-            <NavLink onClick={() => {
-                       this.toggle('1');
-                     }}>
+            <NavLink
+              className={classNames({ active: this.state.activeTab === "1" })}
+              onClick={() => {
+                this.toggle("1");
+              }}
+            >
               <i className="icon-list"></i>
             </NavLink>
           </NavItem>
           <NavItem>
-            <NavLink className={classNames({ active: this.state.activeTab === '2' })}
-                     onClick={() => {
-                       this.toggle('2');
-                     }}>
+            <NavLink
+              className={classNames({ active: this.state.activeTab === "2" })}
+              onClick={() => {
+                this.toggle("2");
+              }}
+            >
               <i className="icon-speech"></i>
             </NavLink>
           </NavItem>
           <NavItem>
-            <NavLink className={classNames({ active: this.state.activeTab === '3' })}
-                     onClick={() => {
-                       this.toggle('3');
-                     }}>
+            <NavLink
+              className={classNames({ active: this.state.activeTab === "3" })}
+              onClick={() => {
+                this.toggle("3");
+              }}
+            >
               <i className="icon-settings"></i>
             </NavLink>
           </NavItem>
         </Nav>
         <TabContent activeTab={this.state.activeTab}>
           <TabPane tabId="1">
-                  <Controls roomName={this.state.roomName}/>
-                  {/*
+            <Controls roomName={this.state.roomName} />
+            {/*
                   <Row>
             <Card className="text-white bg-primary w-25">
               <CardHeader>
@@ -102,8 +129,8 @@ class DefaultAside extends Component {
                   */}
           </TabPane>
           <TabPane tabId="2" className="p-3">
-                  <MessageView roomName={this.state.roomName}/>
-                  {/*
+            <MessageView roomName={this.state.roomName} />
+            {/*
             <div className="message">
               <div className="py-3 pb-5 mr-3 float-left">
                 <div className="avatar">
@@ -195,32 +222,61 @@ class DefaultAside extends Component {
 
             <div className="aside-options">
               <div className="clearfix mt-4">
-                <small><b>Option 1</b></small>
-                <AppSwitch className={'float-right'} variant={'pill'} label color={'success'} defaultChecked size={'sm'}/>
+                <small>
+                  <b>Option 1</b>
+                </small>
+                <AppSwitch
+                  className={"float-right"}
+                  variant={"pill"}
+                  label
+                  color={"success"}
+                  defaultChecked
+                  size={"sm"}
+                />
               </div>
               <div>
-                <small className="text-muted">Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
-                  tempor incididunt ut labore et dolore magna aliqua.
+                <small className="text-muted">
+                  Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed
+                  do eiusmod tempor incididunt ut labore et dolore magna aliqua.
                 </small>
               </div>
             </div>
 
             <div className="aside-options">
               <div className="clearfix mt-3">
-                <small><b>Option 2</b></small>
-                <AppSwitch className={'float-right'} variant={'pill'} label color={'success'} size={'sm'}/>
+                <small>
+                  <b>Option 2</b>
+                </small>
+                <AppSwitch
+                  className={"float-right"}
+                  variant={"pill"}
+                  label
+                  color={"success"}
+                  size={"sm"}
+                />
               </div>
               <div>
-                <small className="text-muted">Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
-                  tempor incididunt ut labore et dolore magna aliqua.
+                <small className="text-muted">
+                  Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed
+                  do eiusmod tempor incididunt ut labore et dolore magna aliqua.
                 </small>
               </div>
             </div>
 
             <div className="aside-options">
               <div className="clearfix mt-3">
-                <small><b>Option 3</b></small>
-                <AppSwitch className={'float-right'} variant={'pill'} label color={'success'} defaultChecked size={'sm'} disabled/>
+                <small>
+                  <b>Option 3</b>
+                </small>
+                <AppSwitch
+                  className={"float-right"}
+                  variant={"pill"}
+                  label
+                  color={"success"}
+                  defaultChecked
+                  size={"sm"}
+                  disabled
+                />
                 <div>
                   <small className="text-muted">Option disabled.</small>
                 </div>
@@ -229,25 +285,38 @@ class DefaultAside extends Component {
 
             <div className="aside-options">
               <div className="clearfix mt-3">
-                <small><b>Option 4</b></small>
-                <AppSwitch className={'float-right'} variant={'pill'} label color={'success'} defaultChecked size={'sm'} />
+                <small>
+                  <b>Option 4</b>
+                </small>
+                <AppSwitch
+                  className={"float-right"}
+                  variant={"pill"}
+                  label
+                  color={"success"}
+                  defaultChecked
+                  size={"sm"}
+                />
               </div>
             </div>
-
+            {/* 
             <hr />
             <h6>System Utilization</h6>
 
             <div className="text-uppercase mb-1 mt-4">
-              <small><b>CPU Usage</b></small>
+              <small>
+                <b>CPU Usage</b>
+              </small>
             </div>
             <Progress className="progress-xs" color="info" value="25" />
             <small className="text-muted">348 Processes. 1/4 Cores.</small>
 
             <div className="text-uppercase mb-1 mt-2">
-              <small><b>Memory Usage</b></small>
+              <small>
+                <b>Memory Usage</b>
+              </small>
             </div>
-            <Progress className="progress-xs" color="warning" value="70" />
-            <small className="text-muted">11444GB/16384MB</small>
+            <Progress className="progress-xs" color="warning" value="70" /> */}
+            {/* <small className="text-muted">11444GB/16384MB</small>
 
             <div className="text-uppercase mb-1 mt-2">
               <small><b>SSD 1 Usage</b></small>
@@ -259,7 +328,7 @@ class DefaultAside extends Component {
               <small><b>SSD 2 Usage</b></small>
             </div>
             <Progress className="progress-xs" color="success" value="10" />
-            <small className="text-muted">25GB/256GB</small>
+            <small className="text-muted">25GB/256GB</small> */}
           </TabPane>
         </TabContent>
       </React.Fragment>
