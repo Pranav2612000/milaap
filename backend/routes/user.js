@@ -6,9 +6,11 @@ const rooms = require('../models/Rooms.model');
 const userLogins = require('../models/UserLogin.model');
 const users = require('../models/User.model');
 var io = require('../index');
+const auth = require("../middleware/auth");
 // console.log(io);
-router.post('/adduser', async (req, res) => {
-    const host = req.body.host;
+router.post('/adduser', auth, async (req, res) => {
+
+    const host = req.user.id;
     const user = req.body.user;
     const roomName = req.body.roomName;
 
@@ -92,8 +94,9 @@ router.post('/adduser', async (req, res) => {
     */
 });
 
-router.post('/getrooms', async (req, res) => {
-    const username = req.body.username;
+router.post('/getrooms', auth, async (req, res) => {
+    console.log('getrooms', req.user.id)
+    const username = req.user.id;
     users.findOne({ username: username }, function (err, user) {
         if (err) {
             return res.status(400).json({ err: "Error. Try again." });
@@ -106,6 +109,11 @@ router.post('/getrooms', async (req, res) => {
     });
 });
 
+router.get('/getUserName', auth, async (req, res) => {
+    const username = req.user.id;
+    // console.log(username)
+    res.status(200).json({ username: username });
+})
 module.exports = router;
 
 

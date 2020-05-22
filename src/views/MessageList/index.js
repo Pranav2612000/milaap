@@ -9,7 +9,7 @@ import socketIOClient from "socket.io-client";
 import "./MessageList.css";
 
 const socket = socketIOClient("http://localhost:5000/");
-const MY_USER_ID = localStorage.getItem("uname");
+
 
 function formatMsgs(tempMsg) {
   let formattedMsgs = [];
@@ -25,8 +25,22 @@ function formatMsgs(tempMsg) {
 }
 
 export default function MessageList(props) {
+  var [MY_USER_ID, setID] = useState("");
   const [messages, setMessages] = useState([]);
   const [lastMsgId, setLastMsgId] = useState(0);
+  useEffect(() => {
+    axios
+      .get("http://localhost:5000/api/user/getUserName", {
+        headers: { 'milaap-auth-token': localStorage.getItem('milaap-auth-token') }
+      }).then(resp => {
+        setID(resp.data.username);
+
+      }).catch(err => {
+        console.log(err, "Error in Verifying JWT")
+      })
+
+  }, [])
+
 
   let getReqData = function () {
     return {
@@ -36,10 +50,12 @@ export default function MessageList(props) {
   };
   const fetchMessages = () => {
     var reqData = getReqData();
-    console.clear();
+    // console.clear();
     console.log(reqData);
     axios
-      .post("http://localhost:5000/api/room/getmsgs", reqData)
+      .post("http://localhost:5000/api/room/getmsgs", reqData, {
+        headers: { 'milaap-auth-token': localStorage.getItem('milaap-auth-token') }
+      })
       .then((res) => {
         console.log(res);
         let tempMsg = res.data.msgs;

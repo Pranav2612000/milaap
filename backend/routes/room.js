@@ -7,11 +7,13 @@ const userLogins = require("../models/UserLogin.model");
 const users = require("../models/User.model");
 const shortid = require("shortid");
 var io = require('../index');
+const auth = require("../middleware/auth");
 
-router.post("/sendmessage", async (req, res) => {
-  const sender = req.body.sender;
+router.post("/sendmessage", auth, async (req, res) => {
+  const sender = req.user.id;
   const msg = req.body.msg;
   const roomName = req.body.roomName;
+  console.log("user", req.user)
   rooms.findOne({ roomName: roomName }, function (err, room) {
     if (err) {
       return res.status(400).json({ err: "Error. Try again." });
@@ -85,8 +87,16 @@ router.post("/sendmessage", async (req, res) => {
   });
 });
 
-router.post("/enterroom", async (req, res) => {
+router.post("/enterroom", auth, async (req, res) => {
   const roomName = req.body.roomName;
+  /*
+    Also need to send sender id here
+  */
+
+  // if (req.user.id === sender) {
+  //   console.log("JWT MATCH ERROR")
+  //   return res.status(500).json({ msg: 'JWT and SSS_No didnt match!' });
+  // }
   /*
          * Reminder that generating peerId on server side is not a good idea.
                 /* We may store previous ids in a room and use them again, but for now creating a
@@ -105,7 +115,8 @@ router.post("/enterroom", async (req, res) => {
 
 //, inCall: room._doc.online
 
-router.post("/getActive", async (req, res) => {
+router.post("/getActive", auth, async (req, res) => {
+
   const roomName = req.body.roomName;
   rooms.findOne({ roomName: roomName }, function (err, room) {
     if (err) {
@@ -120,7 +131,8 @@ router.post("/getActive", async (req, res) => {
   });
 });
 
-router.post("/getmsgs", async (req, res) => {
+router.post("/getmsgs", auth, async (req, res) => {
+
   const roomName = req.body.roomName;
   let lastMsgId = req.body.lastMsgId; // requesting for id 0, should send msg with id 0
   if (lastMsgId == undefined) {
@@ -153,9 +165,9 @@ router.post("/getmsgs", async (req, res) => {
   });
 });
 
-router.post("/exitstream", async (req, res) => {
+router.post("/exitstream", auth, async (req, res) => {
   const roomName = req.body.roomName;
-  const username = req.body.username;
+  const username = req.user.id;
   var idToBeDestroyed = [];
   rooms.findOne({ roomName: roomName }, function (err, room) {
     if (err) {
@@ -171,7 +183,7 @@ router.post("/exitstream", async (req, res) => {
         .status(200).json({ msg: "Already exited", online: onlineArray, idToBeDestroyed: idToBeDestroyed });
     }
     var indicesToBeDeleted = []; // TODO: A peer can be present only 2 times- for audio, video
-                                       //so this can be optimized to stop if we get two elements.
+    //so this can be optimized to stop if we get two elements.
     onlineArray.forEach((val, index) => {
       if (val.username == username) {
         //indexToBeDeleted = index;
@@ -199,22 +211,25 @@ router.post("/exitstream", async (req, res) => {
         } else {
           io.emit("userExit", req.body);
           return res
-            .status(200).json({ msg: "Room Exited successfully", online: onlineArray , idToBeDestroyed: idToBeDestroyed});
+            .status(200).json({ msg: "Room Exited successfully", online: onlineArray, idToBeDestroyed: idToBeDestroyed });
         }
       });
     }
   });
 });
-router.post("/goonline", async (req, res) => {
+router.post("/goonline", auth, async (req, res) => {
   const tkn = req.body.tkn;
   const roomName = req.body.roomName;
-  const username = req.body.username;
+  const username = req.user.id;
   const type = req.body.type;
+  console.log(req.body)
   rooms.findOne({ roomName: roomName }, function (err, room) {
     if (err) {
+      console.log("error 1")
       return res.status(400).json({ err: "Error. Try again." });
     }
     if (!room) {
+      console.log("error 2")
       return res.status(400).json({ err: "Error. Incorrect roomname." });
     }
     let onlineArray = room.online;
@@ -235,7 +250,7 @@ router.post("/goonline", async (req, res) => {
             io.emit('userOnline', req.body);
             return res
               .status(200)
-                          .json({ msg: "Waiting for others", connected: 1, type: type});
+              .json({ msg: "Waiting for others", connected: 1, type: type });
           }
         }
       );
