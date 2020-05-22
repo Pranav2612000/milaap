@@ -41,7 +41,6 @@ class Room extends Component {
     this.state = {
       dropdownOpen: false,
       radioSelected: 2,
-      username: localStorage.getItem("uname"),
       roomName: roomName,
     };
   }

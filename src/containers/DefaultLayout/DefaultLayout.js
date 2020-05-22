@@ -46,12 +46,10 @@ function getGroupElements(rooms) {
 }
 class DefaultLayout extends Component {
   getRooms = () => {
-
-    const reqData = {
-      username: localStorage.getItem("uname"),
-    };
     axios
-      .post("http://localhost:5000/api/user/getrooms", reqData)
+      .post("http://localhost:5000/api/user/getrooms", {}, {
+        headers: { 'milaap-auth-token': localStorage.getItem('milaap-auth-token') },
+      })
       .then((res) => {
         console.log(res);
         var rooms = res.data.rooms;
@@ -98,7 +96,7 @@ class DefaultLayout extends Component {
     var rooms;
 
     this.state = {
-      username: localStorage.getItem("uname"),
+      userToken: localStorage.getItem("milaap-auth-token"),
       navigation: {
         items: [
           {
@@ -128,7 +126,7 @@ class DefaultLayout extends Component {
         ],
       },
     };
-    if (this.state.username == undefined) {
+    if (this.state.userToken === null) {
       return;
     }
     this.getRooms();
@@ -199,7 +197,7 @@ class DefaultLayout extends Component {
 
   }
   render() {
-    if (localStorage.getItem("uname") == undefined) {
+    if (localStorage.getItem("milaap-auth-token") === null) {
       return <Redirect to="/login" />;
     }
     return (

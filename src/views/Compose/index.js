@@ -7,12 +7,16 @@ export default function Compose(props) {
   async function sendMessage() {
     if (msg === "") return;
     const reqData = {
-      sender: localStorage.getItem("uname"),
       msg: msg,
       roomName: props.roomName,
     };
     axios
-      .post("http://localhost:5000/api/room/sendmessage", reqData)
+      .post("http://localhost:5000/api/room/sendmessage",
+        reqData,
+        {
+          headers: { 'milaap-auth-token': localStorage.getItem('milaap-auth-token') }
+        }
+      )
       .then((res) => {
         console.log(res);
         //window.location.reload();

@@ -32,13 +32,13 @@ class DefaultHeader extends Component {
 
 	addFriend() {
 		const reqData = {
-			host: localStorage.getItem('uname'),
 			user: this.state.friendid,
 			roomName: this.state.roomName
 		};
 		axios.post(
-			'http://localhost:5000/api/user/adduser',
-			reqData
+			'http://localhost:5000/api/user/adduser', reqData, {
+			headers: { 'milaap-auth-token': localStorage.getItem('milaap-auth-token') }
+		}
 		).then(res => {
 			console.log(res);
 			this.toggle();
