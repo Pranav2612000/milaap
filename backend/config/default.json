@@ -1,3 +1,4 @@
 {
-        "mongoURI": "mongodb+srv://trump:foolish@cluster0-ccwmh.mongodb.net/test?retryWrites=true&w=majority"
+  "mongoURI": "mongodb+srv://trump:foolish@cluster0-ccwmh.mongodb.net/test?retryWrites=true&w=majority",
+  "jwtSecret": "coronaCulpritChina"
 }

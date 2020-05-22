@@ -24,26 +24,40 @@ import {
 import { CustomTooltips } from '@coreui/coreui-plugin-chartjs-custom-tooltips';
 import { getStyle, hexToRgba } from '@coreui/coreui/dist/js/coreui-utilities'
 import DefaultAside from '../../containers/DefaultLayout/DefaultAside';
-
+const axios = require("axios")
 class Dashboard extends Component {
+
   constructor(props) {
     super(props);
 
     this.toggle = this.toggle.bind(this);
     this.onRadioBtnClick = this.onRadioBtnClick.bind(this);
 
+
     this.state = {
       dropdownOpen: false,
       radioSelected: 2,
-      username: localStorage.getItem('uname')
+      username: this.username
     };
+
+
   }
   toggle() {
     this.setState({
       dropdownOpen: !this.state.dropdownOpen,
     });
   }
-
+  componentDidMount() {
+    axios
+      .get("http://localhost:5000/api/user/getUserName", {
+        headers: { 'milaap-auth-token': localStorage.getItem('milaap-auth-token') }
+      }).then(resp => {
+        console.log(resp.data.username);
+        this.setState({ username: resp.data.username })
+      }).catch(err => {
+        console.log(err, "Error in Verifying JWT")
+      })
+  }
   onRadioBtnClick(radioSelected) {
     this.setState({
       radioSelected: radioSelected,

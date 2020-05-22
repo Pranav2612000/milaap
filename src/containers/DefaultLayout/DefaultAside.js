@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import {withRouter} from 'react-router-dom';
+import { withRouter } from 'react-router-dom';
 import { Nav, NavItem, NavLink, Progress, TabContent, TabPane, ListGroup, ListGroupItem } from 'reactstrap';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
@@ -15,32 +15,36 @@ const propTypes = {
 const defaultProps = {};
 
 function getRoomFromLocation(location_string) {
-        let room = '';
-        let lastslash = location_string.lastIndexOf("/");
-        room = location_string.slice(lastslash + 1);
-        console.log(room);
-        return room;
+  let room = '';
+  let lastslash = location_string.lastIndexOf("/");
+  room = location_string.slice(lastslash + 1);
+  console.log(room);
+  return room;
 }
 
 class DefaultAside extends Component {
 
   constructor(props) {
     super(props);
-    console.log(props.location.pathname);
 
     this.toggle = this.toggle.bind(this);
     this.state = {
       activeTab: '1',
-      roomName: getRoomFromLocation(props.location.pathname)
+      change: false,
+      roomName: getRoomFromLocation(props.location.pathname),
+      path: props.location.pathname
     };
+    console.log(this.state.roomName)
+
   }
   componentDidUpdate(prevProps) {
-      if(this.props.location.pathname != prevProps.location.pathname) {
-          this.setState({
-              roomName: getRoomFromLocation(this.props.location.pathname)
-          });
-          console.log(this.props.location.pathname);
-      }
+    if (this.props.location.pathname != prevProps.location.pathname) {
+      this.setState({
+        roomName: getRoomFromLocation(this.props.location.pathname)
+      });
+      this.setState({ change: !this.state.change })
+      console.log(this.props.location.pathname);
+    }
   }
 
   toggle(tab) {
@@ -61,32 +65,32 @@ class DefaultAside extends Component {
         <Nav tabs>
           <NavItem>
             <NavLink onClick={() => {
-                       this.toggle('1');
-                     }}>
+              this.toggle('1');
+            }}>
               <i className="icon-list"></i>
             </NavLink>
           </NavItem>
           <NavItem>
             <NavLink className={classNames({ active: this.state.activeTab === '2' })}
-                     onClick={() => {
-                       this.toggle('2');
-                     }}>
+              onClick={() => {
+                this.toggle('2');
+              }}>
               <i className="icon-speech"></i>
             </NavLink>
           </NavItem>
           <NavItem>
             <NavLink className={classNames({ active: this.state.activeTab === '3' })}
-                     onClick={() => {
-                       this.toggle('3');
-                     }}>
+              onClick={() => {
+                this.toggle('3');
+              }}>
               <i className="icon-settings"></i>
             </NavLink>
           </NavItem>
         </Nav>
         <TabContent activeTab={this.state.activeTab}>
           <TabPane tabId="1">
-                  <Controls roomName={this.state.roomName}/>
-                  {/*
+            <Controls key={this.change} roomName={this.state.roomName} />
+            {/*
                   <Row>
             <Card className="text-white bg-primary w-25">
               <CardHeader>
@@ -102,8 +106,8 @@ class DefaultAside extends Component {
                   */}
           </TabPane>
           <TabPane tabId="2" className="p-3">
-                  <MessageView roomName={this.state.roomName}/>
-                  {/*
+            <MessageView roomName={this.state.roomName} />
+            {/*
             <div className="message">
               <div className="py-3 pb-5 mr-3 float-left">
                 <div className="avatar">
@@ -196,11 +200,11 @@ class DefaultAside extends Component {
             <div className="aside-options">
               <div className="clearfix mt-4">
                 <small><b>Option 1</b></small>
-                <AppSwitch className={'float-right'} variant={'pill'} label color={'success'} defaultChecked size={'sm'}/>
+                <AppSwitch className={'float-right'} variant={'pill'} label color={'success'} defaultChecked size={'sm'} />
               </div>
               <div>
                 <small className="text-muted">Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
-                  tempor incididunt ut labore et dolore magna aliqua.
+                tempor incididunt ut labore et dolore magna aliqua.
                 </small>
               </div>
             </div>
@@ -208,11 +212,11 @@ class DefaultAside extends Component {
             <div className="aside-options">
               <div className="clearfix mt-3">
                 <small><b>Option 2</b></small>
-                <AppSwitch className={'float-right'} variant={'pill'} label color={'success'} size={'sm'}/>
+                <AppSwitch className={'float-right'} variant={'pill'} label color={'success'} size={'sm'} />
               </div>
               <div>
                 <small className="text-muted">Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
-                  tempor incididunt ut labore et dolore magna aliqua.
+                tempor incididunt ut labore et dolore magna aliqua.
                 </small>
               </div>
             </div>
@@ -220,7 +224,7 @@ class DefaultAside extends Component {
             <div className="aside-options">
               <div className="clearfix mt-3">
                 <small><b>Option 3</b></small>
-                <AppSwitch className={'float-right'} variant={'pill'} label color={'success'} defaultChecked size={'sm'} disabled/>
+                <AppSwitch className={'float-right'} variant={'pill'} label color={'success'} defaultChecked size={'sm'} disabled />
                 <div>
                   <small className="text-muted">Option disabled.</small>
                 </div>
