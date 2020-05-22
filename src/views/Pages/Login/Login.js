@@ -11,11 +11,12 @@ class Login extends Component {
     this.state = {
       login: false,
       username: '',
-      password: ''
+      password: '',
+      error: false
     };
-    this.handleUsernameChange = this.handleUsernameChange.bind(this);
-    this.handlePasswordChange = this.handlePasswordChange.bind(this);
-    this.handleSubmit = this.handleSubmit.bind(this);
+    // this.handleUsernameChange = this.handleUsernameChange.bind(this);
+    // this.handlePasswordChange = this.handlePasswordChange.bind(this);
+    // this.handleSubmit = this.handleSubmit.bind(this);
   }
   componentDidMount() {
     if (this.props.location.register === true) {
@@ -36,18 +37,18 @@ class Login extends Component {
       });
     }
   }
-  handleUsernameChange(e) {
+  handleUsernameChange = e => {
     this.setState({
       username: e.target.value
     });
   }
 
-  handlePasswordChange(e) {
+  handlePasswordChange = e => {
     this.setState({
       password: e.target.value
     });
   }
-  handleSubmit(e) {
+  handleSubmit = e => {
     e.preventDefault();
     var reqData = {
       username: this.state.username,
@@ -57,15 +58,17 @@ class Login extends Component {
       'http://localhost:5000/api/login',
       reqData)
       .then(res => {
-        localStorage.setItem('uname', this.state.username);
-        console.log(res);
+
+        // console.log(res.data)
+        localStorage.setItem('milaap-auth-token', res.data.token);
         this.setState({
           login: true
         });
+
       })
       .catch(err => {
         console.log(err);
-
+        this.setState({ error: true })
         store.addNotification({
           title: "Invalid Username or Password",
           message: `Please Try Again`,
@@ -88,10 +91,12 @@ class Login extends Component {
   render() {
     return (
       <>
-
+        {console.log(this.state.login)}
         {this.state.login === true && <Redirect to={{ pathname: "/dashboard", state: this.state.username }} />}
+        {/* <ReactNotification /> */}
+        {/* {this.state.login && console.log("object")} */}
+        {this.state.error && <ReactNotification />}
         <div className="app flex-row align-items-center" >
-          <ReactNotification />
           <Container>
             <Row className="justify-content-center">
               <Col md="8">

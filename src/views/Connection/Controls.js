@@ -41,9 +41,12 @@ const socket = socketIOClient("http://localhost:5000/");
 
 class Controls extends Component {
   getActive = () => {
+
     axios
       .post("http://localhost:5000/api/room/getActive", {
         roomName: this.props.roomName,
+      }, {
+        headers: { 'milaap-auth-token': localStorage.getItem('milaap-auth-token') }
       })
       .then((res) => {
         console.log("EHREEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE", res);
@@ -67,6 +70,8 @@ class Controls extends Component {
       opinfo: "",
       friendtkn: "",
     };
+    console.clear()
+    console.log(this.state.roomName)
     this.startScreenShare = this.startScreenShare.bind(this);
     this.startConnection = this.startConnection.bind(this);
     this.sendCallEndedSignal = this.sendCallEndedSignal.bind(this);
@@ -104,6 +109,8 @@ class Controls extends Component {
       axios
         .post("http://localhost:5000/api/room/getActive", {
           roomName: this.props.roomName,
+        }, {
+          headers: { 'milaap-auth-token': localStorage.getItem('milaap-auth-token') }
         })
         .then((res) => {
           if (!res.data.active.length || res.data.active == this.state.active)
@@ -172,11 +179,12 @@ class Controls extends Component {
       const reqData = {
         roomName: self.state.roomName,
         tkn: tkn,
-        username: localStorage.getItem("uname"),
         type: type,
       };
       axios
-        .post("http://localhost:5000/api/room/goonline", reqData)
+        .post("http://localhost:5000/api/room/goonline", reqData, {
+          headers: { 'milaap-auth-token': localStorage.getItem('milaap-auth-token') }
+        })
         .then((res) => {
           //console.log(res);
           if (res.data.changePeer) {
@@ -213,14 +221,24 @@ class Controls extends Component {
                   //Array of users online with their peerIDs to make requests to all.
                   let onlineArray = res.data.online;
                   console.log(media);
-                  onlineArray.forEach((val, index) => {
-                    if (val.username == localStorage.getItem("uname")) {
-                      //Display my screen without creating a connection.
-                      return;
-                    }
-                    console.log("Connecting to " + onlineArray[index].tkn);
-                    self.startConnection(self, onlineArray[index].tkn, peer);
-                  });
+                  axios
+                    .get("http://localhost:5000/api/user/getUserName", {
+                      headers: { 'milaap-auth-token': localStorage.getItem('milaap-auth-token') }
+                    }).then(resp => {
+                      console.clear();
+                      console.log(resp.data)
+                      onlineArray.forEach((val, index) => {
+                        if (val.username === resp.data.username) {
+                          //Display my screen without creating a connection.
+                          return;
+                        }
+                        console.log("Connecting to " + onlineArray[index].tkn);
+                        self.startConnection(self, onlineArray[index].tkn, peer);
+                      })
+
+                    }).catch(err => {
+                      console.log(err, "Error in Verifying JWT")
+                    });
                 });
               }
             });
@@ -240,14 +258,23 @@ class Controls extends Component {
                 //Array of users online with their peerIDs to make requests to all.
                 let onlineArray = res.data.online;
                 console.log(media);
-                onlineArray.forEach((val, index) => {
-                  if (val.username == localStorage.getItem("uname")) {
-                    //Display my screen without creating a connection.
-                    return;
-                  }
-                  console.log("Connecting to " + onlineArray[index].tkn);
-                  self.startConnection(self, onlineArray[index].tkn, peer);
-                });
+                axios
+                  .get("http://localhost:5000/api/user/getUserName", {
+                    headers: { 'milaap-auth-token': localStorage.getItem('milaap-auth-token') }
+                  }).then(resp => {
+                    console.clear();
+                    console.log(resp.data)
+                    onlineArray.forEach((val, index) => {
+                      if (val.username == resp.data.username) {
+                        //Display my screen without creating a connection.
+                        return;
+                      }
+                      console.log("Connecting to " + onlineArray[index].tkn);
+                      self.startConnection(self, onlineArray[index].tkn, peer);
+                    })
+                  }).catch(err => {
+                    console.log(err, "Error in Verifying JWT")
+                  });
               });
             }
             next();
@@ -382,7 +409,7 @@ class Controls extends Component {
       thiscall.close();
 
       // If an error is observed, we automatically send another request to start connection,
-      // to provide reliability. Since, we dont want both the receiver and sender of the stream
+      // to provide reliability. Since, we dont want both the receiver and username of the stream
       // to send new calls, only the receiver initiates a new connection.
       if (!isAnswer) {
         console.log(friendtkn);
@@ -445,11 +472,12 @@ class Controls extends Component {
 
   sendCallEndedSignal() {
     const reqData = {
-      username: localStorage.getItem("uname"),
       roomName: this.state.roomName,
     };
     axios
-      .post("http://localhost:5000/api/room/exitstream", reqData)
+      .post("http://localhost:5000/api/room/exitstream", reqData, {
+        headers: { 'milaap-auth-token': localStorage.getItem('milaap-auth-token') }
+      })
       .then((res) => {
         console.log(res.data);
       })
@@ -460,11 +488,12 @@ class Controls extends Component {
 
   sendRequestToEndCall(next) {
     const reqData = {
-      username: localStorage.getItem("uname"),
       roomName: this.state.roomName,
     };
     axios
-      .post("http://localhost:5000/api/room/exitstream", reqData)
+      .post("http://localhost:5000/api/room/exitstream", reqData, {
+        headers: { 'milaap-auth-token': localStorage.getItem('milaap-auth-token') }
+      })
       .then((res) => {
         console.log(res.data);
         var idToBeDestroyed = res.data.idToBeDestroyed;
@@ -538,13 +567,13 @@ class Controls extends Component {
         <ListGroup flush>
           {this.state.active
             ? this.state.active.map((user) => {
-                return (
-                  <ListGroupItem key={Math.random()}>
-                    <Spinner type="grow" size="sm" variant="success" />
-                    {user.username}
-                  </ListGroupItem>
-                );
-              })
+              return (
+                <ListGroupItem key={Math.random()}>
+                  <Spinner type="grow" size="sm" variant="success" />
+                  {user.username}
+                </ListGroupItem>
+              );
+            })
             : " "}
         </ListGroup>
       </Container>
