@@ -205,11 +205,11 @@ class Controls extends Component {
 						peer.destroy();
 						peer = self.createPeer(res.data.changePeer);
 						/*
-            self.setState({
-              myPeer: peer,
-              myIds: [...self.state.myIds, peer],
-            });
-            */
+      self.setState({
+        myPeer: peer,
+        myIds: [...self.state.myIds, peer],
+      });
+      */
 						console.log(peer.disconnected);
 						console.log("Using old Id");
 						console.log(peer.connections);
@@ -615,6 +615,7 @@ self.setState(
 					</AwesomeButtonProgress>
 				</Row>
 				<br />
+				<h3>Members</h3>
 				<ListGroup flush>
 					{this.state.active
 						? this.state.active.map((user) => {

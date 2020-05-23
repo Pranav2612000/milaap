@@ -179,7 +179,7 @@ class DefaultLayout extends Component {
 	);
 	signOut(e) {
 		e.preventDefault();
-		localStorage.removeItem("uname");
+		localStorage.removeItem("milaap-auth-token");
 		this.props.history.push("/login");
 	}
 
@@ -248,7 +248,7 @@ class DefaultLayout extends Component {
 							</Container>
 						</main>
 						<Suspense fallback={this.loading()}>
-							<aside class="aside-menu" display="md" fixed>
+							<aside class="aside-menu" display="md">
 								<DefaultAside />
 							</aside>
 						</Suspense>
