@@ -14,17 +14,14 @@ class Login extends Component {
       password: '',
       error: false
     };
-    // this.handleUsernameChange = this.handleUsernameChange.bind(this);
-    // this.handlePasswordChange = this.handlePasswordChange.bind(this);
-    // this.handleSubmit = this.handleSubmit.bind(this);
   }
   componentDidMount() {
     if (this.props.location.register === true) {
       console.log(this.props.location);
 
       store.addNotification({
-        title: "You are Successfully Registered",
-        message: `Login to go to Dashboard`,
+        title: "Success",
+        message: `Logging In...`,
         type: "success",
         // insert: "top",
         container: "top-right",
@@ -48,6 +45,11 @@ class Login extends Component {
       password: e.target.value
     });
   }
+  handleForgotPassword = e => {
+    e.preventDefault();
+    alert("Work in Progress...");
+    return;
+  }
   handleSubmit = e => {
     e.preventDefault();
     var reqData = {
@@ -58,8 +60,6 @@ class Login extends Component {
       'http://localhost:5000/api/login',
       reqData)
       .then(res => {
-
-        // console.log(res.data)
         localStorage.setItem('milaap-auth-token', res.data.token);
         this.setState({
           login: true
@@ -82,14 +82,12 @@ class Login extends Component {
             pauseOnHover: true,
           },
         });
-
-
-
       });
     return;
   }
   render() {
     return (
+      /*Add Milaap Logo somewhere on this page.*/
       <>
         {console.log(this.state.login)}
         {this.state.login === true && <Redirect to={{ pathname: "/dashboard", state: this.state.username }} />}
@@ -103,7 +101,7 @@ class Login extends Component {
                 <CardGroup>
                   <Card className="p-4">
                     <CardBody>
-                      <Form onSubmit={this.handleSubmit}>
+                      <Form>
                         <h1>Login</h1>
                         <p className="text-muted">Sign In to your account</p>
                         <InputGroup className="mb-3">
@@ -126,10 +124,10 @@ class Login extends Component {
                         </InputGroup>
                         <Row>
                           <Col xs="6">
-                            <Button color="primary" className="px-4">Login</Button>
+                            <Button color="primary" className="px-4" onClick={this.handleSubmit}>Login</Button>
                           </Col>
                           <Col xs="6" className="text-right">
-                            <Button color="link" className="px-0">Forgot password?</Button>
+                            <Button color="link" className="px-0" onClick={this.handleForgotPassword}>Forgot password?</Button>
                           </Col>
                         </Row>
                       </Form>
@@ -139,8 +137,7 @@ class Login extends Component {
                     <CardBody className="text-center">
                       <div>
                         <h2>Sign up</h2>
-                        <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut
-                        labore et dolore magna aliqua.</p>
+                        <p>Don't have an account? It takes just 5 secs to create a new one.</p>
                         <Link to="/register">
                           <Button color="primary" className="mt-3" active tabIndex={-1}>Register Now!</Button>
                         </Link>
