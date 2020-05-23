@@ -105,6 +105,10 @@ class Controls extends Component {
 		this.endCall = this.endCall.bind(this);
 	}
 
+	componentWillUnmount() {
+		this.endCall(() => console.log("Call ended"));
+	}
+
 	componentDidUpdate(prevProps) {
 		if (this.props.roomName != prevProps.roomName) {
 			axios
