@@ -11,12 +11,11 @@ export default function Compose(props) {
       roomName: props.roomName,
     };
     axios
-      .post("http://localhost:5000/api/room/sendmessage",
-        reqData,
-        {
-          headers: { 'milaap-auth-token': localStorage.getItem('milaap-auth-token') }
-        }
-      )
+      .post("http://localhost:5000/api/room/sendmessage", reqData, {
+        headers: {
+          "milaap-auth-token": localStorage.getItem("milaap-auth-token"),
+        },
+      })
       .then((res) => {
         console.log(res);
         //window.location.reload();
@@ -34,15 +33,14 @@ export default function Compose(props) {
         className="compose-input"
         placeholder="Type a message, @name"
         value={msg}
-        onKeyDown={e => {
-          if (e.keyCode === 13)
-            sendMessage();
+        onKeyDown={(e) => {
+          if (e.keyCode === 13) sendMessage();
         }}
         onChange={(e) => {
-          setMsg(e.target.value)
+          setMsg(e.target.value);
         }}
       />
-      <button className="compose-button primary" onClick={sendMessage}>
+      <button className="compose-button" onClick={sendMessage}>
         Send
       </button>
 

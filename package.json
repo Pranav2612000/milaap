@@ -1,15 +1,15 @@
 {
-  "name": "@coreui/coreui-free-react-admin-template",
-  "version": "2.6.0",
-  "description": "CoreUI React Open Source Bootstrap 4 Admin Template",
-  "author": "Łukasz Holeczek",
-  "homepage": "https://coreui.io",
-  "copyright": "Copyright 2017-2019 creativeLabs Łukasz Holeczek",
+  "name": "milap",
+  "version": "1.0.0",
+  "description": "distributed video/audio conferencing application",
+  "author": "Pranav Joglekar",
+  "homepage": "https://github.com/pranav2612000/milaap",
+  "copyright": "Copyright",
   "license": "MIT",
   "private": true,
   "repository": {
     "type": "git",
-    "url": "git@github.com:coreui/coreui-free-react-admin-template.git"
+    "url": "https://github.com/Pranav2612000/milaap.git"
   },
   "dependencies": {
     "@coreui/coreui": "^2.1.12",

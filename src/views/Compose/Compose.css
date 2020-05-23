@@ -30,12 +30,15 @@
 .compose-button {
   float: right;
   flex: 1;
-  margin-left:12%;
-  border: 1px solid grey;
-  font-size: 14px;
+  margin-left: 12%;
+  color: #5585ff;
+  border: 2px solid #5585ff;
+  background-color: transparent;
+  border-radius: 1.5rem;
+  font-size: 17px;
   height: 40px;
   width: 30px;
-  background: lightblue;
+  cursor: pointer;
 }
 
 .compose-input::placeholder {
