@@ -50,7 +50,6 @@ export default function MessageList(props) {
   };
   const fetchMessages = () => {
     var reqData = getReqData();
-    // console.clear();
     console.log(reqData);
     axios
       .post("http://localhost:5000/api/room/getmsgs", reqData, {
