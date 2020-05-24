@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Link, NavLink } from "react-router-dom";
+import { Link, NavLink, Redirect } from "react-router-dom";
 import { Badge, UncontrolledDropdown, DropdownItem, DropdownMenu, DropdownToggle, Nav,
   NavItem, } from "reactstrap";
 import PropTypes from "prop-types";
@@ -42,6 +42,7 @@ class DefaultHeader extends Component {
         this.setState({ username: resp.data.username })
       }).catch(err => {
         console.log(err, "Error in Verifying JWT")
+        this.setState({ username: false })
       })
   }
 
@@ -84,6 +85,10 @@ class DefaultHeader extends Component {
     // eslint-disable-next-line
     const { children, ...attributes } = this.props;
 
+    /* TODO: Use Protected Route component. */
+    if(this.state.username == false) {
+      return <Redirect to='/login'/>
+    }
     return (
       <React.Fragment>
         <AppSidebarToggler className="d-lg-none" display="md" mobile />
@@ -116,9 +121,9 @@ class DefaultHeader extends Component {
             <NavLink to="#" className="nav-link"><i className="icon-location-pin"></i></NavLink>
           </NavItem> */}
           <UncontrolledDropdown nav direction="down">
-            <DropdownToggle nav>
+            <DropdownToggle>
               <NavItem>
-              {this.state.username}
+                <NavLink to="#" className="nav-link">{this.state.username}</NavLink>
               </NavItem>
             </DropdownToggle>
             <DropdownMenu right>
