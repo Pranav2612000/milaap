@@ -79,7 +79,12 @@ class Controls extends Component {
 	}
 
 	componentDidUpdate(prevProps) {
+    console.log(prevProps);
+    console.log(this.props.roomName);
 		if (this.props.roomName != prevProps.roomName) {
+      this.setState({
+        roomName: this.props.roomName,
+      });
 			axios
 				.post(
 					"http://localhost:5000/api/room/getActive",
@@ -94,11 +99,10 @@ class Controls extends Component {
 				)
 				.then((res) => {
 					if (!res.data.active.length || res.data.active == this.state.active)
-						return;
 					this.setState({
-						roomName: this.props.roomName,
 						active: res.data.active,
 					});
+				  return;
 				})
 				.catch((err) => {
 					console.log(err);
