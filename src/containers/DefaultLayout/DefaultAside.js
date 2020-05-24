@@ -1,34 +1,14 @@
 import React, { Component } from "react";
 import { withRouter } from "react-router-dom";
-import {
-	Nav,
-	NavItem,
-	NavLink,
-	Progress,
-	TabContent,
-	TabPane,
-	ListGroup,
-	ListGroupItem,
-} from "reactstrap";
+import { Nav, NavItem, NavLink, Progress, TabContent, TabPane, ListGroup,
+	ListGroupItem, } from "reactstrap";
 import PropTypes from "prop-types";
 import classNames from "classnames";
 import { AppSwitch } from "@coreui/react";
 import MessageView from "../../views/MessageList/index";
 import Controls from "../../views/Connection/Controls";
-import {
-	Button,
-	ButtonGroup,
-	Badge,
-	Card,
-	CardBody,
-	CardFooter,
-	CardHeader,
-	Col,
-	Container,
-	Row,
-	Collapse,
-	Fade,
-} from "reactstrap";
+import { Button, ButtonGroup, Badge, Card, CardBody, CardFooter, CardHeader, Col,
+	Container, Row, Collapse, Fade, } from "reactstrap";
 
 const propTypes = {
 	children: PropTypes.node,
@@ -55,7 +35,6 @@ class DefaultAside extends Component {
 			roomName: getRoomFromLocation(props.location.pathname),
 			path: props.location.pathname,
 		};
-		console.log(this.state.roomName);
 	}
 	componentDidUpdate(prevProps) {
 		if (this.props.location.pathname != prevProps.location.pathname) {
@@ -63,7 +42,6 @@ class DefaultAside extends Component {
 				roomName: getRoomFromLocation(this.props.location.pathname),
 			});
 			this.setState({ change: !this.state.change });
-			console.log(this.props.location.pathname);
 		}
 	}
 
@@ -116,110 +94,12 @@ class DefaultAside extends Component {
 				<TabContent activeTab={this.state.activeTab}>
 					<TabPane tabId="1">
 						<Controls key={this.change} roomName={this.state.roomName} />
-						{/*
-                  <Row>
-            <Card className="text-white bg-primary w-25">
-              <CardHeader>
-                Card title
-              </CardHeader>
-              <CardBody>
-                Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut
-                laoreet dolore magna aliquam erat volutpat. Ut wisi enim ad minim veniam, quis nostrud exerci tation
-                ullamcorper suscipit lobortis nisl ut aliquip ex ea commodo consequat.
-              </CardBody>
-            </Card>
-                  </Row>
-                  */}
 					</TabPane>
+
 					<TabPane tabId="2" className="p-3">
 						<MessageView roomName={this.state.roomName} />
-						{/*
-            <div className="message">
-              <div className="py-3 pb-5 mr-3 float-left">
-                <div className="avatar">
-                  <img src={'assets/img/avatars/7.jpg'} className="img-avatar" alt="admin@bootstrapmaster.com" />
-                  <span className="avatar-status badge-success"></span>
-                </div>
-              </div>
-              <div>
-                <small className="text-muted">Lukasz Holeczek</small>
-                <small className="text-muted float-right mt-1">1:52 PM</small>
-              </div>
-              <div className="text-truncate font-weight-bold">Lorem ipsum dolor sit amet</div>
-              <small className="text-muted">Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
-                tempor incididunt...
-              </small>
-            </div>
-            <hr />
-            <div className="message">
-              <div className="py-3 pb-5 mr-3 float-left">
-                <div className="avatar">
-                  <img src={'assets/img/avatars/7.jpg'} className="img-avatar" alt="admin@bootstrapmaster.com" />
-                  <span className="avatar-status badge-success"></span>
-                </div>
-              </div>
-              <div>
-                <small className="text-muted">Lukasz Holeczek</small>
-                <small className="text-muted float-right mt-1">1:52 PM</small>
-              </div>
-              <div className="text-truncate font-weight-bold">Lorem ipsum dolor sit amet</div>
-              <small className="text-muted">Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
-                tempor incididunt...
-              </small>
-            </div>
-            <hr />
-            <div className="message">
-              <div className="py-3 pb-5 mr-3 float-left">
-                <div className="avatar">
-                  <img src={'assets/img/avatars/7.jpg'} className="img-avatar" alt="admin@bootstrapmaster.com" />
-                  <span className="avatar-status badge-success"></span>
-                </div>
-              </div>
-              <div>
-                <small className="text-muted">Lukasz Holeczek</small>
-                <small className="text-muted float-right mt-1">1:52 PM</small>
-              </div>
-              <div className="text-truncate font-weight-bold">Lorem ipsum dolor sit amet</div>
-              <small className="text-muted">Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
-                tempor incididunt...
-              </small>
-            </div>
-            <hr />
-            <div className="message">
-              <div className="py-3 pb-5 mr-3 float-left">
-                <div className="avatar">
-                  <img src={'assets/img/avatars/7.jpg'} className="img-avatar" alt="admin@bootstrapmaster.com" />
-                  <span className="avatar-status badge-success"></span>
-                </div>
-              </div>
-              <div>
-                <small className="text-muted">Lukasz Holeczek</small>
-                <small className="text-muted float-right mt-1">1:52 PM</small>
-              </div>
-              <div className="text-truncate font-weight-bold">Lorem ipsum dolor sit amet</div>
-              <small className="text-muted">Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
-                tempor incididunt...
-              </small>
-            </div>
-            <hr />
-            <div className="message">
-              <div className="py-3 pb-5 mr-3 float-left">
-                <div className="avatar">
-                  <img src={'assets/img/avatars/7.jpg'} className="img-avatar" alt="admin@bootstrapmaster.com" />
-                  <span className="avatar-status badge-success"></span>
-                </div>
-              </div>
-              <div>
-                <small className="text-muted">Lukasz Holeczek</small>
-                <small className="text-muted float-right mt-1">1:52 PM</small>
-              </div>
-              <div className="text-truncate font-weight-bold">Lorem ipsum dolor sit amet</div>
-              <small className="text-muted">Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
-                tempor incididunt...
-              </small>
-            </div>
-            */}
 					</TabPane>
+
 					<TabPane tabId="3" className="p-3">
 						<h6>Settings</h6>
 

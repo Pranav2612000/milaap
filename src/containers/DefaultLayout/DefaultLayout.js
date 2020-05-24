@@ -19,9 +19,6 @@ import {
 	AppBreadcrumb2 as AppBreadcrumb,
 	AppSidebarNav2 as AppSidebarNav,
 } from "@coreui/react";
-// sidebar nav config
-//import navigation from '../../_nav';
-// routes config
 import routes from "../../routes";
 
 const socket = socketIOClient("http://localhost:5000/");
@@ -31,7 +28,6 @@ const DefaultHeader = React.lazy(() => import("./DefaultHeader"));
 const InnerHeader = React.lazy(() => import("./InnerHeader"));
 function getGroupElements(rooms) {
 	let groupElements = [];
-	console.log(rooms);
 	if (rooms == undefined) {
 		return {};
 	}
@@ -248,7 +244,7 @@ class DefaultLayout extends Component {
 							</Container>
 						</main>
 						<Suspense fallback={this.loading()}>
-							<aside class="aside-menu" display="md">
+							<aside className="aside-menu" display="md">
 								<DefaultAside />
 							</aside>
 						</Suspense>
