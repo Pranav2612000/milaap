@@ -35,7 +35,6 @@ class Register extends Component {
 	}
 	handleSubmit(e) {
 		e.preventDefault();
-		console.log(this.state);
 		axios.post(
 			'http://localhost:5000/api/register/',
 			{
@@ -50,7 +49,7 @@ class Register extends Component {
 			})
 			.catch(err => {
 				store.addNotification({
-					title: "Some Error Occured",
+					title: "Error",
 					message: `Please Try Again`,
 					type: "warning",
 					// insert: "top",

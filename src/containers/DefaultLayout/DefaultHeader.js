@@ -1,42 +1,16 @@
 import React, { Component } from "react";
-import { Link, NavLink } from "react-router-dom";
-import {
-  Badge,
-  UncontrolledDropdown,
-  DropdownItem,
-  DropdownMenu,
-  DropdownToggle,
-  Nav,
-  NavItem,
-} from "reactstrap";
+import { Link, NavLink, Redirect } from "react-router-dom";
+import { Badge, UncontrolledDropdown, DropdownItem, DropdownMenu, DropdownToggle, Nav,
+  NavItem, } from "reactstrap";
 import PropTypes from "prop-types";
 import axios from "axios";
 
-import {
-  AppAsideToggler,
-  AppNavbarBrand,
-  AppSidebarToggler,
-} from "@coreui/react";
+import { AppAsideToggler, AppNavbarBrand, AppSidebarToggler, } from "@coreui/react";
 import DefaultAside from "./DefaultAside";
 import logo from "../../assets/img/brand/logo.png";
 import sygnet from "../../assets/img/brand/sygnet.svg";
-import {
-  Button,
-  Card,
-  CardBody,
-  CardHeader,
-  Col,
-  Form,
-  InputGroup,
-  InputGroupAddon,
-  InputGroupText,
-  Input,
-  Modal,
-  ModalBody,
-  ModalFooter,
-  ModalHeader,
-  Row,
-} from "reactstrap";
+import { Button, Card, CardBody, CardHeader, Col, Form, InputGroup, InputGroupAddon,
+  InputGroupText, Input, Modal, ModalBody, ModalFooter, ModalHeader, Row, } from "reactstrap";
 
 const propTypes = {
   children: PropTypes.node,
@@ -58,6 +32,20 @@ class DefaultHeader extends Component {
     this.addFriend = this.addFriend.bind(this);
   }
 
+  componentDidMount() {
+    /* To be changed: Use Redux to get username.*/
+    axios
+      .get("http://localhost:5000/api/user/getUserName", {
+        headers: { 'milaap-auth-token': localStorage.getItem('milaap-auth-token') }
+      }).then(resp => {
+        console.log(resp.data.username);
+        this.setState({ username: resp.data.username })
+      }).catch(err => {
+        console.log(err, "Error in Verifying JWT")
+        this.setState({ username: false })
+      })
+  }
+
   addFriend() {
     const reqData = {
       user: this.state.friendid,
@@ -72,7 +60,6 @@ class DefaultHeader extends Component {
       .then((res) => {
         console.log(res);
         this.toggle();
-        // window.location.reload();
       })
       .catch((err) => {
         console.log(err);
@@ -98,6 +85,10 @@ class DefaultHeader extends Component {
     // eslint-disable-next-line
     const { children, ...attributes } = this.props;
 
+    /* TODO: Use Protected Route component. */
+    if(this.state.username == false) {
+      return <Redirect to='/login'/>
+    }
     return (
       <React.Fragment>
         <AppSidebarToggler className="d-lg-none" display="md" mobile />
@@ -115,7 +106,7 @@ class DefaultHeader extends Component {
           </NavItem>
           <NavItem className="px-3">
             <NavLink to="#" className="nav-link" onClick={this.toggle}>
-              Add Friends
+              Create Room
             </NavLink>
           </NavItem>
         </Nav>
@@ -130,12 +121,10 @@ class DefaultHeader extends Component {
             <NavLink to="#" className="nav-link"><i className="icon-location-pin"></i></NavLink>
           </NavItem> */}
           <UncontrolledDropdown nav direction="down">
-            <DropdownToggle nav>
-              <img
-                src={"../../assets/img/avatars/6.jpg"}
-                className="img-avatar"
-                alt="admin@bootstrapmaster.com"
-              />
+            <DropdownToggle>
+              <NavItem>
+                <NavLink to="#" className="nav-link">{this.state.username}</NavLink>
+              </NavItem>
             </DropdownToggle>
             <DropdownMenu right>
               <DropdownItem header tag="div" className="text-center">
@@ -185,7 +174,9 @@ class DefaultHeader extends Component {
           </UncontrolledDropdown>
           <AppAsideToggler className="d-xs-none" display="xs" />
         </Nav>
-        {/*<AppAsideToggler className="d-lg-none" mobile />*/}
+
+        {/* Migrate the Modal to a new file. */}
+
         <Modal
           isOpen={this.state.modal}
           toggle={this.toggle}

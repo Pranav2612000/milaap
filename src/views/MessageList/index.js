@@ -50,7 +50,6 @@ export default function MessageList(props) {
   };
   const fetchMessages = () => {
     var reqData = getReqData();
-    // console.clear();
     console.log(reqData);
     axios
       .post("http://localhost:5000/api/room/getmsgs", reqData, {
@@ -70,19 +69,17 @@ export default function MessageList(props) {
       .catch((err) => {
         console.log(err);
       });
-  }
+  };
   useEffect(() => {
     //getMessages();
     console.log(lastMsgId);
-    if (props.roomName !== "dashboard")
-      fetchMessages();
+    if (props.roomName !== "dashboard") fetchMessages();
     socket.on("newMessage", (data) => {
       console.log(data);
       var reqData = getReqData();
       console.log("New Message Arrived");
-      if (props.roomName !== "dashboard")
-        fetchMessages(reqData);
-    })
+      if (props.roomName !== "dashboard") fetchMessages(reqData);
+    });
     //If you are on a limited DataPack, Comment this code segment and the one at
     //the end of useEffect function - (the one with return clearInterval...), to
     //prevent unnecessary multiple calls to the server
@@ -186,7 +183,7 @@ export default function MessageList(props) {
     <div className="message-list">
       <Toolbar
         title={props.roomName}
-      /*
+        /*
         rightItems={[
           <ToolbarButton key="info" icon="ion-ios-information-circle-outline" />,
           <ToolbarButton key="video" icon="ion-ios-videocam" />,
