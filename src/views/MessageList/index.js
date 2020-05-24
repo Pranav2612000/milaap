@@ -48,9 +48,10 @@ export default function MessageList(props) {
       lastMsgId: lastMsgId
     };
   };
-  const fetchMessages = () => {
-    var reqData = getReqData();
-    console.log(reqData);
+  const fetchMessages = (reqData = getReqData()) => {
+    //var reqData = getReqData();
+    console.log("messages : ", messages);
+    console.log("reqData : ", reqData);
     axios
       .post('http://localhost:5000/api/room/getmsgs', reqData, {
         headers: {
@@ -65,8 +66,12 @@ export default function MessageList(props) {
         }
         const tempMsgFormatted = formatMsgs(tempMsg);
         setMessages(tempMsgFormatted);
-        console.log(tempMsgFormatted[tempMsgFormatted.length - 1].id);
-        setLastMsgId(tempMsgFormatted[tempMsgFormatted.length - 1].id);
+        //console.log(tempMsgFormatted[tempMsgFormatted.length - 1].id);
+        setLastMsgId(
+          tempMsgFormatted[tempMsgFormatted.length - 1] === undefined
+            ? 0
+            : tempMsgFormatted[tempMsgFormatted.length - 1].id
+        );
       })
       .catch((err) => {
         console.log(err);
@@ -79,8 +84,9 @@ export default function MessageList(props) {
     socket.on('newMessage', (data) => {
       console.log(data);
       var reqData = getReqData();
-      console.log('New Message Arrived');
-      if (props.roomName !== 'dashboard') fetchMessages(reqData);
+      console.log("New Message Arrived");
+      reqData.lastMsgId = 0;
+      if (props.roomName !== "dashboard") fetchMessages(reqData);
     });
     // If you are on a limited DataPack, Comment this code segment and the one at
     // the end of useEffect function - (the one with return clearInterval...), to
