@@ -41,8 +41,8 @@ class Controls extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {
-			myIds: new Set(),
-			myPeers: new Set(),
+			myIds: [0, 0],
+			myPeers: [0, 0],
 			roomName: this.props.roomName,
 			//Use Sets instead of Arrays to prevent duplicates.
 			remotePeers: new Set(),
@@ -154,6 +154,25 @@ class Controls extends Component {
 		return peer;
 	}
 
+  updateSelfPeerInfo(self, peer, id, type) {
+    console.log(self.state);
+    var id = peer.id;
+    console.log(id);
+    var isVideo = (type === "video") ? 1 : 0;
+    if(self.state.myPeers[isVideo] != 0) {
+      self.state.myPeers[isVideo].destroy();
+    }
+    var peers = self.state.myPeers;
+    var myIDs = self.state.myIds;
+    peers[isVideo] = peer;
+    myIDs[isVideo] = id;
+    self.setState({
+      myPeers: peers,
+      myIds: myIDs,
+      calls: new Array(),
+    });
+  }
+
 	async startScreenShare(type, next) {
 		const self = this;
 		var tkn;
@@ -178,6 +197,7 @@ class Controls extends Component {
 					console.log(res);
 					var onlineArray = res.data.online;
 					if (res.data.changePeer) {
+            //Kept for backward compatibility. Will not execute with latest commit.
 						peer.destroy();
 						peer = self.createPeer(res.data.changePeer);
 						console.log(peer.disconnected);
@@ -199,6 +219,8 @@ class Controls extends Component {
 						next();
 					} else {
 						console.log("My token: " + id);
+            self.updateSelfPeerInfo(self, peer, id, type);
+            /*
 						var peers = self.state.myPeers;
 						var myIDs = self.state.myIds;
 						peers.add(peer);
@@ -207,6 +229,7 @@ class Controls extends Component {
 							myPeers: peers,
 							myIds: myIDs,
 						});
+            */
 						console.log(self.state);
 						self.setUpConnections(self, peer, id, type, onlineArray);
 						next();
@@ -234,9 +257,8 @@ class Controls extends Component {
 				.then((resp) => {
 					console.log(resp.data);
 					onlineArray.forEach((val, index) => {
-						if (val.username === resp.data.username) {
-							//Display my screen without creating a connection.
-							return;
+						if (val.username === resp.data.username && val.type === type) {
+              return;
 						}
 						console.log("Connecting to " + onlineArray[index].tkn);
 						self.startConnection(self, onlineArray[index].tkn, peer);
