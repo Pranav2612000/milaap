@@ -3,36 +3,13 @@ import React, { Component } from "react";
 import { store } from "react-notifications-component";
 import { AwesomeButtonProgress } from "react-awesome-button";
 import "react-awesome-button/dist/styles.css";
-
-import {
-	Nav,
-	NavItem,
-	NavLink,
-	Progress,
-	TabContent,
-	TabPane,
-	ListGroup,
-	ListGroupItem,
-	Spinner,
-} from "reactstrap";
+import { Nav, NavItem, NavLink, Progress, TabContent, TabPane, ListGroup, ListGroupItem,
+	Spinner } from "reactstrap";
 import classNames from "classnames";
 import { AppSwitch } from "@coreui/react";
 import MessageView from "../../views/MessageList/index";
-import {
-	Jumbotron,
-	Button,
-	ButtonGroup,
-	Badge,
-	Card,
-	CardBody,
-	CardFooter,
-	CardHeader,
-	Col,
-	Container,
-	Row,
-	Collapse,
-	Fade,
-} from "reactstrap";
+import { Jumbotron, Button, ButtonGroup, Badge, Card, CardBody, CardFooter,
+	CardHeader, Col, Container, Row, Collapse, Fade, } from "reactstrap";
 //import Peer from "../../dependencies/peerjs/index.d.ts";
 import Peer from "peerjs";
 import axios from "axios";
@@ -54,7 +31,6 @@ class Controls extends Component {
 				}
 			)
 			.then((res) => {
-				console.log("EHREEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE", res);
 				if (!res.data.active.length) return;
 				//this.setState({ active: res.data.active });
 			})
@@ -65,8 +41,8 @@ class Controls extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {
-			myIds: new Set(),
-			myPeers: new Set(),
+			myIds: [0, 0],
+			myPeers: [0, 0],
 			roomName: this.props.roomName,
 			//Use Sets instead of Arrays to prevent duplicates.
 			remotePeers: new Set(),
@@ -76,7 +52,6 @@ class Controls extends Component {
 			opinfo: "",
 			friendtkn: "",
 		};
-		console.clear();
 		console.log(this.state.roomName);
 		this.startScreenShare = this.startScreenShare.bind(this);
 		this.startConnection = this.startConnection.bind(this);
@@ -86,27 +61,30 @@ class Controls extends Component {
 		if (this.state.roomName !== "dashboard") this.getActive();
 
 		socket.on("userJoined", (data) => {
-			console.log("NEW USER JOINED :)");
-			console.log(data);
 			if (this.state.roomName !== "dashboard")
 				//YET TO BE TESTED
 				this.getActive();
 		});
 		socket.on("userOnline", (data) => {
-			console.log("NEW USER ONLINE :)");
-			console.log(data);
 			if (this.state.roomName !== "dashboard") this.getActive();
 		});
 		socket.on("userExit", (data) => {
-			console.log("USER EXITED :(");
-			console.log(data);
 			if (this.state.roomName !== "dashboard") this.getActive();
 		});
 		this.endCall = this.endCall.bind(this);
 	}
 
+	componentWillUnmount() {
+		this.endCall(() => console.log("Call ended"));
+	}
+
 	componentDidUpdate(prevProps) {
+    console.log(prevProps);
+    console.log(this.props.roomName);
 		if (this.props.roomName != prevProps.roomName) {
+      this.setState({
+        roomName: this.props.roomName,
+      });
 			axios
 				.post(
 					"http://localhost:5000/api/room/getActive",
@@ -121,11 +99,10 @@ class Controls extends Component {
 				)
 				.then((res) => {
 					if (!res.data.active.length || res.data.active == this.state.active)
-						return;
 					this.setState({
-						roomName: this.props.roomName,
 						active: res.data.active,
 					});
+				  return;
 				})
 				.catch((err) => {
 					console.log(err);
@@ -160,6 +137,9 @@ class Controls extends Component {
 
 	createPeer(id) {
 		var peer = new Peer(id, {
+      host: 'localhost',
+      port: 9000,
+      path: '/peerserver',
 			config: {
 				iceServers: [
 					{ urls: "stun:stun.l.google.com:19302" },
@@ -173,6 +153,25 @@ class Controls extends Component {
 		});
 		return peer;
 	}
+
+  updateSelfPeerInfo(self, peer, id, type) {
+    console.log(self.state);
+    var id = peer.id;
+    console.log(id);
+    var isVideo = (type === "video") ? 1 : 0;
+    if(self.state.myPeers[isVideo] != 0) {
+      self.state.myPeers[isVideo].destroy();
+    }
+    var peers = self.state.myPeers;
+    var myIDs = self.state.myIds;
+    peers[isVideo] = peer;
+    myIDs[isVideo] = id;
+    self.setState({
+      myPeers: peers,
+      myIds: myIDs,
+      calls: new Array(),
+    });
+  }
 
 	async startScreenShare(type, next) {
 		const self = this;
@@ -198,14 +197,9 @@ class Controls extends Component {
 					console.log(res);
 					var onlineArray = res.data.online;
 					if (res.data.changePeer) {
+            //Kept for backward compatibility. Will not execute with latest commit.
 						peer.destroy();
 						peer = self.createPeer(res.data.changePeer);
-						/*
-      self.setState({
-        myPeer: peer,
-        myIds: [...self.state.myIds, peer],
-      });
-      */
 						console.log(peer.disconnected);
 						console.log("Using old Id");
 						console.log(peer.connections);
@@ -225,6 +219,8 @@ class Controls extends Component {
 						next();
 					} else {
 						console.log("My token: " + id);
+            self.updateSelfPeerInfo(self, peer, id, type);
+            /*
 						var peers = self.state.myPeers;
 						var myIDs = self.state.myIds;
 						peers.add(peer);
@@ -233,6 +229,7 @@ class Controls extends Component {
 							myPeers: peers,
 							myIds: myIDs,
 						});
+            */
 						console.log(self.state);
 						self.setUpConnections(self, peer, id, type, onlineArray);
 						next();
@@ -258,12 +255,10 @@ class Controls extends Component {
 					},
 				})
 				.then((resp) => {
-					console.clear();
 					console.log(resp.data);
 					onlineArray.forEach((val, index) => {
-						if (val.username === resp.data.username) {
-							//Display my screen without creating a connection.
-							return;
+						if (val.username === resp.data.username && val.type === type) {
+              return;
 						}
 						console.log("Connecting to " + onlineArray[index].tkn);
 						self.startConnection(self, onlineArray[index].tkn, peer);
@@ -532,7 +527,6 @@ self.setState(
 	}
 
 	sendRequestToEndCall(next) {
-		if (!next) next = () => {};
 		const reqData = {
 			roomName: this.state.roomName,
 		};
@@ -587,7 +581,7 @@ self.setState(
 							this.startScreenShare("video", next);
 						}}
 					>
-						<i class="icon-user icons"></i>
+						<i className="icon-user icons"></i>
 						<span> Video</span>
 					</AwesomeButtonProgress>
 					<AwesomeButtonProgress
@@ -595,7 +589,7 @@ self.setState(
 						size="medium"
 						action={(element, next) => this.startScreenShare("screen", next)}
 					>
-						<i class="icon-screen-desktop icons"></i>
+						<i className="icon-screen-desktop icons"></i>
 						<span> Screen</span>
 					</AwesomeButtonProgress>
 					<AwesomeButtonProgress
@@ -607,7 +601,7 @@ self.setState(
 							this.endCall(next);
 						}}
 					>
-						<i class="icon-call-end icons"></i>
+						<i className="icon-call-end icons"></i>
 						<span> End Call</span>
 					</AwesomeButtonProgress>
 				</Row>
