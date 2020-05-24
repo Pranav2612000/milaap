@@ -3,36 +3,13 @@ import React, { Component } from "react";
 import { store } from "react-notifications-component";
 import { AwesomeButtonProgress } from "react-awesome-button";
 import "react-awesome-button/dist/styles.css";
-
-import {
-	Nav,
-	NavItem,
-	NavLink,
-	Progress,
-	TabContent,
-	TabPane,
-	ListGroup,
-	ListGroupItem,
-	Spinner,
-} from "reactstrap";
+import { Nav, NavItem, NavLink, Progress, TabContent, TabPane, ListGroup, ListGroupItem,
+	Spinner } from "reactstrap";
 import classNames from "classnames";
 import { AppSwitch } from "@coreui/react";
 import MessageView from "../../views/MessageList/index";
-import {
-	Jumbotron,
-	Button,
-	ButtonGroup,
-	Badge,
-	Card,
-	CardBody,
-	CardFooter,
-	CardHeader,
-	Col,
-	Container,
-	Row,
-	Collapse,
-	Fade,
-} from "reactstrap";
+import { Jumbotron, Button, ButtonGroup, Badge, Card, CardBody, CardFooter,
+	CardHeader, Col, Container, Row, Collapse, Fade, } from "reactstrap";
 //import Peer from "../../dependencies/peerjs/index.d.ts";
 import Peer from "peerjs";
 import axios from "axios";
@@ -54,7 +31,6 @@ class Controls extends Component {
 				}
 			)
 			.then((res) => {
-				console.log("EHREEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE", res);
 				if (!res.data.active.length) return;
 				//this.setState({ active: res.data.active });
 			})
@@ -76,7 +52,6 @@ class Controls extends Component {
 			opinfo: "",
 			friendtkn: "",
 		};
-		console.clear();
 		console.log(this.state.roomName);
 		this.startScreenShare = this.startScreenShare.bind(this);
 		this.startConnection = this.startConnection.bind(this);
@@ -86,20 +61,14 @@ class Controls extends Component {
 		if (this.state.roomName !== "dashboard") this.getActive();
 
 		socket.on("userJoined", (data) => {
-			console.log("NEW USER JOINED :)");
-			console.log(data);
 			if (this.state.roomName !== "dashboard")
 				//YET TO BE TESTED
 				this.getActive();
 		});
 		socket.on("userOnline", (data) => {
-			console.log("NEW USER ONLINE :)");
-			console.log(data);
 			if (this.state.roomName !== "dashboard") this.getActive();
 		});
 		socket.on("userExit", (data) => {
-			console.log("USER EXITED :(");
-			console.log(data);
 			if (this.state.roomName !== "dashboard") this.getActive();
 		});
 		this.endCall = this.endCall.bind(this);
@@ -164,6 +133,9 @@ class Controls extends Component {
 
 	createPeer(id) {
 		var peer = new Peer(id, {
+      host: 'localhost',
+      port: 9000,
+      path: '/peerserver',
 			config: {
 				iceServers: [
 					{ urls: "stun:stun.l.google.com:19302" },
@@ -204,12 +176,6 @@ class Controls extends Component {
 					if (res.data.changePeer) {
 						peer.destroy();
 						peer = self.createPeer(res.data.changePeer);
-						/*
-      self.setState({
-        myPeer: peer,
-        myIds: [...self.state.myIds, peer],
-      });
-      */
 						console.log(peer.disconnected);
 						console.log("Using old Id");
 						console.log(peer.connections);
@@ -262,7 +228,6 @@ class Controls extends Component {
 					},
 				})
 				.then((resp) => {
-					console.clear();
 					console.log(resp.data);
 					onlineArray.forEach((val, index) => {
 						if (val.username === resp.data.username) {
@@ -590,7 +555,7 @@ self.setState(
 							this.startScreenShare("video", next);
 						}}
 					>
-						<i class="icon-user icons"></i>
+						<i className="icon-user icons"></i>
 						<span> Video</span>
 					</AwesomeButtonProgress>
 					<AwesomeButtonProgress
@@ -598,7 +563,7 @@ self.setState(
 						size="medium"
 						action={(element, next) => this.startScreenShare("screen", next)}
 					>
-						<i class="icon-screen-desktop icons"></i>
+						<i className="icon-screen-desktop icons"></i>
 						<span> Screen</span>
 					</AwesomeButtonProgress>
 					<AwesomeButtonProgress
@@ -610,7 +575,7 @@ self.setState(
 							this.endCall(next);
 						}}
 					>
-						<i class="icon-call-end icons"></i>
+						<i className="icon-call-end icons"></i>
 						<span> End Call</span>
 					</AwesomeButtonProgress>
 				</Row>
