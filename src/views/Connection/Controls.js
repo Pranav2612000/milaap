@@ -3,10 +3,9 @@ import React, { Component } from "react";
 import { store } from "react-notifications-component";
 import { AwesomeButtonProgress } from "react-awesome-button";
 import "react-awesome-button/dist/styles.css";
-
 import {
-  Nav, NavItem, NavLink, Progress, TabContent, TabPane, ListGroup,
-  ListGroupItem, Spinner
+  Nav, NavItem, NavLink, Progress, TabContent, TabPane, ListGroup, ListGroupItem,
+  Spinner
 } from "reactstrap";
 import classNames from "classnames";
 import { AppSwitch } from "@coreui/react";
@@ -23,15 +22,19 @@ const socket = socketIOClient("http://localhost:5000/");
 
 class Controls extends Component {
   getActive = () => {
-
     axios
-      .post("http://localhost:5000/api/room/getActive", {
-        roomName: this.props.roomName,
-      }, {
-        headers: { 'milaap-auth-token': localStorage.getItem('milaap-auth-token') }
-      })
+      .post(
+        "http://localhost:5000/api/room/getActive",
+        {
+          roomName: this.props.roomName,
+        },
+        {
+          headers: {
+            "milaap-auth-token": localStorage.getItem("milaap-auth-token"),
+          },
+        }
+      )
       .then((res) => {
-        console.log("EHREEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE", res);
         if (!res.data.active.length) return;
         //this.setState({ active: res.data.active });
       })
@@ -42,8 +45,8 @@ class Controls extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      myIds: new Set(),
-      myPeers: new Set(),
+      myIds: [0, 0],
+      myPeers: [0, 0],
       roomName: this.props.roomName,
       //Use Sets instead of Arrays to prevent duplicates.
       remotePeers: new Set(),
@@ -53,52 +56,57 @@ class Controls extends Component {
       opinfo: "",
       friendtkn: "",
     };
-    console.clear()
-    console.log(this.state.roomName)
+    console.log(this.state.roomName);
     this.startScreenShare = this.startScreenShare.bind(this);
     this.startConnection = this.startConnection.bind(this);
     this.sendCallEndedSignal = this.sendCallEndedSignal.bind(this);
 
     /* TODO:  Move Call to appropriate position, and replace by generalized call.*/
-    if (this.state.roomName !== "dashboard")
-      this.getActive();
+    if (this.state.roomName !== "dashboard") this.getActive();
 
     socket.on("userJoined", (data) => {
-      console.log("NEW USER JOINED :)");
-      console.log(data);
-      if (this.state.roomName !== "dashboard")      //YET TO BE TESTED
+      if (this.state.roomName !== "dashboard")
+        //YET TO BE TESTED
         this.getActive();
     });
     socket.on("userOnline", (data) => {
-      console.log("NEW USER ONLINE :)");
-      console.log(data);
-      if (this.state.roomName !== "dashboard")
-        this.getActive();
+      if (this.state.roomName !== "dashboard") this.getActive();
     });
     socket.on("userExit", (data) => {
-      console.log("USER EXITED :(");
-      console.log(data);
-      if (this.state.roomName !== "dashboard")
-        this.getActive();
+      if (this.state.roomName !== "dashboard") this.getActive();
     });
     this.endCall = this.endCall.bind(this);
   }
 
+  componentWillUnmount() {
+    this.endCall(() => console.log("Call ended"));
+  }
+
   componentDidUpdate(prevProps) {
+    console.log(prevProps);
+    console.log(this.props.roomName);
     if (this.props.roomName != prevProps.roomName) {
+      this.setState({
+        roomName: this.props.roomName,
+      });
       axios
-        .post("http://localhost:5000/api/room/getActive", {
-          roomName: this.props.roomName,
-        }, {
-          headers: { 'milaap-auth-token': localStorage.getItem('milaap-auth-token') }
-        })
+        .post(
+          "http://localhost:5000/api/room/getActive",
+          {
+            roomName: this.props.roomName,
+          },
+          {
+            headers: {
+              "milaap-auth-token": localStorage.getItem("milaap-auth-token"),
+            },
+          }
+        )
         .then((res) => {
           if (!res.data.active.length || res.data.active == this.state.active)
-            return;
-          this.setState({
-            roomName: this.props.roomName,
-            active: res.data.active,
-          });
+            this.setState({
+              active: res.data.active,
+            });
+          return;
         })
         .catch((err) => {
           console.log(err);
@@ -133,6 +141,9 @@ class Controls extends Component {
 
   createPeer(id) {
     var peer = new Peer(id, {
+      host: 'localhost',
+      port: 9000,
+      path: '/peerserver',
       config: {
         iceServers: [
           { urls: "stun:stun.l.google.com:19302" },
@@ -145,6 +156,25 @@ class Controls extends Component {
       } /* Sample servers, please use appropriate ones */,
     });
     return peer;
+  }
+
+  updateSelfPeerInfo(self, peer, id, type) {
+    console.log(self.state);
+    var id = peer.id;
+    console.log(id);
+    var isVideo = (type === "video") ? 1 : 0;
+    if (self.state.myPeers[isVideo] != 0) {
+      self.state.myPeers[isVideo].destroy();
+    }
+    var peers = self.state.myPeers;
+    var myIDs = self.state.myIds;
+    peers[isVideo] = peer;
+    myIDs[isVideo] = id;
+    self.setState({
+      myPeers: peers,
+      myIds: myIDs,
+      calls: new Array(),
+    });
   }
 
   async startScreenShare(type, next) {
@@ -163,20 +193,17 @@ class Controls extends Component {
       };
       axios
         .post("http://localhost:5000/api/room/goonline", reqData, {
-          headers: { 'milaap-auth-token': localStorage.getItem('milaap-auth-token') }
+          headers: {
+            "milaap-auth-token": localStorage.getItem("milaap-auth-token"),
+          },
         })
         .then((res) => {
           console.log(res);
           var onlineArray = res.data.online;
           if (res.data.changePeer) {
+            //Kept for backward compatibility. Will not execute with latest commit.
             peer.destroy();
             peer = self.createPeer(res.data.changePeer);
-            /*
-      self.setState({
-        myPeer: peer,
-        myIds: [...self.state.myIds, peer],
-      });
-      */
             console.log(peer.disconnected);
             console.log("Using old Id");
             console.log(peer.connections);
@@ -184,7 +211,7 @@ class Controls extends Component {
               peer.reconnect();
               console.log("peer was disconnected, reconnecting...");
               peer.on("open", function (id) {
-                console.log('reconnected');
+                console.log("reconnected");
                 console.log("My token: " + id);
                 console.log("using older id: " + id);
                 self.setUpConnections(self, peer, id, type, onlineArray);
@@ -196,14 +223,17 @@ class Controls extends Component {
             next();
           } else {
             console.log("My token: " + id);
-            var peers = self.state.myPeers;
-            var myIDs = self.state.myIds;
-            peers.add(peer);
-            myIDs.add(id);
-            self.setState({
-              myPeers: peers,
-              myIds: myIDs
-            });
+            self.updateSelfPeerInfo(self, peer, id, type);
+            /*
+						var peers = self.state.myPeers;
+						var myIDs = self.state.myIds;
+						peers.add(peer);
+						myIDs.add(id);
+						self.setState({
+							myPeers: peers,
+							myIds: myIDs,
+						});
+            */
             console.log(self.state);
             self.setUpConnections(self, peer, id, type, onlineArray);
             next();
@@ -224,21 +254,22 @@ class Controls extends Component {
       // Make requests to currently online users.
       axios
         .get("http://localhost:5000/api/user/getUserName", {
-          headers: { 'milaap-auth-token': localStorage.getItem('milaap-auth-token') }
-        }).then(resp => {
-          console.clear();
-          console.log(resp.data)
+          headers: {
+            "milaap-auth-token": localStorage.getItem("milaap-auth-token"),
+          },
+        })
+        .then((resp) => {
+          console.log(resp.data);
           onlineArray.forEach((val, index) => {
-            if (val.username === resp.data.username) {
-              //Display my screen without creating a connection.
+            if (val.username === resp.data.username && val.type === type) {
               return;
             }
             console.log("Connecting to " + onlineArray[index].tkn);
             self.startConnection(self, onlineArray[index].tkn, peer);
-          })
-
-        }).catch(err => {
-          console.log(err, "Error in Verifying JWT")
+          });
+        })
+        .catch((err) => {
+          console.log(err, "Error in Verifying JWT");
         });
     });
   }
@@ -287,7 +318,7 @@ class Controls extends Component {
     var mediaa = self.state.myMediaStreamObj;
     console.log(mediaa);
     self.sendMediaStream(self, peer, mediaa, friendtkn, false);
-    /*
+		/*
     var connectedPeers = self.state.connectedPeers;
     connectedPeers.add(friendtkn);
     self.setState({
@@ -302,10 +333,10 @@ class Controls extends Component {
     var mediaa = self.state.myMediaStreamObj;
     peer.on("call", function (call) {
       self.sendMediaStream(self, peer, mediaa, null, true, call);
-      /* This logic just hides the duplicate connections. For better performance. 
-       * Duplicate connections should be closed. */
+			/* This logic just hides the duplicate connections. For better performance.
+			 * Duplicate connections should be closed. */
       //calls.add(thiscall);
-      /*
+			/*
 var calls = self.state.calls;
 console.log(calls);
 var duplicateCall = false;
@@ -332,7 +363,7 @@ self.setState(
   },
 );
       */
-      /*
+			/*
       var connectedPeers = self.state.connectedPeers;
       connectedPeers.add(call.peer);
       self.setState({
@@ -375,7 +406,7 @@ self.setState(
       thiscall = peer.call(friendtkn, media);
     }
     self.addHandlersToCall(self, thiscall, friendtkn, peer, isAnswer);
-    console.log('exit4d');
+    console.log("exit4d");
   }
 
   // Add Event handlers to the thiscall call - error, stream used as of now.
@@ -387,8 +418,7 @@ self.setState(
       console.log(friendtkn);
       console.log(err);
       thiscall.close();
-      //self.startConnection(self, friendtkn, peer); 
-
+      //self.startConnection(self, friendtkn, peer);
 
       // If an error is observed, we automatically send another request to start connection,
       // to provide reliability. Since, we dont want both the receiver and username of the stream
@@ -407,7 +437,7 @@ self.setState(
       var duplicateCall = false;
       var duplicateCallIndex = -1;
       calls.forEach((val, index) => {
-        console.log('checking with ' + val.peer);
+        console.log("checking with " + val.peer);
         if (val.peer == thiscall.peer) {
           duplicateCallIndex = index;
           duplicateCall = val;
@@ -415,7 +445,7 @@ self.setState(
         }
       });
       if (duplicateCall) {
-        console.log('closing a duplicate call.');
+        console.log("closing a duplicate call.");
         console.log(duplicateCall.peer);
         //      calls.delete(duplicateCall);
         //calls.splice(duplicateCallIndex, 1);
@@ -425,13 +455,11 @@ self.setState(
       //calls.add(call);
       console.log(calls);
       console.log(thiscall);
-      self.setState(
-        {
-          //call: peer.call(friendtkn, media),//to be updated appropriately
-          calls: [...calls, thiscall],
-          //calls: calls,
-        },
-      );
+      self.setState({
+        //call: peer.call(friendtkn, media),//to be updated appropriately
+        calls: [...calls, thiscall],
+        //calls: calls,
+      });
       self.createStream(self, stream, friendtkn);
     });
   }
@@ -490,7 +518,9 @@ self.setState(
     };
     axios
       .post("http://localhost:5000/api/room/exitstream", reqData, {
-        headers: { 'milaap-auth-token': localStorage.getItem('milaap-auth-token') }
+        headers: {
+          "milaap-auth-token": localStorage.getItem("milaap-auth-token"),
+        },
       })
       .then((res) => {
         console.log(res.data);
@@ -506,7 +536,9 @@ self.setState(
     };
     axios
       .post("http://localhost:5000/api/room/exitstream", reqData, {
-        headers: { 'milaap-auth-token': localStorage.getItem('milaap-auth-token') }
+        headers: {
+          "milaap-auth-token": localStorage.getItem("milaap-auth-token"),
+        },
       })
       .then((res) => {
         console.log(res.data);
@@ -553,7 +585,7 @@ self.setState(
               this.startScreenShare("video", next);
             }}
           >
-            <i class="icon-user icons"></i>
+            <i className="icon-user icons"></i>
             <span> Video</span>
           </AwesomeButtonProgress>
           <AwesomeButtonProgress
@@ -561,7 +593,7 @@ self.setState(
             size="medium"
             action={(element, next) => this.startScreenShare("screen", next)}
           >
-            <i class="icon-screen-desktop icons"></i>
+            <i className="icon-screen-desktop icons"></i>
             <span> Screen</span>
           </AwesomeButtonProgress>
           <AwesomeButtonProgress
@@ -573,11 +605,12 @@ self.setState(
               this.endCall(next);
             }}
           >
-            <i class="icon-call-end icons"></i>
+            <i className="icon-call-end icons"></i>
             <span> End Call</span>
           </AwesomeButtonProgress>
         </Row>
         <br />
+        <h3>Members</h3>
         <ListGroup flush>
           {this.state.active
             ? this.state.active.map((user) => {

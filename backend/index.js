@@ -42,8 +42,8 @@ app.get('/', (req, res) => res.send('Hello World!'));
 
 
 
-//While deploying uncomment this line and change peerServer throughout the application to use our peerServer.
-//const peerServer = PeerServer({ port: 9000, path: '/peerserver' });
+//While deploying/local testing uncomment this line and change peerServer throughout the application to use our peerServer.
+const peerServer = PeerServer({ port: 9000, path: '/peerserver' });
 http.listen(port, () => {
         console.log(`Server listening on port ${port}`);
 });
