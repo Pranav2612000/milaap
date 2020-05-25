@@ -162,8 +162,11 @@ class Controls extends Component {
     var isVideo = (type === "video") ? 1 : 0;
     if(self.state.myPeers[isVideo] != 0) {
       self.state.myPeers[isVideo].destroy();
+      self.deleteAllVideoElements();
+      self.setState({
+        calls: new Array(),
+      });
     }
-    self.deleteAllVideoElements();
     var peers = self.state.myPeers;
     var myIDs = self.state.myIds;
     peers[isVideo] = peer;
@@ -171,7 +174,6 @@ class Controls extends Component {
     self.setState({
       myPeers: peers,
       myIds: myIDs,
-      calls: new Array(),
     });
   }
 
@@ -444,6 +446,16 @@ self.setState(
 					return;
 				}
 			});
+      /* Check with my tokens to prevent self calls when having both video and screen. */
+      console.log(self.state.myIds);
+      self.state.myIds.forEach((val, index) => {
+        console.log("checking with " + val);
+        if(val == thiscall.peer) {
+          duplicateCallIndex = index;
+          duplicateCall = val;
+          return;
+        }
+      });
 			if (duplicateCall) {
 				console.log("closing a duplicate call.");
 				console.log(duplicateCall.peer);
