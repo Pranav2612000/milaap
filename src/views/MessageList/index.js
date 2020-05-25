@@ -7,85 +7,109 @@ import moment from "moment";
 import axios from "axios";
 import socketIOClient from "socket.io-client";
 import "./MessageList.css";
+import { Col } from "reactstrap";
 
 const socket = socketIOClient("http://localhost:5000/");
 
 
-function formatMsgs(tempMsg) {
-  let formattedMsgs = [];
-  tempMsg.forEach((val, index) => {
-    let formattedMsg = {};
-    formattedMsg.id = val.id;
-    formattedMsg.author = val.sender;
-    formattedMsg.message = val.msg;
-    formattedMsg.timestamp = new Date().getTime();
-    formattedMsgs.push(formattedMsg);
-  });
-  return formattedMsgs;
-}
 
 export default function MessageList(props) {
+
   var [MY_USER_ID, setID] = useState("");
   const [messages, setMessages] = useState([]);
+  const [change, setChange] = useState(false);
   const [lastMsgId, setLastMsgId] = useState(0);
-  useEffect(() => {
+
+
+  function formatMsgs(tempMsg, update = false) {
+    let formattedMsgs = messages;
+    if (update) formattedMsgs = []
+    tempMsg.forEach((val, index) => {
+      let formattedMsg = {};
+      formattedMsg.id = val.id;
+      formattedMsg.author = val.sender;
+      formattedMsg.message = val.msg;
+      formattedMsg.timestamp = new Date().getTime();
+      formattedMsgs.push(formattedMsg);
+    });
+    return formattedMsgs;
+  }
+
+  const init = () => {
     axios
       .get("http://localhost:5000/api/user/getUserName", {
         headers: { 'milaap-auth-token': localStorage.getItem('milaap-auth-token') }
       }).then(resp => {
         setID(resp.data.username);
+        socket.on("newMessage", (data) => {
+          // console.clear();
+          console.log("New Message Arrived");
 
+          if (props.roomName !== "dashboard" && data !== resp.data.username) fetchMessages();
+          // if (props.roomName !== "dashboard") fetchMessages();
+        });
       }).catch(err => {
         console.log(err, "Error in Verifying JWT")
       })
+  }
+  useEffect(() => {
+    init();
 
-  }, [])
+  })
 
 
-  let getReqData = function () {
+  const getReqData = () => {
+    // console.clear()
     return {
       roomName: props.roomName,
-      lastMsgId: lastMsgId,
+      lastMsgId: messages.length > 0 ? messages[messages.length - 1].id + 1 : -1,
     };
   };
-  const fetchMessages = (reqData = getReqData()) => {
-    //var reqData = getReqData();
-    console.log("messages : ", messages);
-    console.log("reqData : ", reqData);
+  const fetchMessages = (change = false) => {
+    // console.clear();
+    console.log(change);
+    var reqData = getReqData();
+    // console.clear();
+    // console.log(reqData);
+    if (change == true) {
+      reqData.lastMsgId = -1;
+    }
     axios
       .post("http://localhost:5000/api/room/getmsgs", reqData, {
         headers: { 'milaap-auth-token': localStorage.getItem('milaap-auth-token') }
       })
       .then((res) => {
-        console.log(res);
         let tempMsg = res.data.msgs;
+        if (JSON.stringify(tempMsg) === JSON.stringify(messages))
+          return;
+        console.clear();
+        // alert(1)
+        console.log(messages);
+        console.log(tempMsg);
+        console.log(tempMsg.length);
+        console.log(reqData);
+
         if (tempMsg == undefined) {
           tempMsg = [];
         }
         let tempMsgFormatted = formatMsgs(tempMsg);
         setMessages(tempMsgFormatted);
-        //console.log(tempMsgFormatted[tempMsgFormatted.length - 1].id);
-        setLastMsgId(
-          tempMsgFormatted[tempMsgFormatted.length - 1] === undefined
-            ? 0
-            : tempMsgFormatted[tempMsgFormatted.length - 1].id
-        );
+        console.log(tempMsgFormatted[tempMsgFormatted.length - 1].id);
+        setLastMsgId(tempMsgFormatted[tempMsgFormatted.length - 1].id);
+        console.log(messages);
       })
       .catch((err) => {
         console.log(err);
       });
   };
+
   useEffect(() => {
     //getMessages();
-    console.log(lastMsgId);
-    if (props.roomName !== "dashboard") fetchMessages();
-    socket.on("newMessage", (data) => {
-      console.log(data);
-      var reqData = getReqData();
-      console.log("New Message Arrived");
-      reqData.lastMsgId = 0;
-      if (props.roomName !== "dashboard") fetchMessages(reqData);
-    });
+    // console.clear();
+    // console.log(props.roomName);
+    if (props.roomName !== "dashboard") fetchMessages(true);
+
+
     //If you are on a limited DataPack, Comment this code segment and the one at
     //the end of useEffect function - (the one with return clearInterval...), to
     //prevent unnecessary multiple calls to the server
@@ -116,8 +140,12 @@ export default function MessageList(props) {
 
     //Yes this line.
     //return () => clearInterval(interval);
-  }, [props.roomName]);
+  }, []);
+
   const renderMessages = () => {
+    console.clear()
+    console.log(messages);
+    console.log(messages.length);
     let i = 0;
     let messageCount = messages.length;
     let tempMessages = [];
@@ -159,7 +187,7 @@ export default function MessageList(props) {
           endsSequence = false;
         }
       }
-
+      if (messageCount == 1) endsSequence = false;
       tempMessages.push(
         <Message
           key={i}
@@ -173,29 +201,32 @@ export default function MessageList(props) {
 
       // Proceed to the next message.
       i += 1;
-    }
 
+      // console.log(current);
+    }
+    console.log(tempMessages);
+    setChange(!change);
     return tempMessages;
   };
   const updateMsg = (msgObject) => {
     let newMsgs = [msgObject];
-    let newFormattedMsg = formatMsgs(newMsgs);
+    let newFormattedMsg = formatMsgs(newMsgs, true);
     newMsgs = messages.concat(newFormattedMsg);
     setMessages(newMsgs);
     return;
   };
 
   return (
-    <div className="message-list">
+    <div className="message-list" >
       <Toolbar
         title={props.roomName}
-        /*
-        rightItems={[
-          <ToolbarButton key="info" icon="ion-ios-information-circle-outline" />,
-          <ToolbarButton key="video" icon="ion-ios-videocam" />,
-          <ToolbarButton key="phone" icon="ion-ios-call" />
-        ]}
-               */
+      /*
+      rightItems={[
+        <ToolbarButton key="info" icon="ion-ios-information-circle-outline" />,
+        <ToolbarButton key="video" icon="ion-ios-videocam" />,
+        <ToolbarButton key="phone" icon="ion-ios-call" />
+      ]}
+             */
       />
 
       <div className="message-list-container">{renderMessages()}</div>
@@ -212,6 +243,6 @@ export default function MessageList(props) {
         roomName={props.roomName}
         callback={updateMsg}
       />
-    </div>
+    </div >
   );
 }
