@@ -131,6 +131,7 @@ class Controls extends Component {
 			let context = document.getElementById("context");
 			context.srcObject = e.target.srcObject;
 			context.play();
+      $("#context").removeClass().addClass(e.target.id);
 		} catch (err) {
 			console.log("The selected stream is old");
 		}
@@ -525,8 +526,12 @@ self.setState(
 
   deleteVideoElement(id) {
     let video = document.getElementById(id);
+    let context = $("#context");
     if(video) {
       video.remove();
+    }
+    if(context.hasClass(id)) {
+      context.remove();
     }
   }
 
@@ -536,6 +541,7 @@ self.setState(
     videos.empty();
     */
     $("#videos").empty();
+    $("#context").remove();
   }
 
 	sendCallEndedSignal() {
