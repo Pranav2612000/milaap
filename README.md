@@ -1,21 +1,21 @@
 <!-- PROJECT LOGO -->
 <br />
 <p align="center">
-  <a href="https://github.com/pranav2612000/milaap/">
-    <img src="public/assets/img/logo.png" alt="Logo" width="130" height="80">
+  <a href="https://github.com/Pranav2612000/distrideochat/">
+    <img src="public/assets/img/logo.png" alt="Logo" width="130" height="130">
   </a>
 
-  <h3 align="center">MILAAP</h3>
+  <h3 align="center">Distrideo Chat</h3>
 
   <p align="center">
     A distributed video/audio calling application!
     <br />
     <br />
-    <!-- <a href="https://github.com/pranav2612000/milaap">View Demo</a>
+    <!-- <a href="https://github.com/Pranav2612000/distrideochat">View Demo</a>
     · -->
-    <a href="https://github.com/pranav2612000/milaap/issues">Report Bug</a>
+    <a href="https://github.com/Pranav2612000/distrideochat/issues">Report Bug</a>
     ·
-    <a href="https://github.com/pranav2612000/milaap/issues">Request Feature</a>
+    <a href="https://github.com/Pranav2612000/distrideochat/issues">Request Feature</a>
   </p>
 </p>
 
@@ -41,18 +41,9 @@
 
 <!-- [![Product Name Screen Shot][product-screenshot]](https://example.com) -->
 
-There are many video calling applications around the globe, but they are mostly server based applications providing maximum load on the server, wherein the audio and video quality decreases with increase in the number of participants. Many don't even support end-to-end encryption, and screen sharing is not efficient.
+There are many video calling applications around the globe, but they are mostly server based applications providing maximum load on the server, wherein the audio and video quality decreases with increase in the number of participants. Many don't even support end-to-end encryption.
 
-So we decided to develop a one-stop solution for not only addressing all these solution but also completely new features like video-syncing, which aren't present in any other video sharing application.
-
-MILAAP is a distributed video/audio conferencing application, which is designed to work on the edge, with very less interference of the server(i.e. peer to peer connection). It is designed to work efficiently on all platforms like mobile phones, tablets, laptops & desktops and in all kind of environments like iOS, Android for mobile and
-Linux, Windows, etc for laptop/desktops.
-
-Here's what makes MILAAP different:
-
-- You can create private as well as public rooms
-- You can create your own profile
-- You can use video syncing feature :smile:
+So we decided to develop a one-stop solution for not only addressing all these solution, but to give a seamless experience to the user. Distrideo Chat is a distributed video/audio conferencing application, which is designed to work on the edge, with very less interference of the server(i.e. peer to peer connection). It is designed to work efficiently on all platforms.
 
 ### Built With
 
@@ -83,7 +74,7 @@ npm install npm@latest -g
 1. Clone the repo
 
 ```sh
-git clone https://github.com/pranav2612000/milaap.git
+git clone https://github.com/Pranav2612000/distrideochat.git
 ```
 
 2. Install NPM packages
@@ -132,7 +123,7 @@ In progress
 
 ## Roadmap
 
-See the [open issues](https://github.com/pranav2612000/milaap/issues) for a list of proposed features (and known issues).
+See the [open issues](https://github.com/Pranav2612000/distrideochat/issues) for a list of proposed features (and known issues).
 
 <!-- CONTRIBUTING -->
 
@@ -156,7 +147,12 @@ Distributed under the MIT License. See `LICENSE` for more information.
 
 ## Contributors
 
-In progress
+- [Pranav Joglekar](https://github.com/Pranav2612000/)
+- [Ved Dandekar](https://github.com/veddandekar)
+- [Vasu Sharma](https://github.com/vasusharma7)
+- [Anup Nair](https://github.com/AnupNair08)
+- [Naman Modi](https://github.com/naman-modi)
+- [Savan Nahar](https://github.com/savannahar68)
 
 <!-- ACKNOWLEDGEMENTS
 
