@@ -37,7 +37,7 @@ export default function MessageList(props) {
 
       }).catch(err => {
         console.log(err, "Error in Verifying JWT")
-      })
+      }
 
   }, [])
 

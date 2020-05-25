@@ -268,19 +268,19 @@ router.post("/goonline", auth, async (req, res) => {
         room._doc.online = onlineArray;
         room.markModified("online");
         room.save((err) => {
-                if (err) {
-                  return res.status(400).json({ err: "Error Exiting Video" });
-                } else {
-                  io.emit('userOnline', req.body);
-                  return res.status(200).json({
-                    msg: "Waiting for others",
-                    connected: onlineArray.length,
-                    online: onlineArray,
-                    changePeer: false,
-                    peerId: onlineArray[indexOfCurrentUser].tkn,
-                    type: type
-                  });
-                }
+          if (err) {
+            return res.status(400).json({ err: "Error Exiting Video" });
+          } else {
+            io.emit('userOnline', req.body);
+            return res.status(200).json({
+              msg: "Waiting for others",
+              connected: onlineArray.length,
+              online: onlineArray,
+              changePeer: false,
+              peerId: onlineArray[indexOfCurrentUser].tkn,
+              type: type
+            });
+          }
         });
       } else {
         rooms.updateOne(
