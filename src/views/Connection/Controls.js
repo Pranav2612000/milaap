@@ -13,6 +13,7 @@ import { Jumbotron, Button, ButtonGroup, Badge, Card, CardBody, CardFooter,
 //import Peer from "../../dependencies/peerjs/index.d.ts";
 import Peer from "peerjs";
 import axios from "axios";
+import $ from "jquery";
 import "./Controls.css";
 const socket = socketIOClient("http://localhost:5000/");
 
@@ -162,6 +163,7 @@ class Controls extends Component {
     if(self.state.myPeers[isVideo] != 0) {
       self.state.myPeers[isVideo].destroy();
     }
+    self.deleteAllVideoElements();
     var peers = self.state.myPeers;
     var myIDs = self.state.myIds;
     peers[isVideo] = peer;
@@ -386,7 +388,8 @@ self.setState(
 		track.addEventListener("ended", () => {
 			console.log("My stream ended. Please show this");
 			thiscall.close();
-			self.sendRequestToEndCall();
+      self.deleteVideoElement(thiscall.peer);
+			//self.sendRequestToEndCall();
 			//self.startConnection(friendtkn, peer, self);
 		});
 
@@ -414,6 +417,7 @@ self.setState(
 			console.log(friendtkn);
 			console.log(err);
 			thiscall.close();
+      self.deleteVideoElement(thiscall.peer);
 			//self.startConnection(self, friendtkn, peer);
 
 			// If an error is observed, we automatically send another request to start connection,
@@ -497,7 +501,6 @@ self.setState(
 
 	// Creates a new video element to show the stream passed to it.
 	createVideoElement(self, stream, friendtkn) {
-		console.trace();
 		let video = document.createElement("video");
 		video.width = "200";
 		video.id = friendtkn;
@@ -507,6 +510,19 @@ self.setState(
 		video.onclick = self.switchContext;
 		document.getElementById("videos").appendChild(video);
 	}
+
+  deleteVideoElement(id) {
+    let video = document.getElementById(id);
+    video.remove();
+  }
+
+  deleteAllVideoElements() {
+    /*
+    let videos = document.getElementById("videos");
+    videos.empty();
+    */
+    $("#videos").empty();
+  }
 
 	sendCallEndedSignal() {
 		const reqData = {
@@ -565,6 +581,7 @@ self.setState(
 			});
 		}
 		//Add by appropriate UI changes which clears the screen.
+    this.deleteAllVideoElements();
 	}
 
 	render() {
