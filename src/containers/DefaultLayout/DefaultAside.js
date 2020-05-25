@@ -1,14 +1,18 @@
 import React, { Component } from "react";
 import { withRouter } from "react-router-dom";
-import { Nav, NavItem, NavLink, Progress, TabContent, TabPane, ListGroup,
-	ListGroupItem, } from "reactstrap";
+import {
+	Nav, NavItem, NavLink, Progress, TabContent, TabPane, ListGroup,
+	ListGroupItem,
+} from "reactstrap";
 import PropTypes from "prop-types";
 import classNames from "classnames";
 import { AppSwitch } from "@coreui/react";
 import MessageView from "../../views/MessageList/index";
 import Controls from "../../views/Connection/Controls";
-import { Button, ButtonGroup, Badge, Card, CardBody, CardFooter, CardHeader, Col,
-	Container, Row, Collapse, Fade, } from "reactstrap";
+import {
+	Button, ButtonGroup, Badge, Card, CardBody, CardFooter, CardHeader, Col,
+	Container, Row, Collapse, Fade,
+} from "reactstrap";
 
 const propTypes = {
 	children: PropTypes.node,
@@ -93,10 +97,10 @@ class DefaultAside extends Component {
 				</Nav>
 				<TabContent activeTab={this.state.activeTab}>
 					<TabPane tabId="1">
-						<Controls key={this.change} roomName={this.state.roomName} />
+						<Controls roomName={this.state.roomName} />
 					</TabPane>
 
-					<TabPane tabId="2" className="p-3">
+					<TabPane tabId="2" className="p-3" key={this.state.change}>
 						<MessageView roomName={this.state.roomName} />
 					</TabPane>
 

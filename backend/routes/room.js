@@ -80,7 +80,7 @@ router.post("/sendmessage", auth, async (req, res) => {
 
         //the data being sent will be chnaged later as per requirements
 
-        io.emit("newMessage", req.data);
+        io.emit("newMessage", req.user.id);
         return res.status(200).json({ status: "Success", msg: msgObject });
       }
     });
@@ -136,9 +136,12 @@ router.post("/getmsgs", auth, async (req, res) => {
   const roomName = req.body.roomName;
   let lastMsgId = req.body.lastMsgId; // requesting for id 0, should send msg with id 0
   if (lastMsgId == undefined) {
+
     lastMsgId = 0;
   }
   lastMsgId = parseInt(lastMsgId);
+  // console.clear()
+  console.log(lastMsgId);
   rooms.findOne({ roomName: roomName }, function (err, room) {
     if (err) {
       return res.status(400).json({ err: "Error. Try again." });
@@ -149,6 +152,9 @@ router.post("/getmsgs", auth, async (req, res) => {
     let msgArray = room._doc.msgArray;
     if (msgArray == undefined) {
       msgArray = [];
+      return res.status(200).json({ msg: "Success", msgs: msgArray });
+    }
+    if (lastMsgId === -1) {
       return res.status(200).json({ msg: "Success", msgs: msgArray });
     }
     let reqIndex = 0;
