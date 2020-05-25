@@ -555,8 +555,11 @@ self.setState(
 			.then((res) => {
 				console.log(res.data);
 				var idToBeDestroyed = res.data.idToBeDestroyed;
-				this.state.myIds.forEach((val, index) => {
-					val.destroy();
+        console.log(this.state.myPeers);
+				this.state.myPeers.forEach((val, index) => {
+          if(val) {
+					  val.destroy();
+          }
 				});
 				next();
 			})
