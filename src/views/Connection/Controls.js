@@ -525,7 +525,9 @@ self.setState(
 
   deleteVideoElement(id) {
     let video = document.getElementById(id);
-    video.remove();
+    if(video) {
+      video.remove();
+    }
   }
 
   deleteAllVideoElements() {
