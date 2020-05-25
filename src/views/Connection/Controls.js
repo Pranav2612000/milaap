@@ -50,7 +50,6 @@ class Controls extends Component {
 			remotePeersID: new Set(),
 			calls: new Array(),
 			connectedPeers: new Set(),
-			opinfo: "",
 			friendtkn: "",
 		};
 		console.log(this.state.roomName);
@@ -603,6 +602,17 @@ self.setState(
 				myMediaStreamObj: null,
 			});
 		}
+    //Clear all state variables associated with calls.
+    this.setState({
+			myIds: [0, 0],
+			myPeers: [0, 0],
+			//Use Sets instead of Arrays to prevent duplicates.
+			remotePeers: new Set(),
+			remotePeersID: new Set(),
+			calls: new Array(),
+			connectedPeers: new Set(),
+			friendtkn: "",
+    });
 		//Add by appropriate UI changes which clears the screen.
     this.deleteAllVideoElements();
 	}
