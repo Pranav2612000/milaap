@@ -157,17 +157,17 @@ router.post("/getmsgs", auth, async (req, res) => {
     if (lastMsgId === -1) {
       return res.status(200).json({ msg: "Success", msgs: msgArray });
     }
-    let reqIndex = 0;
-    let i;
-    for (i = 0; i < msgArray.length; i++) {
-      if (msgArray[i].id >= lastMsgId) {
-        break;
-      }
-      reqIndex++;
-    }
-    let newMsgArray = msgArray.splice(reqIndex);
-    //return res.status(200).json({msg: "Success", msgs: room._doc.msgArray});
-    return res.status(200).json({ msg: "Success", msgs: newMsgArray });
+    // let reqIndex = 0;
+    // let i;
+    // for (i = 0; i < msgArray.length; i++) {
+    //   if (msgArray[i].id >= lastMsgId) {
+    //     break;
+    //   }
+    //   reqIndex++;
+    // }
+    // let newMsgArray = msgArray.splice(reqIndex);
+    return res.status(200).json({msg: "Success", msgs: room._doc.msgArray});
+    // return res.status(200).json({ msg: "Success", msgs: newMsgArray });
   });
 });
 
