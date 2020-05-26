@@ -13,6 +13,7 @@ import { Jumbotron, Button, ButtonGroup, Badge, Card, CardBody, CardFooter,
 //import Peer from "../../dependencies/peerjs/index.d.ts";
 import Peer from "peerjs";
 import axios from "axios";
+import $ from "jquery";
 import "./Controls.css";
 const socket = socketIOClient("http://localhost:5000/");
 
@@ -49,7 +50,6 @@ class Controls extends Component {
 			remotePeersID: new Set(),
 			calls: new Array(),
 			connectedPeers: new Set(),
-			opinfo: "",
 			friendtkn: "",
 		};
 		console.log(this.state.roomName);
@@ -130,6 +130,7 @@ class Controls extends Component {
 			let context = document.getElementById("context");
 			context.srcObject = e.target.srcObject;
 			context.play();
+      $("#context").removeClass().addClass(e.target.id);
 		} catch (err) {
 			console.log("The selected stream is old");
 		}
@@ -161,6 +162,10 @@ class Controls extends Component {
     var isVideo = (type === "video") ? 1 : 0;
     if(self.state.myPeers[isVideo] != 0) {
       self.state.myPeers[isVideo].destroy();
+      self.deleteAllVideoElements();
+      self.setState({
+        calls: new Array(),
+      });
     }
     var peers = self.state.myPeers;
     var myIDs = self.state.myIds;
@@ -169,7 +174,6 @@ class Controls extends Component {
     self.setState({
       myPeers: peers,
       myIds: myIDs,
-      calls: new Array(),
     });
   }
 
@@ -386,7 +390,8 @@ self.setState(
 		track.addEventListener("ended", () => {
 			console.log("My stream ended. Please show this");
 			thiscall.close();
-			self.sendRequestToEndCall();
+      self.deleteVideoElement(thiscall.peer);
+			//self.sendRequestToEndCall();
 			//self.startConnection(friendtkn, peer, self);
 		});
 
@@ -414,6 +419,7 @@ self.setState(
 			console.log(friendtkn);
 			console.log(err);
 			thiscall.close();
+      self.deleteVideoElement(thiscall.peer);
 			//self.startConnection(self, friendtkn, peer);
 
 			// If an error is observed, we automatically send another request to start connection,
@@ -440,6 +446,16 @@ self.setState(
 					return;
 				}
 			});
+      /* Check with my tokens to prevent self calls when having both video and screen. */
+      console.log(self.state.myIds);
+      self.state.myIds.forEach((val, index) => {
+        console.log("checking with " + val);
+        if(val == thiscall.peer) {
+          duplicateCallIndex = index;
+          duplicateCall = val;
+          return;
+        }
+      });
 			if (duplicateCall) {
 				console.log("closing a duplicate call.");
 				console.log(duplicateCall.peer);
@@ -497,7 +513,6 @@ self.setState(
 
 	// Creates a new video element to show the stream passed to it.
 	createVideoElement(self, stream, friendtkn) {
-		console.trace();
 		let video = document.createElement("video");
 		video.width = "200";
 		video.id = friendtkn;
@@ -507,6 +522,26 @@ self.setState(
 		video.onclick = self.switchContext;
 		document.getElementById("videos").appendChild(video);
 	}
+
+  deleteVideoElement(id) {
+    let video = document.getElementById(id);
+    let context = $("#context");
+    if(video) {
+      video.remove();
+    }
+    if(context.hasClass(id)) {
+      context.remove();
+    }
+  }
+
+  deleteAllVideoElements() {
+    /*
+    let videos = document.getElementById("videos");
+    videos.empty();
+    */
+    $("#videos").empty();
+    $("#context").remove();
+  }
 
 	sendCallEndedSignal() {
 		const reqData = {
@@ -539,8 +574,11 @@ self.setState(
 			.then((res) => {
 				console.log(res.data);
 				var idToBeDestroyed = res.data.idToBeDestroyed;
-				this.state.myIds.forEach((val, index) => {
-					val.destroy();
+        console.log(this.state.myPeers);
+				this.state.myPeers.forEach((val, index) => {
+          if(val) {
+					  val.destroy();
+          }
 				});
 				next();
 			})
@@ -564,7 +602,19 @@ self.setState(
 				myMediaStreamObj: null,
 			});
 		}
+    //Clear all state variables associated with calls.
+    this.setState({
+			myIds: [0, 0],
+			myPeers: [0, 0],
+			//Use Sets instead of Arrays to prevent duplicates.
+			remotePeers: new Set(),
+			remotePeersID: new Set(),
+			calls: new Array(),
+			connectedPeers: new Set(),
+			friendtkn: "",
+    });
 		//Add by appropriate UI changes which clears the screen.
+    this.deleteAllVideoElements();
 	}
 
 	render() {
