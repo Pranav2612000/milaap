@@ -1,4 +1,4 @@
-import { ServerMessageType } from "./enums";
+import { ServerMessageType } from './enums';
 
 export class ServerMessage {
   type: ServerMessageType;

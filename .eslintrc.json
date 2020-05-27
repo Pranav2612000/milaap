@@ -1,0 +1,33 @@
+{
+  "env": {
+    "browser": true,
+    "es6": true,
+    "jest": true
+  },
+  "extends": ["plugin:prettier/recommended", "prettier/react"],
+  "globals": {
+    "Atomics": "readonly",
+    "SharedArrayBuffer": "readonly"
+  },
+  "parser": "babel-eslint",
+  "parserOptions": {
+    "ecmaFeatures": {
+      "jsx": true
+    },
+    "ecmaVersion": 11,
+    "sourceType": "module"
+  },
+  "plugins": ["react", "prettier"],
+  "rules": {
+    "semi": [2, "always"],
+    "react/no-unescaped-entities": 0,
+    "react/prop-types": 0,
+    "react/jsx-key": 0,
+    "react/no-find-dom-node": 0,
+    "no-unused-vars": 0,
+    "no-array-constructor": 0,
+    "new-cap": 0,
+    "space-before-function-paren": 0,
+    "prettier/prettier": "error"
+  }
+}

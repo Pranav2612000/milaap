@@ -1,6 +1,6 @@
 import { webRTCAdapter } from './adapter';
 
-export const Supports = new class {
+export const Supports = new (class {
   readonly isIOS = ['iPad', 'iPhone', 'iPod'].includes(navigator.platform);
   readonly supportedBrowsers = ['firefox', 'chrome', 'safari'];
 
@@ -10,7 +10,7 @@ export const Supports = new class {
 
   isWebRTCSupported(): boolean {
     return typeof RTCPeerConnection !== 'undefined';
-  };
+  }
 
   isBrowserSupported(): boolean {
     const browser = this.getBrowser();
@@ -41,7 +41,11 @@ export const Supports = new class {
 
     if (browser === 'chrome' && version < 72) return false;
     if (browser === 'firefox' && version >= 59) return true;
-    if (!window.RTCRtpTransceiver || !('currentDirection' in RTCRtpTransceiver.prototype)) return false;
+    if (
+      !window.RTCRtpTransceiver ||
+      !('currentDirection' in RTCRtpTransceiver.prototype)
+    )
+      return false;
 
     let tempPc: RTCPeerConnection;
     let supported = false;
@@ -50,8 +54,8 @@ export const Supports = new class {
       tempPc = new RTCPeerConnection();
       tempPc.addTransceiver('audio');
       supported = true;
-    } catch (e) { }
-    finally {
+    } catch (e) {
+    } finally {
       if (tempPc) {
         tempPc.close();
       }
@@ -69,4 +73,4 @@ export const Supports = new class {
     isBrowserSupported:${this.isBrowserSupported()} 
     isUnifiedPlanSupported:${this.isUnifiedPlanSupported()}`;
   }
-}
+})();

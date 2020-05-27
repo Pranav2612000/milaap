@@ -1,5 +1,5 @@
-import React, { Component } from "react";
-import { Link, NavLink } from "react-router-dom";
+import React, { Component } from 'react';
+import { Link, NavLink } from 'react-router-dom';
 import {
   Badge,
   UncontrolledDropdown,
@@ -8,19 +8,6 @@ import {
   DropdownToggle,
   Nav,
   NavItem,
-} from "reactstrap";
-import PropTypes from "prop-types";
-import axios from "axios";
-
-import {
-  AppAsideToggler,
-  AppNavbarBrand,
-  AppSidebarToggler,
-} from "@coreui/react";
-import DefaultAside from "./DefaultAside";
-import logo from "../../assets/img/brand/logo.png";
-import sygnet from "../../assets/img/brand/sygnet.svg";
-import {
   Button,
   Card,
   CardBody,
@@ -35,11 +22,18 @@ import {
   ModalBody,
   ModalFooter,
   ModalHeader,
-  Row,
-} from "reactstrap";
+  Row
+} from 'reactstrap';
+import PropTypes from 'prop-types';
+import axios from 'axios';
+
+import { AppAsideToggler, AppNavbarBrand, AppSidebarToggler } from '@coreui/react';
+import DefaultAside from './DefaultAside';
+import logo from '../../assets/img/brand/logo.png';
+import sygnet from '../../assets/img/brand/sygnet.svg';
 
 const propTypes = {
-  children: PropTypes.node,
+  children: PropTypes.node
 };
 
 const defaultProps = {};
@@ -49,8 +43,8 @@ class DefaultHeader extends Component {
     super(props);
     this.state = {
       modal: false,
-      friendid: "",
-      roomName: "",
+      friendid: '',
+      roomName: ''
     };
     this.toggle = this.toggle.bind(this);
     this.handleFriendChange = this.handleFriendChange.bind(this);
@@ -61,13 +55,13 @@ class DefaultHeader extends Component {
   addFriend() {
     const reqData = {
       user: this.state.friendid,
-      roomName: this.state.roomName,
+      roomName: this.state.roomName
     };
     axios
-      .post(reqData, "http://localhost:5000/api/user/adduser", {
+      .post(reqData, 'http://localhost:5000/api/user/adduser', {
         headers: {
-          "milaap-auth-token": localStorage.getItem("milaap-auth-token"),
-        },
+          'milaap-auth-token': localStorage.getItem('milaap-auth-token')
+        }
       })
       .then((res) => {
         console.log(res);
@@ -78,19 +72,22 @@ class DefaultHeader extends Component {
         console.log(err);
       });
   }
+
   handleFriendChange(e) {
     this.setState({
-      friendid: e.target.value,
+      friendid: e.target.value
     });
   }
+
   handleRoomNameChange(e) {
     this.setState({
-      roomName: e.target.value,
+      roomName: e.target.value
     });
   }
+
   toggle() {
     this.setState({
-      modal: !this.state.modal,
+      modal: !this.state.modal
     });
   }
 
@@ -101,7 +98,7 @@ class DefaultHeader extends Component {
     return (
       <React.Fragment>
         <AppAsideToggler className="d-md-down-none ml-auto" />
-        {/*<AppAsideToggler className="d-lg-none" mobile />*/}
+        {/* <AppAsideToggler className="d-lg-none" mobile /> */}
       </React.Fragment>
     );
   }
