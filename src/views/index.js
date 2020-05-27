@@ -15,7 +15,7 @@ import {
   Switches,
   Tables,
   Tabs,
-  Tooltips,
+  Tooltips
 } from './Base';
 
 import { ButtonDropdowns, ButtonGroups, Buttons, BrandButtons } from './Buttons';
@@ -64,6 +64,5 @@ export {
   Carousels,
   Cards,
   Breadcrumbs,
-  Paginations,
+  Paginations
 };
-

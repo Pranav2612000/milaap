@@ -1,15 +1,15 @@
-import { util } from "./util";
-import logger from "./logger";
-import { Negotiator } from "./negotiator";
+import { util } from './util';
+import logger from './logger';
+import { Negotiator } from './negotiator';
 import {
   ConnectionType,
   ConnectionEventType,
   SerializationType,
   ServerMessageType
-} from "./enums";
-import { Peer } from "./peer";
-import { BaseConnection } from "./baseconnection";
-import { ServerMessage } from "./servermessage";
+} from './enums';
+import { Peer } from './peer';
+import { BaseConnection } from './baseconnection';
+import { ServerMessage } from './servermessage';
 import { EncodingQueue } from './encodingQueue';
 import { DataConnection as IDataConnection } from '../index';
 
@@ -17,7 +17,7 @@ import { DataConnection as IDataConnection } from '../index';
  * Wraps a DataChannel between two Peers.
  */
 export class DataConnection extends BaseConnection implements IDataConnection {
-  private static readonly ID_PREFIX = "dc_";
+  private static readonly ID_PREFIX = 'dc_';
   private static readonly MAX_BUFFERED_AMOUNT = 8 * 1024 * 1024;
 
   private _negotiator: Negotiator;
@@ -36,10 +36,10 @@ export class DataConnection extends BaseConnection implements IDataConnection {
   private _buffering = false;
   private _chunkedData: {
     [id: number]: {
-      data: Blob[],
-      count: number,
-      total: number
-    }
+      data: Blob[];
+      count: number;
+      total: number;
+    };
   } = {};
 
   private _dc: RTCDataChannel;
@@ -49,7 +49,9 @@ export class DataConnection extends BaseConnection implements IDataConnection {
     return this._dc;
   }
 
-  get bufferSize(): number { return this._bufferSize; }
+  get bufferSize(): number {
+    return this._bufferSize;
+  }
 
   constructor(peerId: string, provider: Peer, options: any) {
     super(peerId, provider, options);
@@ -66,7 +68,9 @@ export class DataConnection extends BaseConnection implements IDataConnection {
     });
 
     this._encodingQueue.on('error', () => {
-      logger.error(`DC#${this.connectionId}: Error occured in encoding from blob to arraybuffer, close DC`);
+      logger.error(
+        `DC#${this.connectionId}: Error occured in encoding from blob to arraybuffer, close DC`
+      );
       this.close();
     });
 
@@ -87,7 +91,7 @@ export class DataConnection extends BaseConnection implements IDataConnection {
 
   private _configureDataChannel(): void {
     if (!util.supports.binaryBlob || util.supports.reliable) {
-      this.dataChannel.binaryType = "arraybuffer";
+      this.dataChannel.binaryType = 'arraybuffer';
     }
 
     this.dataChannel.onopen = () => {
@@ -111,7 +115,8 @@ export class DataConnection extends BaseConnection implements IDataConnection {
   private _handleDataMessage({ data }: { data: Blob | ArrayBuffer | string }): void {
     const datatype = data.constructor;
 
-    const isBinarySerialization = this.serialization === SerializationType.Binary ||
+    const isBinarySerialization =
+      this.serialization === SerializationType.Binary ||
       this.serialization === SerializationType.BinaryUTF8;
 
     let deserializedData: any = data;
@@ -145,7 +150,12 @@ export class DataConnection extends BaseConnection implements IDataConnection {
     super.emit(ConnectionEventType.Data, deserializedData);
   }
 
-  private _handleChunk(data: { __peerData: number, n: number, total: number, data: Blob }): void {
+  private _handleChunk(data: {
+    __peerData: number;
+    n: number;
+    total: number;
+    data: Blob;
+  }): void {
     const id = data.__peerData;
     const chunkInfo = this._chunkedData[id] || {
       data: [],
@@ -216,7 +226,7 @@ export class DataConnection extends BaseConnection implements IDataConnection {
       super.emit(
         ConnectionEventType.Error,
         new Error(
-          "Connection is not open. You should listen for the `open` event before sending messages."
+          'Connection is not open. You should listen for the `open` event before sending messages.'
         )
       );
       return;
@@ -324,9 +334,9 @@ export class DataConnection extends BaseConnection implements IDataConnection {
         break;
       default:
         logger.warn(
-          "Unrecognized message type:",
+          'Unrecognized message type:',
           message.type,
-          "from peer:",
+          'from peer:',
           this.peer
         );
         break;

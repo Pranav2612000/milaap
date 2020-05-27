@@ -1,4 +1,4 @@
-import "./faker";
+import './faker';
 import { util } from '../lib/util';
 
 //enable support for WebRTC

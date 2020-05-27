@@ -24,7 +24,8 @@
   font-weight: 800;
 }
 
-.left-items, .right-items {
+.left-items,
+.right-items {
   flex: 1;
   padding: 10px;
   display: flex;

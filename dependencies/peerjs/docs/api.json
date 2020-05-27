@@ -44,9 +44,7 @@
           {
             "name": "secure",
             "type": "boolean",
-            "tags": [
-              "beta (0.3.0)"
-            ],
+            "tags": ["beta (0.3.0)"],
             "description": "<code>true</code> if you're using SSL.<span class='tip'>Note that our cloud-hosted server and assets may not support SSL.</span>"
           },
           {
@@ -57,9 +55,7 @@
           {
             "name": "debug",
             "type": "number",
-            "tags": [
-              "beta (0.3.0)"
-            ],
+            "tags": ["beta (0.3.0)"],
             "description": "Prints log messages depending on the debug level passed in. Defaults to <code>0</code>.",
             "children": [
               {
@@ -125,9 +121,7 @@
   },
   {
     "name": "peer.call",
-    "tags": [
-      "beta (0.3.0)"
-    ],
+    "tags": ["beta (0.3.0)"],
     "type": "method",
     "snippet": "var <a href='#mediaconnection'>mediaConnection</a> = peer.call(id, stream, [options]);",
     "description": "Calls the remote peer specified by <code>id</code> and returns a media connection. Be sure to listen on the <a href='#peeron-error'><code>error</code></a> event in case the connection fails.",
@@ -181,9 +175,7 @@
       {
         "name": "'call'",
         "type": "event",
-        "tags": [
-          "beta (0.3.0)"
-        ],
+        "tags": ["beta (0.3.0)"],
         "snippet": "peer.on('call', function(<a href='#mediaconnection'>mediaConnection</a>) { ... });",
         "description": "Emitted when a remote peer attempts to call you. The emitted <code>mediaConnection</code> is not yet active; you must first answer the call (<a href='#mediaconnection-answer'><code>mediaConnection.answer([stream]);</code></a>). Then, you can listen for the <a href='#mediaconnection-on'><code>stream</code></a> event."
       },
@@ -208,9 +200,7 @@
           {
             "name": "'browser-incompatible'",
             "type": "Error",
-            "tags": [
-              "fatal"
-            ],
+            "tags": ["fatal"],
             "description": "The client's browser does not support some or all WebRTC features that you are trying to use."
           },
           {
@@ -221,17 +211,13 @@
           {
             "name": "'invalid-id'",
             "type": "Error",
-            "tags": [
-              "fatal"
-            ],
+            "tags": ["fatal"],
             "description": "The ID passed into the Peer constructor contains illegal characters."
           },
           {
             "name": "'invalid-key'",
             "type": "Error",
-            "tags": [
-              "fatal"
-            ],
+            "tags": ["fatal"],
             "description": "The API key passed into the Peer constructor contains illegal characters or is not in the system (cloud server only)."
           },
           {
@@ -247,41 +233,31 @@
           {
             "name": "'ssl-unavailable'",
             "type": "Error",
-            "tags": [
-              "fatal"
-            ],
+            "tags": ["fatal"],
             "description": "PeerJS is being used securely, but the cloud server does not support SSL. Use a custom PeerServer."
           },
           {
             "name": "'server-error'",
             "type": "Error",
-            "tags": [
-              "fatal"
-            ],
+            "tags": ["fatal"],
             "description": "Unable to reach the server."
           },
           {
             "name": "'socket-error'",
             "type": "Error",
-            "tags": [
-              "fatal"
-            ],
+            "tags": ["fatal"],
             "description": "An error from the underlying socket."
           },
           {
             "name": "'socket-closed'",
             "type": "Error",
-            "tags": [
-              "fatal"
-            ],
+            "tags": ["fatal"],
             "description": "The underlying socket closed unexpectedly."
           },
           {
             "name": "'unavailable-id'",
             "type": "Error",
-            "tags": [
-              "sometimes fatal"
-            ],
+            "tags": ["sometimes fatal"],
             "description": "The ID passed into the Peer constructor is already taken.<span class='warn'>This error is not fatal if your peer has open peer-to-peer connections. This can happen if you attempt to <a href='#peerreconnect'>reconnect</a> a peer that has been <a href='#peerdisconnect'>disconnected from the server</a>, but its old ID has now been taken.</span>"
           },
           {
@@ -437,9 +413,7 @@
   {
     "name": "MediaConnection",
     "type": "class",
-    "tags": [
-      "beta (0.3.0)"
-    ],
+    "tags": ["beta (0.3.0)"],
     "description": "Wraps WebRTC's media streams. To get one, use <a href='#peercall'><code>peer.call</code></a> or listen for the <a href='#peeron-call'><code>call</code></a> event.",
     "children": [
       {
@@ -523,9 +497,7 @@
   {
     "name": "util",
     "type": "object",
-    "tags": [
-      "utility"
-    ],
+    "tags": ["utility"],
     "description": "Provides a variety of helpful utilities.<span class='warn'>Only the utilities documented here are guaranteed to be present on <code>util</code>. Undocumented utilities can be removed without warning. We don't consider these to be 'breaking changes.'</span>",
     "children": [
       {

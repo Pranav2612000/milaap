@@ -12,7 +12,7 @@ const propTypes = {
   children: PropTypes.node,
   className: PropTypes.string,
   cssModule: PropTypes.object,
-  invert: PropTypes.bool,
+  invert: PropTypes.bool
 };
 
 const defaultProps = {
@@ -21,12 +21,22 @@ const defaultProps = {
   color: 'info',
   value: '25',
   children: 'Visitors',
-  invert: false,
+  invert: false
 };
 
 class Widget04 extends Component {
   render() {
-    const { className, cssModule, header, icon, color, value, children, invert, ...attributes } = this.props;
+    const {
+      className,
+      cssModule,
+      header,
+      icon,
+      color,
+      value,
+      children,
+      invert,
+      ...attributes
+    } = this.props;
 
     // demo purposes only
     const progress = { style: '', color: color, value: value };
@@ -39,7 +49,10 @@ class Widget04 extends Component {
       card.bgColor = 'bg-' + color;
     }
 
-    const classes = mapToCssModules(classNames(className, card.style, card.bgColor), cssModule);
+    const classes = mapToCssModules(
+      classNames(className, card.style, card.bgColor),
+      cssModule
+    );
     progress.style = classNames('progress-xs mt-3 mb-0', progress.style);
 
     return (
@@ -49,8 +62,14 @@ class Widget04 extends Component {
             <i className={card.icon}></i>
           </div>
           <div className="h4 mb-0">{header}</div>
-          <small className="text-muted text-uppercase font-weight-bold">{children}</small>
-          <Progress className={progress.style} color={progress.color} value={progress.value} />
+          <small className="text-muted text-uppercase font-weight-bold">
+            {children}
+          </small>
+          <Progress
+            className={progress.style}
+            color={progress.color}
+            value={progress.value}
+          />
         </CardBody>
       </Card>
     );

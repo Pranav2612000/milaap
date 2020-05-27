@@ -15,17 +15,17 @@ import {
 } from "reactstrap";
 
 const propTypes = {
-	children: PropTypes.node,
+  children: PropTypes.node
 };
 
 const defaultProps = {};
 
-function getRoomFromLocation(location_string) {
-	let room = "";
-	let lastslash = location_string.lastIndexOf("/");
-	room = location_string.slice(lastslash + 1);
-	console.log(room);
-	return room;
+function getRoomFromLocation(locationString) {
+  let room = '';
+  const lastslash = locationString.lastIndexOf('/');
+  room = locationString.slice(lastslash + 1);
+  console.log(room);
+  return room;
 }
 
 class DefaultAside extends Component {
@@ -203,7 +203,7 @@ class DefaultAside extends Component {
               </small>
             </div>
             <Progress className="progress-xs" color="warning" value="70" /> */}
-						{/* <small className="text-muted">11444GB/16384MB</small>
+            {/* <small className="text-muted">11444GB/16384MB</small>
 
             <div className="text-uppercase mb-1 mt-2">
               <small><b>SSD 1 Usage</b></small>
@@ -216,11 +216,11 @@ class DefaultAside extends Component {
             </div>
             <Progress className="progress-xs" color="success" value="10" />
             <small className="text-muted">25GB/256GB</small> */}
-					</TabPane>
-				</TabContent>
-			</React.Fragment>
-		);
-	}
+          </TabPane>
+        </TabContent>
+      </React.Fragment>
+    );
+  }
 }
 
 DefaultAside.propTypes = propTypes;
