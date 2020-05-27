@@ -13,7 +13,7 @@ const propTypes = {
   children: PropTypes.node,
   className: PropTypes.string,
   cssModule: PropTypes.object,
-  variant: PropTypes.string,
+  variant: PropTypes.string
 };
 
 const defaultProps = {
@@ -22,12 +22,23 @@ const defaultProps = {
   smallText: 'Lorem ipsum dolor sit amet enim.',
   // color: '',
   value: '25',
-  variant: '',
+  variant: ''
 };
 
 class Widget01 extends Component {
   render() {
-    const { className, cssModule, header, mainText, smallText, color, value, children, variant, ...attributes } = this.props;
+    const {
+      className,
+      cssModule,
+      header,
+      mainText,
+      smallText,
+      color,
+      value,
+      children,
+      variant,
+      ...attributes
+    } = this.props;
 
     // demo purposes only
     const progress = { style: '', color: color, value: value };
@@ -40,7 +51,10 @@ class Widget01 extends Component {
       card.bgColor = 'bg-' + color;
     }
 
-    const classes = mapToCssModules(classNames(className, card.style, card.bgColor), cssModule);
+    const classes = mapToCssModules(
+      classNames(className, card.style, card.bgColor),
+      cssModule
+    );
     progress.style = classNames('progress-xs my-3', progress.style);
 
     return (
@@ -48,7 +62,11 @@ class Widget01 extends Component {
         <CardBody>
           <div className="h4 m-0">{header}</div>
           <div>{mainText}</div>
-          <Progress className={progress.style} color={progress.color} value={progress.value} />
+          <Progress
+            className={progress.style}
+            color={progress.color}
+            value={progress.value}
+          />
           <small className="text-muted">{smallText}</small>
           <div>{children}</div>
         </CardBody>

@@ -8,7 +8,7 @@ jest.mock('react-chartjs-2', () => ({
   Pie: () => null,
   Radar: () => null,
   Bar: () => null,
-  Doughnut: () => null,
+  Doughnut: () => null
 }));
 
 it('renders without crashing', () => {

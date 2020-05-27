@@ -7,16 +7,15 @@ const propTypes = {
   children: PropTypes.node,
   className: PropTypes.string,
   cssModule: PropTypes.object,
-  dataBox: PropTypes.func,
+  dataBox: PropTypes.func
 };
 
 const defaultProps = {
-  dataBox: () => ({ variant: 'facebook', friends: '-', feeds: '-' }),
+  dataBox: () => ({ variant: 'facebook', friends: '-', feeds: '-' })
 };
 
 class Widget03 extends Component {
   render() {
-
     // eslint-disable-next-line
     const { children, className, cssModule, dataBox, ...attributes } = this.props;
 
@@ -24,8 +23,11 @@ class Widget03 extends Component {
     const data = dataBox();
     const variant = data.variant;
 
-    if (!variant || ['facebook', 'twitter', 'linkedin', 'google-plus'].indexOf(variant) < 0) {
-      return (null);
+    if (
+      !variant ||
+      ['facebook', 'twitter', 'linkedin', 'google-plus'].indexOf(variant) < 0
+    ) {
+      return null;
     }
 
     const back = 'bg-' + variant;

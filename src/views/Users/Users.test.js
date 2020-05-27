@@ -5,6 +5,11 @@ import Users from './Users';
 
 it('renders without crashing', () => {
   const div = document.createElement('div');
-  ReactDOM.render(<MemoryRouter><Users /></MemoryRouter>, div);
+  ReactDOM.render(
+    <MemoryRouter>
+      <Users />
+    </MemoryRouter>,
+    div
+  );
   ReactDOM.unmountComponentAtNode(div);
 });

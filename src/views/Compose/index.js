@@ -1,26 +1,26 @@
-import React, { useState } from "react";
-import "./Compose.css";
-import axios from "axios";
+import React, { useState } from 'react';
+import './Compose.css';
+import axios from 'axios';
 
 export default function Compose(props) {
-  const [msg, setMsg] = useState("");
+  const [msg, setMsg] = useState('');
   async function sendMessage() {
-    if (msg === "") return;
+    if (msg === '') return;
     const reqData = {
       msg: msg,
-      roomName: props.roomName,
+      roomName: props.roomName
     };
     axios
-      .post("http://localhost:5000/api/room/sendmessage", reqData, {
+      .post('http://localhost:5000/api/room/sendmessage', reqData, {
         headers: {
-          "milaap-auth-token": localStorage.getItem("milaap-auth-token"),
-        },
+          'milaap-auth-token': localStorage.getItem('milaap-auth-token')
+        }
       })
       .then((res) => {
         console.log(res);
-        //window.location.reload();
+        // window.location.reload();
         props.callback(res.data.msg);
-        setMsg("");
+        setMsg('');
       })
       .catch((err) => {
         console.log(err);

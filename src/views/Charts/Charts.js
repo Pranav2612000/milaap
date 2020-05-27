@@ -25,9 +25,9 @@ const line = {
       pointHoverBorderWidth: 2,
       pointRadius: 1,
       pointHitRadius: 10,
-      data: [65, 59, 80, 81, 56, 55, 40],
-    },
-  ],
+      data: [65, 59, 80, 81, 56, 55, 40]
+    }
+  ]
 };
 
 const bar = {
@@ -40,35 +40,32 @@ const bar = {
       borderWidth: 1,
       hoverBackgroundColor: 'rgba(255,99,132,0.4)',
       hoverBorderColor: 'rgba(255,99,132,1)',
-      data: [65, 59, 80, 81, 56, 55, 40],
-    },
-  ],
+      data: [65, 59, 80, 81, 56, 55, 40]
+    }
+  ]
 };
 
 const doughnut = {
-  labels: [
-    'Red',
-    'Green',
-    'Yellow',
-  ],
+  labels: ['Red', 'Green', 'Yellow'],
   datasets: [
     {
       data: [300, 50, 100],
-      backgroundColor: [
-        '#FF6384',
-        '#36A2EB',
-        '#FFCE56',
-      ],
-      hoverBackgroundColor: [
-        '#FF6384',
-        '#36A2EB',
-        '#FFCE56',
-      ],
-    }],
+      backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56'],
+      hoverBackgroundColor: ['#FF6384', '#36A2EB', '#FFCE56']
+    }
+  ]
 };
 
 const radar = {
-  labels: ['Eating', 'Drinking', 'Sleeping', 'Designing', 'Coding', 'Cycling', 'Running'],
+  labels: [
+    'Eating',
+    'Drinking',
+    'Sleeping',
+    'Designing',
+    'Coding',
+    'Cycling',
+    'Running'
+  ],
   datasets: [
     {
       label: 'My First dataset',
@@ -78,7 +75,7 @@ const radar = {
       pointBorderColor: '#fff',
       pointHoverBackgroundColor: '#fff',
       pointHoverBorderColor: 'rgba(179,181,198,1)',
-      data: [65, 59, 90, 81, 56, 55, 40],
+      data: [65, 59, 90, 81, 56, 55, 40]
     },
     {
       label: 'My Second dataset',
@@ -88,59 +85,31 @@ const radar = {
       pointBorderColor: '#fff',
       pointHoverBackgroundColor: '#fff',
       pointHoverBorderColor: 'rgba(255,99,132,1)',
-      data: [28, 48, 40, 19, 96, 27, 100],
-    },
-  ],
+      data: [28, 48, 40, 19, 96, 27, 100]
+    }
+  ]
 };
 
 const pie = {
-  labels: [
-    'Red',
-    'Green',
-    'Yellow',
-  ],
+  labels: ['Red', 'Green', 'Yellow'],
   datasets: [
     {
       data: [300, 50, 100],
-      backgroundColor: [
-        '#FF6384',
-        '#36A2EB',
-        '#FFCE56',
-      ],
-      hoverBackgroundColor: [
-        '#FF6384',
-        '#36A2EB',
-        '#FFCE56',
-      ],
-    }],
+      backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56'],
+      hoverBackgroundColor: ['#FF6384', '#36A2EB', '#FFCE56']
+    }
+  ]
 };
 
 const polar = {
   datasets: [
     {
-      data: [
-        11,
-        16,
-        7,
-        3,
-        14,
-      ],
-      backgroundColor: [
-        '#FF6384',
-        '#4BC0C0',
-        '#FFCE56',
-        '#E7E9ED',
-        '#36A2EB',
-      ],
+      data: [11, 16, 7, 3, 14],
+      backgroundColor: ['#FF6384', '#4BC0C0', '#FFCE56', '#E7E9ED', '#36A2EB'],
       label: 'My dataset' // for legend
-    }],
-  labels: [
-    'Red',
-    'Green',
-    'Yellow',
-    'Grey',
-    'Blue',
+    }
   ],
+  labels: ['Red', 'Green', 'Yellow', 'Grey', 'Blue']
 };
 
 const options = {
@@ -149,7 +118,7 @@ const options = {
     custom: CustomTooltips
   },
   maintainAspectRatio: false
-}
+};
 
 class Charts extends Component {
   render() {
@@ -242,7 +211,7 @@ class Charts extends Component {
             </CardHeader>
             <CardBody>
               <div className="chart-wrapper">
-                <Polar data={polar} options={options}/>
+                <Polar data={polar} options={options} />
               </div>
             </CardBody>
           </Card>

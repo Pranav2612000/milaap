@@ -1,20 +1,20 @@
-import { EventEmitter } from "eventemitter3";
-import { util } from "./util";
-import logger, { LogLevel } from "./logger";
-import { Socket } from "./socket";
-import { MediaConnection } from "./mediaconnection";
-import { DataConnection } from "./dataconnection";
+import { EventEmitter } from 'eventemitter3';
+import { util } from './util';
+import logger, { LogLevel } from './logger';
+import { Socket } from './socket';
+import { MediaConnection } from './mediaconnection';
+import { DataConnection } from './dataconnection';
 import {
   ConnectionType,
   PeerErrorType,
   PeerEventType,
   SocketEventType,
   ServerMessageType
-} from "./enums";
-import { BaseConnection } from "./baseconnection";
-import { ServerMessage } from "./servermessage";
-import { API } from "./api";
-import { PeerConnectOption, PeerJSOption } from "..";
+} from './enums';
+import { BaseConnection } from './baseconnection';
+import { ServerMessage } from './servermessage';
+import { API } from './api';
+import { PeerConnectOption, PeerJSOption } from '..';
 
 class PeerOptions implements PeerJSOption {
   debug?: LogLevel; // 1: Errors, 2: Warnings, 3: All logs
@@ -33,7 +33,7 @@ class PeerOptions implements PeerJSOption {
  * A peer who can initiate connections with other peers.
  */
 export class Peer extends EventEmitter {
-  private static readonly DEFAULT_KEY = "peerjs";
+  private static readonly DEFAULT_KEY = 'peerjs';
 
   private readonly _options: PeerOptions;
   private readonly _api: API;
@@ -66,8 +66,8 @@ export class Peer extends EventEmitter {
   }
 
   /**
-   * @deprecated 
-   * Return type will change from Object to Map<string,[]> 
+   * @deprecated
+   * Return type will change from Object to Map<string,[]>
    */
   get connections(): Object {
     const plainConnections = Object.create(null);
@@ -103,7 +103,7 @@ export class Peer extends EventEmitter {
       debug: 0, // 1: Errors, 2: Warnings, 3: All logs
       host: util.CLOUD_HOST,
       port: util.CLOUD_PORT,
-      path: "/",
+      path: '/',
       key: Peer.DEFAULT_KEY,
       token: util.randomToken(),
       config: util.defaultConfig,
@@ -112,22 +112,25 @@ export class Peer extends EventEmitter {
     this._options = options;
 
     // Detect relative URL host.
-    if (this._options.host === "/") {
+    if (this._options.host === '/') {
       this._options.host = window.location.hostname;
     }
 
     // Set path correctly.
     if (this._options.path) {
-      if (this._options.path[0] !== "/") {
-        this._options.path = "/" + this._options.path;
+      if (this._options.path[0] !== '/') {
+        this._options.path = '/' + this._options.path;
       }
-      if (this._options.path[this._options.path.length - 1] !== "/") {
-        this._options.path += "/";
+      if (this._options.path[this._options.path.length - 1] !== '/') {
+        this._options.path += '/';
       }
     }
 
     // Set whether we use SSL to same as current host
-    if (this._options.secure === undefined && this._options.host !== util.CLOUD_HOST) {
+    if (
+      this._options.secure === undefined &&
+      this._options.host !== util.CLOUD_HOST
+    ) {
       this._options.secure = util.isSecure();
     } else if (this._options.host == util.CLOUD_HOST) {
       this._options.secure = true;
@@ -147,7 +150,7 @@ export class Peer extends EventEmitter {
     if (!util.supports.audioVideo && !util.supports.data) {
       this._delayedAbort(
         PeerErrorType.BrowserIncompatible,
-        "The current browser does not support WebRTC"
+        'The current browser does not support WebRTC'
       );
       return;
     }
@@ -161,9 +164,10 @@ export class Peer extends EventEmitter {
     if (userId) {
       this._initialize(userId);
     } else {
-      this._api.retrieveId()
-        .then(id => this._initialize(id))
-        .catch(error => this._abort(PeerErrorType.ServerError, error));
+      this._api
+        .retrieveId()
+        .then((id) => this._initialize(id))
+        .catch((error) => this._abort(PeerErrorType.ServerError, error));
     }
   }
 
@@ -190,7 +194,7 @@ export class Peer extends EventEmitter {
         return;
       }
 
-      this.emitError(PeerErrorType.Network, "Lost connection to server.");
+      this.emitError(PeerErrorType.Network, 'Lost connection to server.');
       this.disconnect();
     });
 
@@ -199,7 +203,10 @@ export class Peer extends EventEmitter {
         return;
       }
 
-      this._abort(PeerErrorType.SocketClosed, "Underlying socket is already closed.");
+      this._abort(
+        PeerErrorType.SocketClosed,
+        'Underlying socket is already closed.'
+      );
     });
 
     return socket;
@@ -230,7 +237,10 @@ export class Peer extends EventEmitter {
         this._abort(PeerErrorType.UnavailableID, `ID "${this.id}" is taken`);
         break;
       case ServerMessageType.InvalidKey: // The given API key cannot be found.
-        this._abort(PeerErrorType.InvalidKey, `API KEY "${this._options.key}" is invalid`);
+        this._abort(
+          PeerErrorType.InvalidKey,
+          `API KEY "${this._options.key}" is invalid`
+        );
         break;
       case ServerMessageType.Leave: // Another peer has closed its connection to this peer.
         logger.log(`Received leave message from ${peerId}`);
@@ -238,7 +248,10 @@ export class Peer extends EventEmitter {
         this._connections.delete(peerId);
         break;
       case ServerMessageType.Expire: // The offer sent to a peer has expired without response.
-        this.emitError(PeerErrorType.PeerUnavailable, `Could not connect to peer ${peerId}`);
+        this.emitError(
+          PeerErrorType.PeerUnavailable,
+          `Could not connect to peer ${peerId}`
+        );
         break;
       case ServerMessageType.Offer: {
         // we should consider switching this to CALL/CONNECT, but this is the least breaking option.
@@ -285,7 +298,9 @@ export class Peer extends EventEmitter {
       }
       default: {
         if (!payload) {
-          logger.warn(`You received a malformed message from ${peerId} of type ${type}`);
+          logger.warn(
+            `You received a malformed message from ${peerId} of type ${type}`
+          );
           return;
         }
 
@@ -299,7 +314,7 @@ export class Peer extends EventEmitter {
           // Store for possible later use
           this._storeMessage(connectionId, message);
         } else {
-          logger.warn("You received an unrecognized message:", message);
+          logger.warn('You received an unrecognized message:', message);
         }
         break;
       }
@@ -335,14 +350,14 @@ export class Peer extends EventEmitter {
   connect(peer: string, options: PeerConnectOption = {}): DataConnection {
     if (this.disconnected) {
       logger.warn(
-        "You cannot connect to a new Peer because you called " +
-        ".disconnect() on this Peer and ended your connection with the " +
-        "server. You can create a new Peer to reconnect, or call reconnect " +
-        "on this peer if you believe its ID to still be available."
+        'You cannot connect to a new Peer because you called ' +
+          '.disconnect() on this Peer and ended your connection with the ' +
+          'server. You can create a new Peer to reconnect, or call reconnect ' +
+          'on this peer if you believe its ID to still be available.'
       );
       this.emitError(
         PeerErrorType.Disconnected,
-        "Cannot connect to new Peer after disconnecting from server."
+        'Cannot connect to new Peer after disconnecting from server.'
       );
       return;
     }
@@ -359,13 +374,13 @@ export class Peer extends EventEmitter {
   call(peer: string, stream: MediaStream, options: any = {}): MediaConnection {
     if (this.disconnected) {
       logger.warn(
-        "You cannot connect to a new Peer because you called " +
-        ".disconnect() on this Peer and ended your connection with the " +
-        "server. You can create a new Peer to reconnect."
+        'You cannot connect to a new Peer because you called ' +
+          '.disconnect() on this Peer and ended your connection with the ' +
+          'server. You can create a new Peer to reconnect.'
       );
       this.emitError(
         PeerErrorType.Disconnected,
-        "Cannot connect to new Peer after disconnecting from server."
+        'Cannot connect to new Peer after disconnecting from server.'
       );
       return;
     }
@@ -386,7 +401,9 @@ export class Peer extends EventEmitter {
 
   /** Add a data/media connection to this peer. */
   private _addConnection(peerId: string, connection: BaseConnection): void {
-    logger.log(`add connection ${connection.type}:${connection.connectionId} to peerId:${peerId}`);
+    logger.log(
+      `add connection ${connection.type}:${connection.connectionId} to peerId:${peerId}`
+    );
 
     if (!this._connections.has(peerId)) {
       this._connections.set(peerId, []);
@@ -438,7 +455,7 @@ export class Peer extends EventEmitter {
    * it retains its disconnected state and its existing connections.
    */
   private _abort(type: PeerErrorType, message: string | Error): void {
-    logger.error("Aborting!");
+    logger.error('Aborting!');
 
     this.emitError(type, message);
 
@@ -451,11 +468,11 @@ export class Peer extends EventEmitter {
 
   /** Emits a typed error message. */
   emitError(type: PeerErrorType, err: string | Error): void {
-    logger.error("Error:", err);
+    logger.error('Error:', err);
 
     let error: Error & { type?: PeerErrorType };
 
-    if (typeof err === "string") {
+    if (typeof err === 'string') {
       error = new Error(err);
     } else {
       error = err as Error;
@@ -541,12 +558,16 @@ export class Peer extends EventEmitter {
       this._disconnected = false;
       this._initialize(this._lastServerId!);
     } else if (this.destroyed) {
-      throw new Error("This peer cannot reconnect to the server. It has already been destroyed.");
+      throw new Error(
+        'This peer cannot reconnect to the server. It has already been destroyed.'
+      );
     } else if (!this.disconnected && !this.open) {
       // Do nothing. We're still connecting the first time.
       logger.error("In a hurry? We're still trying to make the initial connection!");
     } else {
-      throw new Error(`Peer ${this.id} cannot reconnect because it is not disconnected from the server!`);
+      throw new Error(
+        `Peer ${this.id} cannot reconnect because it is not disconnected from the server!`
+      );
     }
   }
 
@@ -556,9 +577,10 @@ export class Peer extends EventEmitter {
    * the cloud server, email team@peerjs.com to get the functionality enabled for
    * your key.
    */
-  listAllPeers(cb = (_: any[]) => { }): void {
-    this._api.listAllPeers()
-      .then(peers => cb(peers))
-      .catch(error => this._abort(PeerErrorType.ServerError, error));
+  listAllPeers(cb = (_: any[]) => {}): void {
+    this._api
+      .listAllPeers()
+      .then((peers) => cb(peers))
+      .catch((error) => this._abort(PeerErrorType.ServerError, error));
   }
 }
