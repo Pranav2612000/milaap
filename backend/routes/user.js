@@ -8,6 +8,7 @@ const users = require('../models/User.model');
 var io = require('../index');
 const auth = require('../middleware/auth');
 // console.log(io);
+
 router.post('/adduser', auth, async (req, res) => {
   const host = req.user.id;
   const user = req.body.user;
@@ -83,6 +84,35 @@ router.post('/adduser', auth, async (req, res) => {
             }
     });
     */
+});
+
+/* Takes an input username and returns a JWT string which encrypts 
+ * this name. */
+router.post('/gettokenfortempuser', async(req, res) => {
+  const username = req.body.username;
+  const payload = {
+    user: {
+      id: username
+    }
+  };
+  try {
+    jwt.sign(
+      payload,
+      config.get('jwtSecret'),
+      { expiresIn: 3600 },
+      (err, token) => {
+        if (err) throw err;
+        res.status(200).json({
+          token,
+          temp_details: {
+            userId: username
+          }
+        });
+      }
+    );
+  } catch (e) {
+    res.status(400).json({ err: e });
+  }
 });
 
 router.post('/getrooms', auth, async (req, res) => {
