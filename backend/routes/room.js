@@ -9,6 +9,80 @@ const shortid = require("shortid");
 var io = require('../index');
 const auth = require("../middleware/auth");
 
+//Create a new room
+/* TODO: Modify the function rollback changes on failure*/
+router.post('/createroom', auth, async (req, res) => {
+  const host = req.user.id;
+  const roomName = req.body.roomName;
+
+  // Create and save new room
+  rooms.findOne({ roomName: roomName }, function (err, room) {
+    if (err) {
+      return res.status(400).json({ err: 'Error Creating Room' });
+    }
+    if (!room) {
+      // Create a new room
+      room = new rooms({ roomName: roomName, users: [host] , guests: []});
+      room.save((err) => {
+        if (err) {
+          return res.status(400).json({ err: 'Error Creating Room' });
+        } else {
+          console.log(room);
+          io.emit('newRoom', req.data);
+          // Add roomname to host
+          users.updateOne({ username: host }, { $addToSet: { rooms: roomName } }, function (
+            err,
+            result
+          ) {
+            if (err) {
+              res.send(err);
+              return;
+            } else {
+              console.log('here');
+              return res.status(200).json({ msg: 'Room Created successfully' });
+            }
+          });
+        }
+      });
+    } else {
+      // Another room with this name exists. 
+      res.status(403).json({msg: 'Another Room with same name already exists'});
+      return;
+    }
+  });
+});
+
+router.post('/addusertoroom', auth, async (req, res) => {
+  const user = req.user.id;
+  const roomName = req.body.roomName;
+  rooms.findOne({ roomName: roomName }, function (err, room) {
+    if (err) {
+      return res.status(400).json({ err: 'Error Creating Room' });
+    }
+    if (!room) {
+      return res.status(404).json({ msg: 'Room Not Found' });
+    } else {
+      var userArray = room._doc.users;
+      if (userArray === undefined) {
+        return res.status(400).json({ err: 'An unknown error occured' });
+      }
+      userArray.push(user);
+      room._doc.users = userArray;
+      room.markModified('users');
+      room.save((err) => {
+        if (err) {
+          return res.status(400).json({ err: 'Error Adding user' });
+        } else {
+          io.emit('userJoined', req.body);
+          io.emit('newRoom', req.data);
+          console.log(room._doc.users);
+          return res.status(200).json({ msg: 'User Added successfully' });
+        }
+      });
+    }
+  });
+});
+
 router.post("/sendmessage", auth, async (req, res) => {
   const sender = req.user.id;
   const msg = req.body.msg;
@@ -223,6 +297,7 @@ router.post("/exitstream", auth, async (req, res) => {
     }
   });
 });
+
 router.post("/goonline", auth, async (req, res) => {
   const tkn = req.body.tkn;
   const roomName = req.body.roomName;
