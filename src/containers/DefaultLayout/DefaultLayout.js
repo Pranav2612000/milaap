@@ -224,26 +224,24 @@ class DefaultLayout extends Component {
               <AppSidebarFooter />
               <AppSidebarMinimizer />
             </AppSidebar>
-            <main className="main">
-              <Container fluid>
-                <Suspense fallback={this.loading()}>
-                  <Switch>
-                    {routes.map((route, idx) => {
-                      return route.component ? (
-                        <Route
-                          key={idx}
-                          path={route.path}
-                          exact={route.exact}
-                          name={route.name}
-                          render={(props) => <route.component {...props} />}
-                        />
-                      ) : null;
-                    })}
-                    <Redirect from="/" to="/dashboard" />
-                  </Switch>
-                </Suspense>
-              </Container>
-            </main>
+            <Container fluid>
+              <Suspense fallback={this.loading()}>
+                <Switch>
+                  {routes.map((route, idx) => {
+                    return route.component ? (
+                      <Route
+                        key={idx}
+                        path={route.path}
+                        exact={route.exact}
+                        name={route.name}
+                        render={(props) => <route.component {...props} />}
+                      />
+                    ) : null;
+                  })}
+                  <Redirect from="/" to="/dashboard" />
+                </Switch>
+              </Suspense>
+            </Container>
             <Suspense fallback={this.loading()}>
               <aside className="aside-menu" display="md">
                 <DefaultAside />
