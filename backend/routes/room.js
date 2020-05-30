@@ -246,7 +246,6 @@ router.post('/enterroom', auth, async (req, res) => {
   });
 });
 
-//, inCall: room._doc.online
 
 router.post('/getActive', auth, async (req, res) => {
   const roomName = req.body.roomName;
