@@ -91,14 +91,26 @@ router.post('/addusertoroom', auth, async (req, res) => {
           }
         );
       });
-
-      var userArray = room._doc.users;
-      if (userArray === undefined) {
-        return res.status(400).json({ err: 'An unknown error occured' });
+      if (req.user.temp !== undefined) {
+        var userArray = room._doc.guests;
+        if (userArray === undefined) {
+          userArray = [];
+        }
+      } else {
+        var userArray = room._doc.users;
+        if (userArray === undefined) {
+          return res.status(400).json({ err: 'An unknown error occured' });
+        }
       }
+
       userArray.push(user);
       room._doc.users = userArray;
-      room.markModified('users');
+      if (req.user.temp !== undefined) {
+        room.markModified('guests');
+      } else {
+        room.markModified('users');
+      }
+
       room.save((err) => {
         if (err) {
           return res.status(400).json({ err: 'Error Adding user' });

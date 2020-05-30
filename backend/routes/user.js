@@ -96,10 +96,11 @@ router.post('/gettokenfortempuser', async (req, res) => {
   const username = name.split(' ')[0] + random;
   const payload = {
     user: {
-      id: username
+      id: username,
+      temp: true
     }
   };
-  console.log('INITIAL', username, roomName);
+
   try {
     jwt.sign(payload, config.get('jwtSecret'), { expiresIn: 3600 }, (err, token) => {
       if (err) throw err;
@@ -136,7 +137,11 @@ router.post('/gettokenfortempuser', async (req, res) => {
 });
 
 router.post('/getrooms', auth, async (req, res) => {
+  console.log('HI there');
   const username = req.user.id;
+  if (req.user.temp !== undefined) {
+    return res.status(201).json({ msg: 'Temporary User' });
+  }
   console.log('getrooms', req.user.id);
   users.findOne({ username: username }, function (err, user) {
     if (err) {

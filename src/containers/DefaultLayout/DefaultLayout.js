@@ -41,10 +41,10 @@ function getGroupElements(rooms) {
   return groupElements;
 }
 class DefaultLayout extends Component {
-  getRooms = () => {
+  getRooms = async () => {
     const token = localStorage.getItem('milaap-auth-token');
     const reqHeader = { 'milaap-auth-token': token };
-    axios
+    await axios
       .post(
         'http://localhost:5000/api/user/getrooms',
         {},
@@ -53,8 +53,28 @@ class DefaultLayout extends Component {
         }
       )
       .then((res) => {
+        if (res.status === 201) {
+          this.setState({
+            navigation: {
+              items: [
+                {
+                  title: true,
+                  name: 'Rooms',
+                  icon: 'icon-puzzle'
+                },
+                {
+                  icon: 'icon-user',
+                  name: 'Login To View Rooms',
+                  url: '/login'
+                }
+              ]
+            }
+          });
+          return;
+        }
         console.log(res);
         var rooms = res.data.rooms;
+        this.setState({ rooms: rooms });
         const PMList = {};
         const GroupList = getGroupElements(rooms);
         console.log({ ...GroupList });
@@ -100,6 +120,7 @@ class DefaultLayout extends Component {
     const PMList = {};
     const GroupList = getGroupElements(rooms);
     this.state = {
+      rooms: [],
       userToken: localStorage.getItem('milaap-auth-token'),
       navigation: {
         items: [
@@ -151,7 +172,7 @@ class DefaultLayout extends Component {
               {
                 // title: true,
                 name: 'No Messages Yet.',
-                icon: 'icon-puzzle',
+                icon: 'icon-paxios.getuzzle',
                 badge: {
                   variant: 'info',
                   text: 'Add'

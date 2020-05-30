@@ -51,6 +51,41 @@ class Guest extends Component {
     alert('Work in Progress...');
   };
 
+  handleUserAdd = (e) => {
+    e.preventDefault();
+    var reqData = {
+      name: this.state.name,
+      roomName: this.state.roomName,
+      temp: localStorage.getItem('milaap-auth-token') !== undefined
+    };
+    axios
+      .post('http://localhost:5000/api/room/addusertoroom', reqData, {
+        headers: {
+          'milaap-auth-token': localStorage.getItem('milaap-auth-token')
+        }
+      })
+      .then((res) => {
+        this.setState({
+          login: true
+        });
+      })
+      .catch((err) => {
+        console.log(err);
+        this.setState({ error: true });
+        store.addNotification({
+          title: 'Invalid Room',
+          message: 'Room Not Found',
+          type: 'danger',
+          container: 'top-right',
+          animationIn: ['animated', 'fadeIn'],
+          animationOut: ['animated', 'fadeOut'],
+          dismiss: {
+            duration: 3000,
+            pauseOnHover: true
+          }
+        });
+      });
+  };
   handleSubmit = (e) => {
     e.preventDefault();
     var reqData = {
@@ -90,7 +125,12 @@ class Guest extends Component {
       <>
         {console.log(this.state.login)}
         {this.state.login === true && (
-          <Redirect to={{ pathname: '/dashboard', state: this.state.name }} />
+          <Redirect
+            to={{
+              pathname: `/rooms/${this.state.roomName}`,
+              state: this.state.name
+            }}
+          />
         )}
         {this.state.error && <ReactNotification />}
         <div className="app flex-row align-items-center">
@@ -106,21 +146,25 @@ class Guest extends Component {
                         ) : (
                           <h2>Join a Meeting Room</h2>
                         )}
+                        {localStorage.getItem('milaap-auth-token') ? (
+                          <></>
+                        ) : (
+                          <InputGroup className="mb-3">
+                            <InputGroupAddon addonType="prepend">
+                              <InputGroupText>
+                                <i className="icon-user"></i>
+                              </InputGroupText>
+                            </InputGroupAddon>
+                            <Input
+                              type="text"
+                              placeholder="Enter Your Name"
+                              autoComplete="name"
+                              value={this.state.name}
+                              onChange={this.handlenameChange}
+                            />
+                          </InputGroup>
+                        )}
 
-                        <InputGroup className="mb-3">
-                          <InputGroupAddon addonType="prepend">
-                            <InputGroupText>
-                              <i className="icon-user"></i>
-                            </InputGroupText>
-                          </InputGroupAddon>
-                          <Input
-                            type="text"
-                            placeholder="Enter Your Name"
-                            autoComplete="name"
-                            value={this.state.name}
-                            onChange={this.handlenameChange}
-                          />
-                        </InputGroup>
                         {this.state.room ? (
                           <></>
                         ) : (
@@ -144,7 +188,11 @@ class Guest extends Component {
                             <Button
                               color="primary"
                               className="px-4"
-                              onClick={this.handleSubmit}>
+                              onClick={(e) =>
+                                localStorage.getItem('milaap-auth-token')
+                                  ? this.handleUserAdd(e)
+                                  : this.handleSubmit(e)
+                              }>
                               Join
                             </Button>
                           </Col>

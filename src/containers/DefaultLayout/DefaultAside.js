@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { withRouter } from 'react-router-dom';
+import { Redirect, Route, Switch } from 'react-router-dom';
 import {
   Nav,
   NavItem,
@@ -65,7 +66,7 @@ class DefaultAside extends Component {
       });
       let reqData = {
         roomName
-      }
+      };
       axios
         .post('http://localhost:5000/api/room/enterroom', reqData, {
           headers: {
@@ -74,10 +75,36 @@ class DefaultAside extends Component {
         })
         .then((res) => {
           console.log(res.data);
-        }).catch((err) => {
+        })
+        .catch((err) => {
           console.log(err);
         });
       this.setState({ change: !this.state.change });
+      var token = localStorage.getItem('milaap-auth-token');
+      if (token) {
+        const reqHeader = { 'milaap-auth-token': token };
+        if (this.props.location.pathname.match('/rooms/')) {
+          var room = this.props.location.pathname.split('/')[2];
+          axios
+            .post(
+              'http://localhost:5000/api/user/getrooms',
+              {},
+              {
+                headers: reqHeader
+              }
+            )
+            .then((res) => {
+              alert(room);
+              if (res.data.rooms.indexOf(room) === -1) {
+                return <Redirect to={{ pathname: '/join', room: room }} />;
+              }
+            })
+            .catch((err) => {
+              alert(err);
+              console.log(err);
+            });
+        }
+      }
     }
   }
 
