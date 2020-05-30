@@ -15,7 +15,7 @@ import {
 } from 'reactstrap';
 import axios from 'axios';
 import ReactNotification, { store } from 'react-notifications-component';
-import { Redirect } from 'react-router-dom';
+import { Redirect, Link } from 'react-router-dom';
 class Register extends Component {
   constructor(props) {
     super(props);
@@ -173,6 +173,9 @@ class Register extends Component {
                         Create Account
                       </Button>
                     </Form>
+                    <center>
+                    <p> Already have an account?<Link to="/login">Login</Link></p>
+                    </center>
                   </CardBody>
                 </Card>
               </Col>
