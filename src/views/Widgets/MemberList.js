@@ -73,7 +73,7 @@ class MemberList extends Component {
         <h3> Members </h3>
         <h5> Admins </h5>
         <ListGroup flush>
-          {this.state.users.length > 0
+          {this.state.users && this.state.users.length > 0
             ? this.state.users.map((user) => {
                 return (
                   <ListGroupItem key={Math.random()}>
@@ -86,7 +86,7 @@ class MemberList extends Component {
         <br/>
         <ListGroup flush>
           <h5> Guests </h5>
-          {this.state.guests.length > 0
+          {this.state.guests && this.state.guests.length > 0
             ? this.state.guests.map((user) => {
                 return (
                   <ListGroupItem key={Math.random()}>

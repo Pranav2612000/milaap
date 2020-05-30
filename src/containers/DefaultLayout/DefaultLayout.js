@@ -41,20 +41,40 @@ function getGroupElements(rooms) {
   return groupElements;
 }
 class DefaultLayout extends Component {
-  getRooms = () => {
-    axios
+  getRooms = async () => {
+    const token = localStorage.getItem('milaap-auth-token');
+    const reqHeader = { 'milaap-auth-token': token };
+    await axios
       .post(
         'http://localhost:5000/api/user/getrooms',
         {},
         {
-          headers: {
-            'milaap-auth-token': localStorage.getItem('milaap-auth-token')
-          }
+          headers: reqHeader
         }
       )
       .then((res) => {
+        if (res.status === 201) {
+          this.setState({
+            navigation: {
+              items: [
+                {
+                  title: true,
+                  name: 'Rooms',
+                  icon: 'icon-puzzle'
+                },
+                {
+                  icon: 'icon-user',
+                  name: 'Login To View Rooms',
+                  url: '/login'
+                }
+              ]
+            }
+          });
+          return;
+        }
         console.log(res);
         var rooms = res.data.rooms;
+        this.setState({ rooms: rooms });
         const PMList = {};
         const GroupList = getGroupElements(rooms);
         console.log({ ...GroupList });
@@ -100,6 +120,7 @@ class DefaultLayout extends Component {
     const PMList = {};
     const GroupList = getGroupElements(rooms);
     this.state = {
+      rooms: [],
       userToken: localStorage.getItem('milaap-auth-token'),
       navigation: {
         items: [
@@ -199,7 +220,11 @@ class DefaultLayout extends Component {
 
   render() {
     if (localStorage.getItem('milaap-auth-token') === null) {
-      return <Redirect to="/login" />;
+      if (this.props.location.pathname.match('/rooms/')) {
+        var room = this.props.location.pathname.split('/')[2];
+        return <Redirect to={{ pathname: '/join', room: room }} />;
+      }
+      return <Redirect to={{ pathname: '/login' }} />;
     }
     return (
       <React.Fragment>
