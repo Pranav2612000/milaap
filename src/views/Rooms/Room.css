@@ -1,4 +1,5 @@
 #context {
+  margin-left: 130px;
   margin-top: 5vh;
   max-width: 85vw;
   max-height: 60vh;
@@ -10,9 +11,19 @@
   overflow-y: hidden;
   white-space: nowrap;
   flex-wrap: nowrap;
-  width: 85vw;
+  width: 60vw;
   bottom: 2vh;
   background-color: rgba(100, 100, 100, 0.5);
+  left: 215px;
+}
+@media only screen and (max-width: 900px) {
+  #videos {
+    left: 10px;
+    width: 95vw;
+  }
+  #context {
+    margin-left: 15px;
+  }
 }
 
 #videos > div > video {
@@ -28,6 +39,8 @@
   text-align: center;
   margin: 0 !important;
   padding: 0 !important;
+  text-align: center !important;
+  justify-content: center !important;
   width: 90vw;
   height: 90vh;
 }
