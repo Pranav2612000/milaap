@@ -72,7 +72,8 @@ class Controls extends Component {
       remotePeersID: new Set(),
       calls: new Array(),
       connectedPeers: new Set(),
-      friendtkn: ''
+      friendtkn: '',
+      myUsername: '' 
     };
     console.log(this.state.roomName);
     this.startScreenShare = this.startScreenShare.bind(this);
@@ -156,6 +157,7 @@ class Controls extends Component {
       $('#context').removeClass().addClass(e.target.id);
     } catch (err) {
       console.log('The selected stream is old');
+      console.log(err);
     }
   };
 
@@ -181,6 +183,7 @@ class Controls extends Component {
   updateSelfPeerInfo(self, peer, id, type) {
     console.log(self.state);
     var isVideo = type === 'video' ? 1 : 0;
+    console.log(isVideo);
     if (self.state.myPeers[isVideo] !== 0) {
       self.state.myPeers[isVideo].destroy();
       self.deleteAllVideoElements();
@@ -196,6 +199,7 @@ class Controls extends Component {
       myPeers: peers,
       myIds: myIDs
     });
+    console.log(self.state);
   }
 
   async startScreenShare(type, next) {
@@ -281,6 +285,9 @@ class Controls extends Component {
         })
         .then((resp) => {
           console.log(resp.data);
+          self.setState({
+            myUsername: resp.data.username
+          });
           onlineArray.forEach((val, index) => {
             if (val.username === resp.data.username && val.type === type) {
               return;
@@ -400,6 +407,7 @@ connectedPeers: connectedPeers,
     if (isAnswer) {
       friendtkn = call.peer;
       console.log('Connected to ' + friendtkn);
+      console.log(call.metadata);
       this.createNotif('Member joined', `${friendtkn} joined the call`, 'info');
     }
     var tracks = media.getTracks();
@@ -424,10 +432,10 @@ connectedPeers: connectedPeers,
     if (isAnswer) {
       thiscall.answer(media);
     } else {
-      thiscall = peer.call(friendtkn, media);
+      thiscall = peer.call(friendtkn, media, { metadata: this.state.myUsername });
     }
     self.addHandlersToCall(self, thiscall, friendtkn, peer, isAnswer);
-    console.log('exit4d');
+    //console.log('exit4d');
   }
 
   // Add Event handlers to the thiscall call - error, stream used as of now.
@@ -558,7 +566,11 @@ let videos = document.getElementById("videos");
 videos.empty();
 */
     $('#videos').empty();
-    $('#context').remove();
+    //$('#context').empty();
+    const context = document.getElementById('context');
+    if(context != null) {
+      context.srcObject = null;
+    }
   }
 
   sendCallEndedSignal() {
@@ -598,16 +610,29 @@ videos.empty();
             val.destroy();
           }
         });
-        next();
+        // Clear all state variables associated with calls.
+        this.setState({
+          myIds: [0, 0],
+          myPeers: [0, 0],
+          // Use Sets instead of Arrays to prevent duplicates.
+          remotePeers: new Set(),
+          remotePeersID: new Set(),
+          calls: new Array(),
+          connectedPeers: new Set(),
+          friendtkn: ''
+        });
+            next();
+            return;
       })
       .catch((err) => {
         console.log(err);
         next(false, 'Error');
+        return;
       });
   }
 
-  endCall(next) {
-    this.sendRequestToEndCall(next);
+  async endCall(next) {
+    await this.sendRequestToEndCall(next);
     if (this.state.myMediaStreamObj) {
       this.state.myMediaStreamObj.getTracks().forEach((track) => {
         console.log(track);
@@ -620,17 +645,6 @@ videos.empty();
         myMediaStreamObj: null
       });
     }
-    // Clear all state variables associated with calls.
-    this.setState({
-      myIds: [0, 0],
-      myPeers: [0, 0],
-      // Use Sets instead of Arrays to prevent duplicates.
-      remotePeers: new Set(),
-      remotePeersID: new Set(),
-      calls: new Array(),
-      connectedPeers: new Set(),
-      friendtkn: ''
-    });
     // Add by appropriate UI changes which clears the screen.
     this.deleteAllVideoElements();
   }
