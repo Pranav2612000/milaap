@@ -82,7 +82,7 @@ export default function MessageList(props) {
       .then((res) => {
         let tempMsg = res.data.msgs;
         if (JSON.stringify(tempMsg) === JSON.stringify(messages)) return;
-        console.clear();
+        //console.clear();
         // alert(1)
         console.log(messages);
         console.log(tempMsg);
@@ -142,9 +142,6 @@ export default function MessageList(props) {
   }, []);
 
   const renderMessages = () => {
-    console.clear();
-    console.log(messages);
-    console.log(messages.length);
     let i = 0;
     const messageCount = messages.length;
     const tempMessages = [];
