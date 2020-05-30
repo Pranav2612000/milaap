@@ -6,6 +6,7 @@ const rooms = require('../models/Rooms.model');
 const userLogins = require('../models/UserLogin.model');
 const users = require('../models/User.model');
 var io = require('../index');
+const axios = require('axios');
 const auth = require('../middleware/auth');
 // console.log(io);
 
@@ -49,7 +50,7 @@ router.post('/adduser', auth, async (req, res) => {
         if (err) {
           return res.status(400).json({ err: 'Error Creating Room' });
         } else {
-          console.log(room);
+          // console.log(room);
           io.emit('newRoom', req.data);
           return res.status(200).json({ msg: 'Room Created successfully' });
         }
@@ -89,21 +90,45 @@ router.post('/adduser', auth, async (req, res) => {
 /* Takes an input username and returns a JWT string which encrypts
  * this name. */
 router.post('/gettokenfortempuser', async (req, res) => {
-  const username = req.body.username;
+  const name = req.body.name;
+  const roomName = req.body.roomName;
+  const random = new Date().getTime();
+  const username = name.split(' ')[0] + random;
   const payload = {
     user: {
       id: username
     }
   };
+  console.log('INITIAL', username, roomName);
   try {
     jwt.sign(payload, config.get('jwtSecret'), { expiresIn: 3600 }, (err, token) => {
       if (err) throw err;
-      res.status(200).json({
-        token,
-        temp_details: {
-          userId: username
-        }
-      });
+      axios
+        .post(
+          'http://localhost:5000/api/room/addusertoroom',
+          {
+            roomName: roomName
+          },
+          {
+            headers: {
+              'milaap-auth-token': token
+            }
+          }
+        )
+        .then((resp) => {
+          res.status(200).json({
+            token,
+            temp_details: {
+              userId: username
+            }
+          });
+        })
+        .catch((error) => {
+          console.log(error);
+          res.status(400).json({
+            msg: 'Unable to Join to Room'
+          });
+        });
     });
   } catch (e) {
     res.status(400).json({ err: e });
@@ -111,8 +136,8 @@ router.post('/gettokenfortempuser', async (req, res) => {
 });
 
 router.post('/getrooms', auth, async (req, res) => {
-  console.log('getrooms', req.user.id);
   const username = req.user.id;
+  console.log('getrooms', req.user.id);
   users.findOne({ username: username }, function (err, user) {
     if (err) {
       return res.status(400).json({ err: 'Error. Try again.' });

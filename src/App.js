@@ -15,6 +15,8 @@ const Login = React.lazy(() => import('./views/Pages/Login'));
 const Register = React.lazy(() => import('./views/Pages/Register'));
 const Page404 = React.lazy(() => import('./views/Pages/Page404'));
 const Page500 = React.lazy(() => import('./views/Pages/Page500'));
+const Guest = React.lazy(() => import('./views/Pages/Guest/Guest'));
+const Landing = React.lazy(() => import('./views/Pages/Landing/Landing'));
 
 class App extends Component {
   render() {
@@ -24,9 +26,20 @@ class App extends Component {
           <Switch>
             <Route
               exact
+              path="/landing"
+              name="Landing Page"
+              render={(props) => <Landing {...props} />}
+            />
+            <Route
+              exact
               path="/login"
               name="Login Page"
               render={(props) => <Login {...props} />}
+            />
+            <Route
+              path="/join"
+              name="Guest Login"
+              render={(props) => <Guest {...props} />}
             />
             <Route
               exact

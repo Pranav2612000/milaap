@@ -55,14 +55,43 @@ router.post('/createroom', auth, async (req, res) => {
 
 router.post('/addusertoroom', auth, async (req, res) => {
   const user = req.user.id;
+  console.clear();
+  console.log(user);
   const roomName = req.body.roomName;
-  rooms.findOne({ roomName: roomName }, function (err, room) {
+  rooms.findOne({ roomName: roomName }, async function (err, room) {
     if (err) {
       return res.status(400).json({ err: 'Error Creating Room' });
     }
     if (!room) {
-      return res.status(404).json({ msg: 'Room Not Found' });
+      return res.status(405).json({ msg: 'Room Not Found' });
     } else {
+      await users.findOne({ username: user }, async function (errr, user_found) {
+        if (errr) {
+          return res.status(400).json({ err: 'Error. Try again.' });
+        }
+        if (!user_found) {
+          var userdata = new users({ username: user });
+          await userdata.save((errrr) => {
+            if (errrr) {
+              return res.status(400).json({ err: 'Error Registering User' });
+            } else {
+              console.log('User saved Successfully');
+            }
+          });
+        }
+        await users.updateOne(
+          { username: user },
+          { $addToSet: { rooms: roomName } },
+          function (err, result) {
+            if (err) {
+              res.send(err);
+            } else {
+              console.log('Updated Successfully');
+            }
+          }
+        );
+      });
+
       var userArray = room._doc.users;
       if (userArray === undefined) {
         return res.status(400).json({ err: 'An unknown error occured' });
@@ -75,8 +104,8 @@ router.post('/addusertoroom', auth, async (req, res) => {
           return res.status(400).json({ err: 'Error Adding user' });
         } else {
           io.emit('userJoined', req.body);
-          io.emit('newRoom', req.data);
-          console.log(room._doc.users);
+          // io.emit('newRoom', req.data);
+          console.log('User Added Successfully');
           return res.status(200).json({ msg: 'User Added successfully' });
         }
       });
@@ -197,7 +226,7 @@ router.post('/enterroom', auth, async (req, res) => {
       }
     });
     if (i == -1) {
-      console.log("not found in users.");
+      console.log('not found in users.');
     }
     /* Check if username in in room.tempusers. */
     if (userExists == false) {
@@ -208,7 +237,7 @@ router.post('/enterroom', auth, async (req, res) => {
         }
       });
       if (i == -1) {
-        console.log("not found in guests too.");
+        console.log('not found in guests too.');
       }
     }
 

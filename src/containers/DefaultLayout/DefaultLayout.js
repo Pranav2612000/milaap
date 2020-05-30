@@ -42,14 +42,14 @@ function getGroupElements(rooms) {
 }
 class DefaultLayout extends Component {
   getRooms = () => {
+    const token = localStorage.getItem('milaap-auth-token');
+    const reqHeader = { 'milaap-auth-token': token };
     axios
       .post(
         'http://localhost:5000/api/user/getrooms',
         {},
         {
-          headers: {
-            'milaap-auth-token': localStorage.getItem('milaap-auth-token')
-          }
+          headers: reqHeader
         }
       )
       .then((res) => {
@@ -176,7 +176,7 @@ class DefaultLayout extends Component {
   signOut(e) {
     e.preventDefault();
     localStorage.removeItem('milaap-auth-token');
-    this.props.history.push('/login');
+    this.props.history.push('/landing');
   }
 
   componentDidMount() {
@@ -199,7 +199,11 @@ class DefaultLayout extends Component {
 
   render() {
     if (localStorage.getItem('milaap-auth-token') === null) {
-      return <Redirect to="/login" />;
+      if (this.props.location.pathname.match('/rooms/')) {
+        var room = this.props.location.pathname.split('/')[2];
+        return <Redirect to={{ pathname: '/join', room: room }} />;
+      }
+      return <Redirect to={{ pathname: '/landing' }} />;
     }
     return (
       <React.Fragment>

@@ -142,7 +142,7 @@ export default function MessageList(props) {
   }, []);
 
   const renderMessages = () => {
-    console.clear()
+    // console.clear()
     console.log(messages);
     console.log(messages.length);
     let i = 0;
@@ -212,10 +212,10 @@ export default function MessageList(props) {
   };
 
   return (
-    <div className="message-list" >
+    <div className="message-list">
       <Toolbar
         title={props.roomName}
-      /*
+        /*
     rightItems={[
       <ToolbarButton key="info" icon="ion-ios-information-circle-outline" />,
       <ToolbarButton key="video" icon="ion-ios-videocam" />,
@@ -238,6 +238,6 @@ export default function MessageList(props) {
         roomName={props.roomName}
         callback={updateMsg}
       />
-    </div >
+    </div>
   );
 }
