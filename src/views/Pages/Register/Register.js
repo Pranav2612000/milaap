@@ -59,8 +59,25 @@ class Register extends Component {
       })
       .then((res) => {
         console.log(res);
-        this.setState({ redirect: true });
         console.log(res);
+        if(res.data.err == 'UEXIST') {
+          console.log('username exists');
+          store.addNotification({
+            title: 'Error',
+            message: 'You are late! Username already exists, choose a different username.',
+            type: 'warning',
+            // insert: "top",
+            container: 'top-right',
+            animationIn: ['animated', 'fadeIn'],
+            animationOut: ['animated', 'fadeOut'],
+            dismiss: {
+              duration: 3000,
+              pauseOnHover: true
+            }
+          });
+          return;
+        }
+        this.setState({ redirect: true });
       })
       .catch((err) => {
         store.addNotification({
