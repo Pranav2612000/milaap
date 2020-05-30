@@ -39,28 +39,6 @@ import './Controls.css';
 const socket = socketIOClient('http://localhost:5000/');
 
 class Controls extends Component {
-  getActive = () => {
-    axios
-      .post(
-        'http://localhost:5000/api/room/getActive',
-        {
-          roomName: this.props.roomName
-        },
-        {
-          headers: {
-            'milaap-auth-token': localStorage.getItem('milaap-auth-token')
-          }
-        }
-      )
-      .then((res) => {
-        if (!res.data.active.length) {
-        }
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  };
-
   constructor(props) {
     super(props);
     this.state = {
@@ -80,21 +58,7 @@ class Controls extends Component {
     this.startConnection = this.startConnection.bind(this);
     this.sendCallEndedSignal = this.sendCallEndedSignal.bind(this);
 
-    /* TODO:  Move Call to appropriate position, and replace by generalized call. */
-    if (this.state.roomName !== 'dashboard') this.getActive();
 
-    socket.on('userJoined', (data) => {
-      if (this.state.roomName !== 'dashboard') {
-        // YET TO BE TESTED
-        this.getActive();
-      }
-    });
-    socket.on('userOnline', (data) => {
-      if (this.state.roomName !== 'dashboard') this.getActive();
-    });
-    socket.on('userExit', (data) => {
-      if (this.state.roomName !== 'dashboard') this.getActive();
-    });
     this.endCall = this.endCall.bind(this);
   }
 
@@ -110,28 +74,6 @@ class Controls extends Component {
         roomName: this.props.roomName
       });
       this.endCall();
-      axios
-        .post(
-          'http://localhost:5000/api/room/getActive',
-          {
-            roomName: this.props.roomName
-          },
-          {
-            headers: {
-              'milaap-auth-token': localStorage.getItem('milaap-auth-token')
-            }
-          }
-        )
-        .then((res) => {
-          if (!res.data.active.length || res.data.active === this.state.active) {
-            this.setState({
-              active: res.data.active
-            });
-          }
-        })
-        .catch((err) => {
-          console.log(err);
-        });
     }
   }
 
@@ -713,19 +655,6 @@ videos.empty();
           </AwesomeButtonProgress>
         </Row>
         <br />
-        <h3>Members</h3>
-        <ListGroup flush>
-          {this.state.active
-            ? this.state.active.map((user) => {
-                return (
-                  <ListGroupItem key={Math.random()}>
-                    <Spinner type="grow" size="sm" variant="success" />
-                    {user.username}
-                  </ListGroupItem>
-                );
-              })
-            : ' '}
-        </ListGroup>
       </Container>
     );
   }

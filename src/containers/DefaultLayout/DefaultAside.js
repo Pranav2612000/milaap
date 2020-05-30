@@ -15,6 +15,7 @@ import classNames from 'classnames';
 import { AppSwitch } from '@coreui/react';
 import MessageView from '../../views/MessageList/index';
 import Controls from '../../views/Connection/Controls';
+import MemberList from '../../views/Widgets/MemberList';
 import axios from 'axios';
 import {
   Button,
@@ -49,13 +50,16 @@ class DefaultAside extends Component {
   constructor(props) {
     super(props);
 
+    let roomName = getRoomFromLocation(this.props.location.pathname);
     this.toggle = this.toggle.bind(this);
     this.state = {
       activeTab: '1',
       change: false,
-      roomName: getRoomFromLocation(props.location.pathname),
+      roomName: roomName, 
       path: props.location.pathname
     };
+    this.getRoomInfo = this.getRoomInfo.bind(this);
+    this.getRoomInfo(roomName);
   }
   componentDidUpdate(prevProps) {
     if (this.props.location.pathname != prevProps.location.pathname) {
@@ -63,22 +67,31 @@ class DefaultAside extends Component {
       this.setState({
         roomName
       });
-      let reqData = {
-        roomName
-      }
-      axios
-        .post('http://localhost:5000/api/room/enterroom', reqData, {
-          headers: {
-            'milaap-auth-token': localStorage.getItem('milaap-auth-token')
-          }
-        })
-        .then((res) => {
-          console.log(res.data);
-        }).catch((err) => {
-          console.log(err);
-        });
+      this.getRoomInfo(roomName);
       this.setState({ change: !this.state.change });
     }
+  }
+
+  getRoomInfo(roomName) {
+    let reqData = {
+      roomName
+    }
+    axios
+      .post('http://localhost:5000/api/room/enterroom', reqData, {
+        headers: {
+          'milaap-auth-token': localStorage.getItem('milaap-auth-token')
+        }
+      })
+      .then((res) => {
+        console.log(res.data);
+        this.setState({
+          msgs: res.data.msgs,
+          users: res.data.users,
+          guests: res.data.guests,
+        });
+      }).catch((err) => {
+        console.log(err);
+      });
   }
   
   componentDidMount() {
@@ -131,6 +144,7 @@ class DefaultAside extends Component {
         <TabContent activeTab={this.state.activeTab}>
           <TabPane tabId="1">
             <Controls roomName={this.state.roomName} />
+            <MemberList users = {this.state.users} guests = {this.state.guests}/>
           </TabPane>
 
           <TabPane tabId="2" className="p-3" key={this.state.change}>
