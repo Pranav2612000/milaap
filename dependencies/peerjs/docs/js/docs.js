@@ -1,4 +1,4 @@
-$(document).ready(function() {
+$(document).ready(function () {
   var $api = $('.api');
   var $start = $('.start');
   var $show = $('.left .show');
@@ -9,7 +9,7 @@ $(document).ready(function() {
 
   init();
 
-  $(window).on('resize', function() {
+  $(window).on('resize', function () {
     width = $(window).width();
     height = $(window).height();
 
@@ -20,7 +20,6 @@ $(document).ready(function() {
   if (hash === '#start' && width < THRESHOLD) {
     hideAPI();
   }
-
 
   function init() {
     if (width < THRESHOLD) {
@@ -60,7 +59,7 @@ $(document).ready(function() {
     $api.removeClass('hidden');
   }
 
-  $('body').on('click', '.left', function() {
+  $('body').on('click', '.left', function () {
     if ($api.attr('class').indexOf('hidden') !== -1) {
       showAPI();
     } else if ($api.attr('class').indexOf('fullscreen') === -1) {
@@ -68,10 +67,10 @@ $(document).ready(function() {
       hideAPI();
     }
   });
-  $('body').on('click', '.right', function() {
+  $('body').on('click', '.right', function () {
     hideAPI();
   });
-  $('body').on('click', 'a', function() {
+  $('body').on('click', 'a', function () {
     if ($(this).attr('href').indexOf('#') === 0) {
       showAPI();
     }

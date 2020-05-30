@@ -1,19 +1,19 @@
-import * as BinaryPack from "peerjs-js-binarypack";
+import * as BinaryPack from 'peerjs-js-binarypack';
 import { Supports } from './supports';
 import { UtilSupportsObj } from '..';
 
 const DEFAULT_CONFIG = {
   iceServers: [
-    { urls: "stun:stun.l.google.com:19302" },
-    { urls: "turn:0.peerjs.com:3478", username: "peerjs", credential: "peerjsp" }
+    { urls: 'stun:stun.l.google.com:19302' },
+    { urls: 'turn:0.peerjs.com:3478', username: 'peerjs', credential: 'peerjsp' }
   ],
-  sdpSemantics: "unified-plan"
+  sdpSemantics: 'unified-plan'
 };
 
-export const util = new class {
-  noop(): void { }
+export const util = new (class {
+  noop(): void {}
 
-  readonly CLOUD_HOST = "0.peerjs.com";
+  readonly CLOUD_HOST = '0.peerjs.com';
   readonly CLOUD_PORT = 443;
 
   // Browsers that need chunking:
@@ -34,7 +34,7 @@ export const util = new class {
       audioVideo: false,
       data: false,
       binaryBlob: false,
-      reliable: false,
+      reliable: false
     };
 
     if (!supported.webRTC) return supported;
@@ -49,16 +49,15 @@ export const util = new class {
       let dc: RTCDataChannel;
 
       try {
-        dc = pc.createDataChannel("_PEERJSTEST", { ordered: true });
+        dc = pc.createDataChannel('_PEERJSTEST', { ordered: true });
         supported.data = true;
         supported.reliable = !!dc.ordered;
 
         // Binary test
         try {
-          dc.binaryType = "blob";
+          dc.binaryType = 'blob';
           supported.binaryBlob = !Supports.isIOS;
-        } catch (e) {
-        }
+        } catch (e) {}
       } catch (e) {
       } finally {
         if (dc) {
@@ -88,7 +87,7 @@ export const util = new class {
 
   private _dataCount: number = 1;
 
-  chunk(blob: Blob): { __peerData: number, n: number, total: number, data: Blob }[] {
+  chunk(blob: Blob): { __peerData: number; n: number; total: number; data: Blob }[] {
     const chunks = [];
     const size = blob.size;
     const total = Math.ceil(size / util.chunkedMTU);
@@ -104,7 +103,7 @@ export const util = new class {
         __peerData: this._dataCount,
         n: index,
         data: b,
-        total,
+        total
       };
 
       chunks.push(chunk);
@@ -143,12 +142,10 @@ export const util = new class {
   }
 
   randomToken(): string {
-    return Math.random()
-      .toString(36)
-      .substr(2);
+    return Math.random().toString(36).substr(2);
   }
 
   isSecure(): boolean {
-    return location.protocol === "https:";
+    return location.protocol === 'https:';
   }
-}
+})();

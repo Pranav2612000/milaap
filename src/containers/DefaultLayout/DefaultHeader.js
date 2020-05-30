@@ -1,19 +1,39 @@
-import React, { Component } from "react";
-import { Link, NavLink, Redirect } from "react-router-dom";
-import { Badge, UncontrolledDropdown, DropdownItem, DropdownMenu, DropdownToggle, Nav,
-  NavItem, } from "reactstrap";
-import PropTypes from "prop-types";
-import axios from "axios";
+import React, { Component } from 'react';
+import { Link, NavLink, Redirect } from 'react-router-dom';
+import {
+  Badge,
+  UncontrolledDropdown,
+  DropdownItem,
+  DropdownMenu,
+  DropdownToggle,
+  Nav,
+  NavItem,
+  Button,
+  Card,
+  CardBody,
+  CardHeader,
+  Col,
+  Form,
+  InputGroup,
+  InputGroupAddon,
+  InputGroupText,
+  Input,
+  Modal,
+  ModalBody,
+  ModalFooter,
+  ModalHeader,
+  Row
+} from 'reactstrap';
+import PropTypes from 'prop-types';
+import axios from 'axios';
 
-import { AppAsideToggler, AppNavbarBrand, AppSidebarToggler, } from "@coreui/react";
-import DefaultAside from "./DefaultAside";
-import logo from "../../assets/img/brand/logo.png";
-import sygnet from "../../assets/img/brand/sygnet.svg";
-import { Button, Card, CardBody, CardHeader, Col, Form, InputGroup, InputGroupAddon,
-  InputGroupText, Input, Modal, ModalBody, ModalFooter, ModalHeader, Row, } from "reactstrap";
+import { AppAsideToggler, AppNavbarBrand, AppSidebarToggler } from '@coreui/react';
+import DefaultAside from './DefaultAside';
+import logo from '../../assets/img/brand/logo.png';
+import sygnet from '../../assets/img/brand/sygnet.svg';
 
 const propTypes = {
-  children: PropTypes.node,
+  children: PropTypes.node
 };
 
 const defaultProps = {};
@@ -23,8 +43,8 @@ class DefaultHeader extends Component {
     super(props);
     this.state = {
       modal: false,
-      friendid: "",
-      roomName: "",
+      friendid: '',
+      roomName: ''
     };
     this.toggle = this.toggle.bind(this);
     this.handleFriendChange = this.handleFriendChange.bind(this);
@@ -33,29 +53,33 @@ class DefaultHeader extends Component {
   }
 
   componentDidMount() {
-    /* To be changed: Use Redux to get username.*/
+    /* To be changed: Use Redux to get username. */
     axios
-      .get("http://localhost:5000/api/user/getUserName", {
-        headers: { 'milaap-auth-token': localStorage.getItem('milaap-auth-token') }
-      }).then(resp => {
-        console.log(resp.data.username);
-        this.setState({ username: resp.data.username })
-      }).catch(err => {
-        console.log(err, "Error in Verifying JWT")
-        this.setState({ username: false })
+      .get('http://localhost:5000/api/user/getUserName', {
+        headers: {
+          'milaap-auth-token': localStorage.getItem('milaap-auth-token')
+        }
       })
+      .then((resp) => {
+        console.log(resp.data.username);
+        this.setState({ username: resp.data.username });
+      })
+      .catch((err) => {
+        console.log(err, 'Error in Verifying JWT');
+        this.setState({ username: false });
+      });
   }
 
   addFriend() {
     const reqData = {
       user: this.state.friendid,
-      roomName: this.state.roomName,
+      roomName: this.state.roomName
     };
     axios
-      .post("http://localhost:5000/api/user/adduser", reqData, {
+      .post('http://localhost:5000/api/room/createroom', reqData, {
         headers: {
-          "milaap-auth-token": localStorage.getItem("milaap-auth-token"),
-        },
+          'milaap-auth-token': localStorage.getItem('milaap-auth-token')
+        }
       })
       .then((res) => {
         console.log(res);
@@ -65,19 +89,22 @@ class DefaultHeader extends Component {
         console.log(err);
       });
   }
+
   handleFriendChange(e) {
     this.setState({
-      friendid: e.target.value,
+      friendid: e.target.value
     });
   }
+
   handleRoomNameChange(e) {
     this.setState({
-      roomName: e.target.value,
+      roomName: e.target.value
     });
   }
+
   toggle() {
     this.setState({
-      modal: !this.state.modal,
+      modal: !this.state.modal
     });
   }
 
@@ -86,15 +113,20 @@ class DefaultHeader extends Component {
     const { children, ...attributes } = this.props;
 
     /* TODO: Use Protected Route component. */
-    if(this.state.username == false) {
-      return <Redirect to='/login'/>
+    if (this.state.username === false) {
+      return <Redirect to="/login" />;
     }
     return (
       <React.Fragment>
         <AppSidebarToggler className="d-lg-none" display="md" mobile />
         <AppNavbarBrand
-          full={{ src: logo, width: 89, height: 25, alt: "CoreUI Logo" }}
-          minimized={{ src: sygnet, width: 30, height: 30, alt: "CoreUI Logo" }}
+          full={{ src: logo, width: 89, height: 25, alt: 'CoreUI Logo' }}
+          minimized={{
+            src: sygnet,
+            width: 30,
+            height: 30,
+            alt: 'CoreUI Logo'
+          }}
         />
         <AppSidebarToggler className="d-md-down-none" display="lg" />
 
@@ -123,7 +155,9 @@ class DefaultHeader extends Component {
           <UncontrolledDropdown nav direction="down">
             <DropdownToggle>
               <NavItem>
-                <NavLink to="#" className="nav-link">{this.state.username}</NavLink>
+                <NavLink to="#" className="nav-link">
+                  {this.state.username}
+                </NavLink>
               </NavItem>
             </DropdownToggle>
             <DropdownMenu right>
@@ -180,11 +214,11 @@ class DefaultHeader extends Component {
         <Modal
           isOpen={this.state.modal}
           toggle={this.toggle}
-          className={this.props.className}
-        >
-          <ModalHeader toggle={this.toggle}>Add Friends</ModalHeader>
+          className={this.props.className}>
+          <ModalHeader toggle={this.toggle}>Create Room</ModalHeader>
           <ModalBody>
             <Form>
+              {/*
               <InputGroup className="mb-3">
                 <InputGroupAddon addonType="prepend">
                   <InputGroupText>
@@ -199,6 +233,7 @@ class DefaultHeader extends Component {
                   onChange={this.handleFriendChange}
                 />
               </InputGroup>
+              */}
               <InputGroup className="mb-3">
                 <InputGroupAddon addonType="prepend">
                   <InputGroupText>
@@ -218,7 +253,7 @@ class DefaultHeader extends Component {
           <ModalFooter>
             <Button color="primary" onClick={this.addFriend}>
               Add
-            </Button>{" "}
+            </Button>{' '}
             <Button color="secondary" onClick={this.toggle}>
               Cancel
             </Button>

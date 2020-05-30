@@ -1,16 +1,113 @@
-html{color:#000;background:#FFF;}body,div,dl,dt,dd,ul,ol,li,pre,code,form,fieldset,legend,input,button,textarea,p,blockquote,th,td{margin:0;padding:0;}table{border-collapse:collapse;border-spacing:0;}fieldset,img{border:0;}address,caption,cite,code,dfn,em,th,var,optgroup{font-style:inherit;font-weight:inherit;}del,ins{text-decoration:none;}li{list-style:none;}caption,th{text-align:left;}q:before,q:after{content:'';}abbr,acronym{border:0;font-variant:normal;}sup{vertical-align:baseline;}sub{vertical-align:baseline;}legend{color:#000;}input,button,textarea,select,optgroup,option{font-family:inherit;font-size:inherit;font-style:inherit;font-weight:inherit;}input,button,textarea,select{font-size:100%;}
-a {outline: none;} /* Gets rid of Firefox's dotted borders */
-a img {border: none;} /* Gets rid of IE's blue borders */
+html {
+  color: #000;
+  background: #fff;
+}
+body,
+div,
+dl,
+dt,
+dd,
+ul,
+ol,
+li,
+pre,
+code,
+form,
+fieldset,
+legend,
+input,
+button,
+textarea,
+p,
+blockquote,
+th,
+td {
+  margin: 0;
+  padding: 0;
+}
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+fieldset,
+img {
+  border: 0;
+}
+address,
+caption,
+cite,
+code,
+dfn,
+em,
+th,
+var,
+optgroup {
+  font-style: inherit;
+  font-weight: inherit;
+}
+del,
+ins {
+  text-decoration: none;
+}
+li {
+  list-style: none;
+}
+caption,
+th {
+  text-align: left;
+}
+q:before,
+q:after {
+  content: '';
+}
+abbr,
+acronym {
+  border: 0;
+  font-variant: normal;
+}
+sup {
+  vertical-align: baseline;
+}
+sub {
+  vertical-align: baseline;
+}
+legend {
+  color: #000;
+}
+input,
+button,
+textarea,
+select,
+optgroup,
+option {
+  font-family: inherit;
+  font-size: inherit;
+  font-style: inherit;
+  font-weight: inherit;
+}
+input,
+button,
+textarea,
+select {
+  font-size: 100%;
+}
+a {
+  outline: none;
+} /* Gets rid of Firefox's dotted borders */
+a img {
+  border: none;
+} /* Gets rid of IE's blue borders */
 
-
-body, html {
+body,
+html {
   font-size: 14px;
   line-height: 24px;
-  font-family: "Lato", Helvetica, sans-serif;
+  font-family: 'Lato', Helvetica, sans-serif;
   color: #454545;
 }
 
-header.right, header.left {
+header.right,
+header.left {
   cursor: pointer;
   z-index: 100;
   position: fixed;
@@ -21,30 +118,31 @@ header.right, header.left {
 }
 
 header.left {
-  border-bottom: 1px solid rgba(0,0,0,0.1);
-  border-right: 4px solid rgba(0,0,0,0.1);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  border-right: 4px solid rgba(0, 0, 0, 0.1);
   background-color: #50484e;
   text-align: right;
   left: 0;
   width: 47%;
 }
 header.right {
-  border-bottom: 1px solid rgba(0,0,0,0.1);
-  border-left: 4px solid rgba(0,0,0,0.1);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  border-left: 4px solid rgba(0, 0, 0, 0.1);
   background-color: #eee;
   text-align: left;
   right: 0;
   width: 53%;
 }
 
-.left h2, .right h2 {
-  color: #E2A62E;
+.left h2,
+.right h2 {
+  color: #e2a62e;
   letter-spacing: 1px;
   text-transform: uppercase;
   font-size: 14px;
   margin: 0;
   padding: 6px 10px;
-  text-shadow: 0 -1px 0 rgba(0,0,0,0.2);
+  text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.2);
 }
 
 .right h2 {
@@ -53,7 +151,7 @@ header.right {
 }
 
 .left .icon {
-  color: #E2A62E;
+  color: #e2a62e;
   cursor: pointer;
   font-family: monospace;
   font-size: 20px;
@@ -65,8 +163,8 @@ header.right {
   display: none;
 }
 
-
-.api, .start {
+.api,
+.start {
   position: absolute;
   top: 0px;
   bottom: 0px;
@@ -121,13 +219,14 @@ header.right {
 
 /** Code stylings */
 section.start pre {
-  font-family: Consolas, Inconsolata, 'Bitstream Vera Sans Mono', Menlo, Monaco, 'Andale Mono', 'Courier New', monospace;
+  font-family: Consolas, Inconsolata, 'Bitstream Vera Sans Mono', Menlo, Monaco,
+    'Andale Mono', 'Courier New', monospace;
   font-size: 12px;
   background-color: #474045;
   border-left: 4px solid #40393e;
   padding: 15px 30px 15px 40px;
   color: #e7e0e5;
-  text-shadow: 0 -1px 0 rgba(0,0,0,0.1);
+  text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.1);
   max-width: 100%;
   overflow: auto;
 }
@@ -149,24 +248,27 @@ h1 .title {
   font-size: 15px;
   text-transform: uppercase;
   font-variant: small-caps;
-  background-color: #E2A62E;
+  background-color: #e2a62e;
   padding: 2px 4px;
   line-height: 15px;
   border-radius: 2px;
-  border: 2px solid rgba(0,0,0,0.2);
-  text-shadow: 0 -1px 0 rgba(0,0,0,0.2);
+  border: 2px solid rgba(0, 0, 0, 0.2);
+  text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.2);
 }
 
-.start > p, .start > div {
+.start > p,
+.start > div {
   padding: 5px 30px 5px 40px;
   border-left: 4px solid #ddd;
 }
 
 .start p.red {
-  color: #8F4537;
+  color: #8f4537;
 }
 
-.start h2, .start h3, .start h4 {
+.start h2,
+.start h3,
+.start h4 {
   color: #5a5157;
   padding: 12px 25px 5px 25px;
   margin: 0;
@@ -182,14 +284,13 @@ h1 .title {
 
 a {
   font-weight: 600;
-  color: #1295D8;
+  color: #1295d8;
   text-decoration: none;
   transition: color 200ms;
 }
 a:hover {
   color: #33a2dc;
 }
-
 
 .api {
   color: #f5eff3;
@@ -198,7 +299,7 @@ a:hover {
   left: 0px;
   width: 47%;
   border-right: 4px solid #474046;
-  border-top: 1px solid rgba(255,255,255,0.1);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
   background-color: #5a5157;
   text-shadow: 0px -1px 0 #474045;
   z-index: 100;
@@ -212,16 +313,16 @@ a:hover {
   font-weight: 800;
   display: inline-block;
   margin: 0 2px;
-  color: rgba(255,255,255,0.2);
+  color: rgba(255, 255, 255, 0.2);
 }
 
 .toplevel {
-  border-bottom: 1px solid rgba(0,0,0,0.1);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
   padding: 30px 35px;
 }
 
 .api:not(:first-child) {
-  border-top: 1px solid rgba(255,255,255,0.1);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .toplevel > .children > .child {
@@ -229,7 +330,7 @@ a:hover {
 }
 
 .children {
-  border-left: 1px solid rgba(0,0,0,0.1);
+  border-left: 1px solid rgba(0, 0, 0, 0.1);
 }
 
 .beta_030 .children {
@@ -249,41 +350,44 @@ a:hover {
   display: inline-block;
   background-color: #454545;
   border-radius: 2px;
-  color: rgba(255,255,255,0.8);
+  color: rgba(255, 255, 255, 0.8);
   line-height: 11px;
   padding: 1px 2px;
   margin-left: 5px;
   font-size: 9px;
   letter-spacing: 1px;
   font-weight: 600;
-  font-family: "Lato", Helvetica, sans-serif;
+  font-family: 'Lato', Helvetica, sans-serif;
   text-transform: uppercase;
-  border: 1px solid rgba(0,0,0,0.4);
-  text-shadow: 0px -1px 0px rgba(0,0,0,0.2);
+  border: 1px solid rgba(0, 0, 0, 0.4);
+  text-shadow: 0px -1px 0px rgba(0, 0, 0, 0.2);
 }
 
 .tag.type {
-  background-color: #757E2B;
+  background-color: #757e2b;
 }
 
 .tag.beta_030 {
-  background-color: #E96151;
+  background-color: #e96151;
 }
 
-.tag.method, .tag.function {
-  background-color: #E2A62E;
+.tag.method,
+.tag.function {
+  background-color: #e2a62e;
 }
 
-.tag.class, .tag.constructor, .tag.utility {
-  background-color: #468F81;
+.tag.class,
+.tag.constructor,
+.tag.utility {
+  background-color: #468f81;
 }
 
 .tag.error {
-  background-color: #8F4537;
+  background-color: #8f4537;
 }
 
 .tag.event {
-  background-color: #1295D8;
+  background-color: #1295d8;
 }
 
 .toplevel > .name {
@@ -300,7 +404,8 @@ a:hover {
   border-bottom: 1px solid #6b666a;
   text-shadow: 0 -1px 0 #393438;
   font-size: 12px;
-  font-family: Consolas, Inconsolata, 'Bitstream Vera Sans Mono', Menlo, Monaco, 'Andale Mono', 'Courier New', monospace;
+  font-family: Consolas, Inconsolata, 'Bitstream Vera Sans Mono', Menlo, Monaco,
+    'Andale Mono', 'Courier New', monospace;
   font-weight: 400;
   display: inline-block;
   background-color: #474045;
@@ -327,7 +432,8 @@ a:hover {
 }
 /* /name */
 
-.tip, .warn {
+.tip,
+.warn {
   opacity: 0.9;
   display: block;
   background-color: #d1c7be;
@@ -335,16 +441,16 @@ a:hover {
   line-height: 18px;
   border-radius: 2px;
   padding: 5px 8px;
-  border: 2px solid rgba(0,0,0,0.2);
+  border: 2px solid rgba(0, 0, 0, 0.2);
   margin: 8px 8px 0 0;
 }
 
 .warn {
-  background-color: #8F4537;
+  background-color: #8f4537;
 }
 .tip {
   color: #544e4a;
-  text-shadow: 0px -1px 0px rgba(255,255,255,0.2);
+  text-shadow: 0px -1px 0px rgba(255, 255, 255, 0.2);
   font-weight: 600;
 }
 
@@ -357,11 +463,13 @@ a:hover {
   margin-left: 10px;
 }
 
-.start code, .api code {
-  font-family: Consolas, Inconsolata, 'Bitstream Vera Sans Mono', Menlo, Monaco, 'Andale Mono', 'Courier New', monospace;
+.start code,
+.api code {
+  font-family: Consolas, Inconsolata, 'Bitstream Vera Sans Mono', Menlo, Monaco,
+    'Andale Mono', 'Courier New', monospace;
   border-radius: 2px;
-  border: 1px solid rgba(255,255,255,0.2);
-  background: rgba(255,255,255,0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.1);
   font-size: 12px;
   padding: 2px;
 }
@@ -375,7 +483,7 @@ a:hover {
   padding-left: 0;
   padding-right: 0;
 }
-.two-col .col{
+.two-col .col {
   float: left;
   width: 50%;
 }

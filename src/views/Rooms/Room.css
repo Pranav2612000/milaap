@@ -1,21 +1,40 @@
 #context {
   margin-top: 5vh;
   max-width: 85vw;
-  max-height: 80vh;
+  max-height: 60vh;
 }
 
 #videos {
   position: fixed;
   overflow-x: auto;
+  overflow-y: hidden;
   white-space: nowrap;
   flex-wrap: nowrap;
   width: 85vw;
-  bottom: 5vh;
+  bottom: 2vh;
+  background-color: rgba(100, 100, 100, 0.5);
 }
 
-#videos > video {
+#videos > div > video {
+  margin-top: -110px !important;
   display: inline-block;
   float: none;
   margin-left: 10px;
   margin-bottom: -110px;
+}
+
+.room {
+  position: absolute;
+  text-align: center;
+  margin: 0 !important;
+  padding: 0 !important;
+  width: 90vw;
+  height: 90vh;
+}
+
+.name-label {
+  font-weight: bolder;
+  height: 25px;
+  z-index: 100;
+  margin-top: -10px;
 }
