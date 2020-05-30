@@ -71,6 +71,7 @@ class MemberList extends Component {
     return (
       <Container>
         <h3> Members </h3>
+        <h5> Admins </h5>
         <ListGroup flush>
           {this.state.users.length > 0
             ? this.state.users.map((user) => {
@@ -81,6 +82,19 @@ class MemberList extends Component {
                 );
               })
               : 'No members yet'}
+        </ListGroup>
+        <br/>
+        <ListGroup flush>
+          <h5> Guests </h5>
+          {this.state.guests.length > 0
+            ? this.state.guests.map((user) => {
+                return (
+                  <ListGroupItem key={Math.random()}>
+                    {user}
+                  </ListGroupItem>
+                );
+              })
+              : 'No guests yet'}
         </ListGroup>
       </Container>
     );
