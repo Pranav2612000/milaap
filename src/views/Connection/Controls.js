@@ -542,7 +542,11 @@ connectedPeers: connectedPeers,
 
   // Creates a new video element to show the stream passed to it.
   createVideoElement(self, stream, friendtkn) {
+    const wrapper = document.createElement('div');
     const video = document.createElement('video');
+    const nameTag = document.createElement('div');
+    nameTag.classList.add('name-label');
+    nameTag.innerText = friendtkn;
     video.width = '200';
     video.id = friendtkn;
     if (video.id == 'me') {
@@ -552,7 +556,9 @@ connectedPeers: connectedPeers,
     video.srcObject = stream;
     video.autoplay = true;
     video.onclick = self.switchContext;
-    document.getElementById('videos').appendChild(video);
+    wrapper.appendChild(video);
+    wrapper.appendChild(nameTag);
+    document.getElementById('videos').appendChild(wrapper);
   }
 
   clearContext() {
@@ -566,6 +572,7 @@ connectedPeers: connectedPeers,
     const video = document.getElementById(id);
     const context = $('#context');
     if (video) {
+      video.nextElementSibling.remove();
       video.remove();
     }
     if (context.hasClass(id)) {
