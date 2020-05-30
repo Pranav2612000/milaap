@@ -160,8 +160,13 @@ router.post('/sendmessage', auth, async (req, res) => {
   });
 });
 
+/* Can only enter the room if the room object has this user's id.
+ * Returns a complete list of users, currently online users, messages etc.
+ * */
 router.post('/enterroom', auth, async (req, res) => {
   const roomName = req.body.roomName;
+  const username = req.user.id;
+
   /*
     Also need to send sender id here
   */
@@ -182,7 +187,41 @@ router.post('/enterroom', auth, async (req, res) => {
     if (!room) {
       return res.status(400).json({ err: 'Error. Incorrect roomname.' });
     }
-    return res.status(200).json({ msg: 'Success', msgs: room._doc.msgArray });
+    /* Check if username is in room.users */
+    var i = -1;
+    var userExists = false;
+    room._doc.users.forEach((val, index) => {
+      if(val == username) {
+        i = index;
+        userExists = true;
+      }
+    });
+    if(i == -1) {
+      console.log("not found in users.");
+    }
+    /* Check if username in in room.tempusers. */
+    if(userExists == false) {
+      room._doc.guests.forEach((val, index) => {
+        if(val == username) {
+          i = index;
+          userExists = true;
+        }
+      });
+      if(i == -1) {
+        console.log("not found in guests too.");
+      }
+    }
+
+    if(userExists) {
+    /* If username exits return with all userful info. */
+      return res.status(200).json({ 
+        msg: 'Success', 
+        msgs: room._doc.msgArray 
+      });
+    } else {
+    /* If username in none exit with appropriate error msg. */
+      return res.status(400).json({ err: 'Error. Username not registered.' });
+    }
   });
 });
 

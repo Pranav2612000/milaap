@@ -15,6 +15,7 @@ import classNames from 'classnames';
 import { AppSwitch } from '@coreui/react';
 import MessageView from '../../views/MessageList/index';
 import Controls from '../../views/Connection/Controls';
+import axios from 'axios';
 import {
   Button,
   ButtonGroup,
@@ -58,11 +59,30 @@ class DefaultAside extends Component {
   }
   componentDidUpdate(prevProps) {
     if (this.props.location.pathname != prevProps.location.pathname) {
+      let roomName = getRoomFromLocation(this.props.location.pathname);
       this.setState({
-        roomName: getRoomFromLocation(this.props.location.pathname)
+        roomName
       });
+      let reqData = {
+        roomName
+      }
+      axios
+        .post('http://localhost:5000/api/room/enterroom', reqData, {
+          headers: {
+            'milaap-auth-token': localStorage.getItem('milaap-auth-token')
+          }
+        })
+        .then((res) => {
+          console.log(res.data);
+        }).catch((err) => {
+          console.log(err);
+        });
       this.setState({ change: !this.state.change });
     }
+  }
+  
+  componentDidMount() {
+    console.log('mounting');
   }
 
   toggle(tab) {
