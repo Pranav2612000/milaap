@@ -205,7 +205,6 @@ export default function MessageList(props) {
       // console.log(current);
     }
     console.log(tempMessages);
-    setChange(!change);
     return tempMessages;
   };
   const updateMsg = (msgObject) => {
