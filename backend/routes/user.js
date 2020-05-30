@@ -86,9 +86,9 @@ router.post('/adduser', auth, async (req, res) => {
     */
 });
 
-/* Takes an input username and returns a JWT string which encrypts 
+/* Takes an input username and returns a JWT string which encrypts
  * this name. */
-router.post('/gettokenfortempuser', async(req, res) => {
+router.post('/gettokenfortempuser', async (req, res) => {
   const username = req.body.username;
   const payload = {
     user: {
@@ -96,20 +96,15 @@ router.post('/gettokenfortempuser', async(req, res) => {
     }
   };
   try {
-    jwt.sign(
-      payload,
-      config.get('jwtSecret'),
-      { expiresIn: 3600 },
-      (err, token) => {
-        if (err) throw err;
-        res.status(200).json({
-          token,
-          temp_details: {
-            userId: username
-          }
-        });
-      }
-    );
+    jwt.sign(payload, config.get('jwtSecret'), { expiresIn: 3600 }, (err, token) => {
+      if (err) throw err;
+      res.status(200).json({
+        token,
+        temp_details: {
+          userId: username
+        }
+      });
+    });
   } catch (e) {
     res.status(400).json({ err: e });
   }

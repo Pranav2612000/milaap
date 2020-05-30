@@ -73,7 +73,7 @@ class Controls extends Component {
       calls: new Array(),
       connectedPeers: new Set(),
       friendtkn: '',
-      myUsername: '' 
+      myUsername: ''
     };
     console.log(this.state.roomName);
     this.startScreenShare = this.startScreenShare.bind(this);
@@ -109,6 +109,7 @@ class Controls extends Component {
       this.setState({
         roomName: this.props.roomName
       });
+      this.endCall();
       axios
         .post(
           'http://localhost:5000/api/room/getActive',
@@ -544,8 +545,8 @@ connectedPeers: connectedPeers,
     const video = document.createElement('video');
     video.width = '200';
     video.id = friendtkn;
-    if(video.id == "me") {
-      video.muted = "true";
+    if (video.id == 'me') {
+      video.muted = 'true';
     }
     video.height = '350';
     video.srcObject = stream;
@@ -556,7 +557,7 @@ connectedPeers: connectedPeers,
 
   clearContext() {
     const context = document.getElementById('context');
-    if(context != null) {
+    if (context != null) {
       context.srcObject = null;
     }
   }
@@ -630,12 +631,16 @@ videos.empty();
           connectedPeers: new Set(),
           friendtkn: ''
         });
-            next();
-            return;
+        if (next) {
+          next();
+        }
+        return;
       })
       .catch((err) => {
         console.log(err);
-        next(false, 'Error');
+        if (next) {
+          next(false, 'Error');
+        }
         return;
       });
   }

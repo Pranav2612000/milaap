@@ -1,18 +1,18 @@
-import React, { useEffect, useState } from "react";
-import Compose from "../Compose";
-import Toolbar from "../Toolbar";
-import ToolbarButton from "../ToolbarButton";
-import Message from "../Message";
-import moment from "moment";
-import axios from "axios";
-import socketIOClient from "socket.io-client";
-import "./MessageList.css";
-import { Col } from "reactstrap";
+import React, { useEffect, useState } from 'react';
+import Compose from '../Compose';
+import Toolbar from '../Toolbar';
+import ToolbarButton from '../ToolbarButton';
+import Message from '../Message';
+import moment from 'moment';
+import axios from 'axios';
+import socketIOClient from 'socket.io-client';
+import './MessageList.css';
+import { Col } from 'reactstrap';
 
-const socket = socketIOClient("http://localhost:5000/");
+const socket = socketIOClient('http://localhost:5000/');
 
 export default function MessageList(props) {
-  var [MY_USER_ID, setID] = useState("");
+  var [MY_USER_ID, setID] = useState('');
   const [messages, setMessages] = useState([]);
   const [change, setChange] = useState(false);
   const [lastMsgId, setLastMsgId] = useState(0);
@@ -33,24 +33,24 @@ export default function MessageList(props) {
 
   const init = () => {
     axios
-      .get("http://localhost:5000/api/user/getUserName", {
+      .get('http://localhost:5000/api/user/getUserName', {
         headers: {
-          "milaap-auth-token": localStorage.getItem("milaap-auth-token"),
-        },
+          'milaap-auth-token': localStorage.getItem('milaap-auth-token')
+        }
       })
       .then((resp) => {
         setID(resp.data.username);
-        socket.on("newMessage", (data) => {
+        socket.on('newMessage', (data) => {
           // console.clear();
-          console.log("New Message Arrived");
+          console.log('New Message Arrived');
 
-          if (props.roomName !== "dashboard" && data !== resp.data.username)
+          if (props.roomName !== 'dashboard' && data !== resp.data.username)
             fetchMessages();
           // if (props.roomName !== "dashboard") fetchMessages();
         });
       })
       .catch((err) => {
-        console.log(err, "Error in Verifying JWT");
+        console.log(err, 'Error in Verifying JWT');
       });
   };
   useEffect(() => {
@@ -61,8 +61,7 @@ export default function MessageList(props) {
     // console.clear()
     return {
       roomName: props.roomName,
-      lastMsgId:
-        messages.length > 0 ? messages[messages.length - 1].id + 1 : -1,
+      lastMsgId: messages.length > 0 ? messages[messages.length - 1].id + 1 : -1
     };
   };
   const fetchMessages = (change = false) => {
@@ -75,10 +74,10 @@ export default function MessageList(props) {
       reqData.lastMsgId = -1;
     }
     axios
-      .post("http://localhost:5000/api/room/getmsgs", reqData, {
+      .post('http://localhost:5000/api/room/getmsgs', reqData, {
         headers: {
-          "milaap-auth-token": localStorage.getItem("milaap-auth-token"),
-        },
+          'milaap-auth-token': localStorage.getItem('milaap-auth-token')
+        }
       })
       .then((res) => {
         let tempMsg = res.data.msgs;
@@ -108,7 +107,7 @@ export default function MessageList(props) {
     //getMessages();
     // console.clear();
     // console.log(props.roomName);
-    if (props.roomName !== "dashboard") fetchMessages(true);
+    if (props.roomName !== 'dashboard') fetchMessages(true);
 
     //If you are on a limited DataPack, Comment this code segment and the one at
     //the end of useEffect function - (the one with return clearInterval...), to
