@@ -39,28 +39,6 @@ import './Controls.css';
 const socket = socketIOClient('http://localhost:5000/');
 
 class Controls extends Component {
-  getActive = () => {
-    axios
-      .post(
-        'http://localhost:5000/api/room/getActive',
-        {
-          roomName: this.props.roomName
-        },
-        {
-          headers: {
-            'milaap-auth-token': localStorage.getItem('milaap-auth-token')
-          }
-        }
-      )
-      .then((res) => {
-        if (!res.data.active.length) {
-        }
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  };
-
   constructor(props) {
     super(props);
     this.state = {
@@ -72,28 +50,15 @@ class Controls extends Component {
       remotePeersID: new Set(),
       calls: new Array(),
       connectedPeers: new Set(),
-      friendtkn: ''
+      friendtkn: '',
+      myUsername: ''
     };
     console.log(this.state.roomName);
     this.startScreenShare = this.startScreenShare.bind(this);
     this.startConnection = this.startConnection.bind(this);
     this.sendCallEndedSignal = this.sendCallEndedSignal.bind(this);
 
-    /* TODO:  Move Call to appropriate position, and replace by generalized call. */
-    if (this.state.roomName !== 'dashboard') this.getActive();
 
-    socket.on('userJoined', (data) => {
-      if (this.state.roomName !== 'dashboard') {
-        // YET TO BE TESTED
-        this.getActive();
-      }
-    });
-    socket.on('userOnline', (data) => {
-      if (this.state.roomName !== 'dashboard') this.getActive();
-    });
-    socket.on('userExit', (data) => {
-      if (this.state.roomName !== 'dashboard') this.getActive();
-    });
     this.endCall = this.endCall.bind(this);
   }
 
@@ -108,28 +73,7 @@ class Controls extends Component {
       this.setState({
         roomName: this.props.roomName
       });
-      axios
-        .post(
-          'http://localhost:5000/api/room/getActive',
-          {
-            roomName: this.props.roomName
-          },
-          {
-            headers: {
-              'milaap-auth-token': localStorage.getItem('milaap-auth-token')
-            }
-          }
-        )
-        .then((res) => {
-          if (!res.data.active.length || res.data.active === this.state.active) {
-            this.setState({
-              active: res.data.active
-            });
-          }
-        })
-        .catch((err) => {
-          console.log(err);
-        });
+      this.endCall();
     }
   }
 
@@ -156,6 +100,7 @@ class Controls extends Component {
       $('#context').removeClass().addClass(e.target.id);
     } catch (err) {
       console.log('The selected stream is old');
+      console.log(err);
     }
   };
 
@@ -181,6 +126,7 @@ class Controls extends Component {
   updateSelfPeerInfo(self, peer, id, type) {
     console.log(self.state);
     var isVideo = type === 'video' ? 1 : 0;
+    console.log(isVideo);
     if (self.state.myPeers[isVideo] !== 0) {
       self.state.myPeers[isVideo].destroy();
       self.deleteAllVideoElements();
@@ -196,6 +142,7 @@ class Controls extends Component {
       myPeers: peers,
       myIds: myIDs
     });
+    console.log(self.state);
   }
 
   async startScreenShare(type, next) {
@@ -281,6 +228,9 @@ class Controls extends Component {
         })
         .then((resp) => {
           console.log(resp.data);
+          self.setState({
+            myUsername: resp.data.username
+          });
           onlineArray.forEach((val, index) => {
             if (val.username === resp.data.username && val.type === type) {
               return;
@@ -400,7 +350,8 @@ connectedPeers: connectedPeers,
     if (isAnswer) {
       friendtkn = call.peer;
       console.log('Connected to ' + friendtkn);
-      this.createNotif('Member joined', `${friendtkn} joined the call`, 'info');
+      console.log(call.metadata);
+      this.createNotif('Member joined', `${call.metadata} joined the call`, 'info');
     }
     var tracks = media.getTracks();
     var track = tracks[0];
@@ -424,14 +375,22 @@ connectedPeers: connectedPeers,
     if (isAnswer) {
       thiscall.answer(media);
     } else {
-      thiscall = peer.call(friendtkn, media);
+      console.log(media.getTracks());
+      thiscall = peer.call(friendtkn, media, { metadata: this.state.myUsername });
     }
-    self.addHandlersToCall(self, thiscall, friendtkn, peer, isAnswer);
-    console.log('exit4d');
+    self.addHandlersToCall(
+      self,
+      thiscall,
+      friendtkn,
+      thiscall.metadata,
+      peer,
+      isAnswer
+    );
+    //console.log('exit4d');
   }
 
   // Add Event handlers to the thiscall call - error, stream used as of now.
-  addHandlersToCall(self, thiscall, friendtkn, peer, isAnswer) {
+  addHandlersToCall(self, thiscall, friendtkn, username, peer, isAnswer) {
     // Triggered when an error is observed in connection.
     thiscall.on('error', (err) => {
       // TODO: Add condition to close the connection.
@@ -453,6 +412,7 @@ connectedPeers: connectedPeers,
 
     // Triggered when receiving a stream from peer.
     thiscall.on('stream', function (stream) {
+      console.log(stream.getTracks());
       console.log('stream received from' + thiscall.peer);
       var calls = self.state.calls;
       console.log(calls);
@@ -490,13 +450,13 @@ connectedPeers: connectedPeers,
         calls: [...calls, thiscall]
         // calls: calls,
       });
-      self.createStream(self, stream, friendtkn);
+      self.createStream(self, stream, friendtkn, username);
     });
   }
 
   // Add event handlers to the incoming stream and do some other processing,
   // before being sent to the video object to be displayed on screen.
-  createStream(self, stream, friendtkn) {
+  createStream(self, stream, friendtkn, username) {
     var tracks = stream.getTracks();
     var track = tracks[0];
 
@@ -524,31 +484,48 @@ connectedPeers: connectedPeers,
 
     console.log(stream.getTracks());
 
-    self.createVideoElement(self, stream, friendtkn);
+    self.createVideoElement(self, stream, friendtkn, username);
 
     // self.videoRef.current.srcObject = stream;
   }
 
   // Creates a new video element to show the stream passed to it.
-  createVideoElement(self, stream, friendtkn) {
+  createVideoElement(self, stream, friendtkn, username) {
+    const wrapper = document.createElement('div');
     const video = document.createElement('video');
+    const nameTag = document.createElement('div');
+    nameTag.classList.add('name-label');
+    nameTag.innerText = username || 'me';
     video.width = '200';
     video.id = friendtkn;
+    if (video.id == 'me') {
+      video.muted = 'true';
+    }
     video.height = '350';
     video.srcObject = stream;
     video.autoplay = true;
     video.onclick = self.switchContext;
-    document.getElementById('videos').appendChild(video);
+    wrapper.appendChild(video);
+    wrapper.appendChild(nameTag);
+    document.getElementById('videos').appendChild(wrapper);
+  }
+
+  clearContext() {
+    const context = document.getElementById('context');
+    if (context != null) {
+      context.srcObject = null;
+    }
   }
 
   deleteVideoElement(id) {
     const video = document.getElementById(id);
     const context = $('#context');
     if (video) {
+      video.nextElementSibling.remove();
       video.remove();
     }
     if (context.hasClass(id)) {
-      context.remove();
+      this.clearContext();
     }
   }
 
@@ -558,7 +535,8 @@ let videos = document.getElementById("videos");
 videos.empty();
 */
     $('#videos').empty();
-    $('#context').remove();
+    //$('#context').empty();
+    this.clearContext();
   }
 
   sendCallEndedSignal() {
@@ -598,16 +576,33 @@ videos.empty();
             val.destroy();
           }
         });
-        next();
+        // Clear all state variables associated with calls.
+        this.setState({
+          myIds: [0, 0],
+          myPeers: [0, 0],
+          // Use Sets instead of Arrays to prevent duplicates.
+          remotePeers: new Set(),
+          remotePeersID: new Set(),
+          calls: new Array(),
+          connectedPeers: new Set(),
+          friendtkn: ''
+        });
+        if (next) {
+          next();
+        }
+        return;
       })
       .catch((err) => {
         console.log(err);
-        next(false, 'Error');
+        if (next) {
+          next(false, 'Error');
+        }
+        return;
       });
   }
 
-  endCall(next) {
-    this.sendRequestToEndCall(next);
+  async endCall(next) {
+    await this.sendRequestToEndCall(next);
     if (this.state.myMediaStreamObj) {
       this.state.myMediaStreamObj.getTracks().forEach((track) => {
         console.log(track);
@@ -620,17 +615,6 @@ videos.empty();
         myMediaStreamObj: null
       });
     }
-    // Clear all state variables associated with calls.
-    this.setState({
-      myIds: [0, 0],
-      myPeers: [0, 0],
-      // Use Sets instead of Arrays to prevent duplicates.
-      remotePeers: new Set(),
-      remotePeersID: new Set(),
-      calls: new Array(),
-      connectedPeers: new Set(),
-      friendtkn: ''
-    });
     // Add by appropriate UI changes which clears the screen.
     this.deleteAllVideoElements();
   }
@@ -671,19 +655,6 @@ videos.empty();
           </AwesomeButtonProgress>
         </Row>
         <br />
-        <h3>Members</h3>
-        <ListGroup flush>
-          {this.state.active
-            ? this.state.active.map((user) => {
-                return (
-                  <ListGroupItem key={Math.random()}>
-                    <Spinner type="grow" size="sm" variant="success" />
-                    {user.username}
-                  </ListGroupItem>
-                );
-              })
-            : ' '}
-        </ListGroup>
       </Container>
     );
   }

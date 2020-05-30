@@ -76,7 +76,7 @@ class DefaultHeader extends Component {
       roomName: this.state.roomName
     };
     axios
-      .post('http://localhost:5000/api/user/adduser', reqData, {
+      .post('http://localhost:5000/api/room/createroom', reqData, {
         headers: {
           'milaap-auth-token': localStorage.getItem('milaap-auth-token')
         }
@@ -215,9 +215,10 @@ class DefaultHeader extends Component {
           isOpen={this.state.modal}
           toggle={this.toggle}
           className={this.props.className}>
-          <ModalHeader toggle={this.toggle}>Add Friends</ModalHeader>
+          <ModalHeader toggle={this.toggle}>Create Room</ModalHeader>
           <ModalBody>
             <Form>
+              {/*
               <InputGroup className="mb-3">
                 <InputGroupAddon addonType="prepend">
                   <InputGroupText>
@@ -232,6 +233,7 @@ class DefaultHeader extends Component {
                   onChange={this.handleFriendChange}
                 />
               </InputGroup>
+              */}
               <InputGroup className="mb-3">
                 <InputGroupAddon addonType="prepend">
                   <InputGroupText>
