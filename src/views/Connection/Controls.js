@@ -432,6 +432,7 @@ connectedPeers: connectedPeers,
     if (isAnswer) {
       thiscall.answer(media);
     } else {
+      console.log(media.getTracks());
       thiscall = peer.call(friendtkn, media, { metadata: this.state.myUsername });
     }
     self.addHandlersToCall(self, thiscall, friendtkn, peer, isAnswer);
@@ -461,6 +462,7 @@ connectedPeers: connectedPeers,
 
     // Triggered when receiving a stream from peer.
     thiscall.on('stream', function (stream) {
+      console.log(stream.getTracks());
       console.log('stream received from' + thiscall.peer);
       var calls = self.state.calls;
       console.log(calls);
@@ -542,11 +544,21 @@ connectedPeers: connectedPeers,
     const video = document.createElement('video');
     video.width = '200';
     video.id = friendtkn;
+    if(video.id == "me") {
+      video.muted = "true";
+    }
     video.height = '350';
     video.srcObject = stream;
     video.autoplay = true;
     video.onclick = self.switchContext;
     document.getElementById('videos').appendChild(video);
+  }
+
+  clearContext() {
+    const context = document.getElementById('context');
+    if(context != null) {
+      context.srcObject = null;
+    }
   }
 
   deleteVideoElement(id) {
@@ -556,7 +568,7 @@ connectedPeers: connectedPeers,
       video.remove();
     }
     if (context.hasClass(id)) {
-      context.remove();
+      this.clearContext();
     }
   }
 
@@ -567,10 +579,7 @@ videos.empty();
 */
     $('#videos').empty();
     //$('#context').empty();
-    const context = document.getElementById('context');
-    if(context != null) {
-      context.srcObject = null;
-    }
+    this.clearContext();
   }
 
   sendCallEndedSignal() {
