@@ -69,10 +69,7 @@ class Room extends Component {
 
   render() {
     return (
-      <Container className="m-0 p-0 animated fadeIn">
-        <center>
-          <h1>{this.state.roomName}</h1>
-        </center>
+      <Container className="room">
         <video id="context" autoPlay></video>
         <Row className="m-0 p-0" id="videos"></Row>
       </Container>

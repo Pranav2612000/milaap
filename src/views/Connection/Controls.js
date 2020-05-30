@@ -409,7 +409,7 @@ connectedPeers: connectedPeers,
       friendtkn = call.peer;
       console.log('Connected to ' + friendtkn);
       console.log(call.metadata);
-      this.createNotif('Member joined', `${friendtkn} joined the call`, 'info');
+      this.createNotif('Member joined', `${call.metadata} joined the call`, 'info');
     }
     var tracks = media.getTracks();
     var track = tracks[0];
@@ -436,12 +436,19 @@ connectedPeers: connectedPeers,
       console.log(media.getTracks());
       thiscall = peer.call(friendtkn, media, { metadata: this.state.myUsername });
     }
-    self.addHandlersToCall(self, thiscall, friendtkn, peer, isAnswer);
+    self.addHandlersToCall(
+      self,
+      thiscall,
+      friendtkn,
+      thiscall.metadata,
+      peer,
+      isAnswer
+    );
     //console.log('exit4d');
   }
 
   // Add Event handlers to the thiscall call - error, stream used as of now.
-  addHandlersToCall(self, thiscall, friendtkn, peer, isAnswer) {
+  addHandlersToCall(self, thiscall, friendtkn, username, peer, isAnswer) {
     // Triggered when an error is observed in connection.
     thiscall.on('error', (err) => {
       // TODO: Add condition to close the connection.
@@ -501,13 +508,13 @@ connectedPeers: connectedPeers,
         calls: [...calls, thiscall]
         // calls: calls,
       });
-      self.createStream(self, stream, friendtkn);
+      self.createStream(self, stream, friendtkn, username);
     });
   }
 
   // Add event handlers to the incoming stream and do some other processing,
   // before being sent to the video object to be displayed on screen.
-  createStream(self, stream, friendtkn) {
+  createStream(self, stream, friendtkn, username) {
     var tracks = stream.getTracks();
     var track = tracks[0];
 
@@ -535,14 +542,18 @@ connectedPeers: connectedPeers,
 
     console.log(stream.getTracks());
 
-    self.createVideoElement(self, stream, friendtkn);
+    self.createVideoElement(self, stream, friendtkn, username);
 
     // self.videoRef.current.srcObject = stream;
   }
 
   // Creates a new video element to show the stream passed to it.
-  createVideoElement(self, stream, friendtkn) {
+  createVideoElement(self, stream, friendtkn, username) {
+    const wrapper = document.createElement('div');
     const video = document.createElement('video');
+    const nameTag = document.createElement('div');
+    nameTag.classList.add('name-label');
+    nameTag.innerText = username || 'me';
     video.width = '200';
     video.id = friendtkn;
     if (video.id == 'me') {
@@ -552,7 +563,9 @@ connectedPeers: connectedPeers,
     video.srcObject = stream;
     video.autoplay = true;
     video.onclick = self.switchContext;
-    document.getElementById('videos').appendChild(video);
+    wrapper.appendChild(video);
+    wrapper.appendChild(nameTag);
+    document.getElementById('videos').appendChild(wrapper);
   }
 
   clearContext() {
@@ -566,6 +579,7 @@ connectedPeers: connectedPeers,
     const video = document.getElementById(id);
     const context = $('#context');
     if (video) {
+      video.nextElementSibling.remove();
       video.remove();
     }
     if (context.hasClass(id)) {
