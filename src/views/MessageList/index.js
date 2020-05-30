@@ -83,6 +83,7 @@ export default function MessageList(props) {
         let tempMsg = res.data.msgs;
         if (JSON.stringify(tempMsg) === JSON.stringify(messages)) return;
         //console.clear();
+        // console.clear();
         // alert(1)
         console.log(messages);
         console.log(tempMsg);
@@ -142,6 +143,9 @@ export default function MessageList(props) {
   }, []);
 
   const renderMessages = () => {
+    // console.clear();
+    console.log(messages);
+    console.log(messages.length);
     let i = 0;
     const messageCount = messages.length;
     const tempMessages = [];
@@ -213,12 +217,12 @@ export default function MessageList(props) {
       <Toolbar
         title={props.roomName}
         /*
-      rightItems={[
-        <ToolbarButton key="info" icon="ion-ios-information-circle-outline" />,
-        <ToolbarButton key="video" icon="ion-ios-videocam" />,
-        <ToolbarButton key="phone" icon="ion-ios-call" />
-      ]}
-             */
+    rightItems={[
+      <ToolbarButton key="info" icon="ion-ios-information-circle-outline" />,
+      <ToolbarButton key="video" icon="ion-ios-videocam" />,
+      <ToolbarButton key="phone" icon="ion-ios-call" />
+    ]}
+           */
       />
 
       <div className="message-list-container">{renderMessages()}</div>

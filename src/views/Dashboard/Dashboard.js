@@ -24,34 +24,39 @@ import {
 import { CustomTooltips } from '@coreui/coreui-plugin-chartjs-custom-tooltips';
 import { getStyle, hexToRgba } from '@coreui/coreui/dist/js/coreui-utilities';
 import DefaultAside from '../../containers/DefaultLayout/DefaultAside';
+import PeerHandler from '../../containers/DefaultLayout/peerHandler';
 const axios = require('axios');
 class Dashboard extends Component {
   constructor(props) {
     super(props);
-
     this.state = {
-      username: this.username
+      username: localStorage.getItem('uname')
     };
   }
 
   componentDidMount() {
     /* Can be changed by getting the username when user logs in. */
-    axios
-      .get('http://localhost:5000/api/user/getUserName', {
-        headers: {
-          'milaap-auth-token': localStorage.getItem('milaap-auth-token')
-        }
-      })
-      .then((resp) => {
-        console.log(resp.data.username);
-        this.setState({ username: resp.data.username });
-      })
-      .catch((err) => {
-        console.log(err, 'Error in Verifying JWT');
-        this.setState({ username: false });
-        // browserHistory.push('/login');
-        // redirectTo('/login');
-      });
+    console.log(this.state.gID);
+    if (!this.state.gID) {
+      axios
+        .get('http://localhost:5000/api/user/getUserName', {
+          headers: {
+            'milaap-auth-token': localStorage.getItem('milaap-auth-token')
+          }
+        })
+        .then((resp) => {
+          console.log(resp.data.username);
+          this.setState({ username: resp.data.username });
+        })
+        .catch((err) => {
+          console.log(err, 'Error in Verifying JWT');
+          this.setState({ username: false });
+          // browserHistory.push('/login');
+          // redirectTo('/login');
+        });
+    } else {
+      console.log(this.state.username);
+    }
   }
 
   loading = () => <div className="animated fadeIn pt-1 text-center">Loading...</div>;
@@ -64,6 +69,7 @@ class Dashboard extends Component {
       <>
         <div className="animated fadeIn ">
           <center>
+            <h1>Welcome {`${this.state.username}`}</h1>
             <h1>Dashboard</h1>
           </center>
         </div>
