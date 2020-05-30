@@ -67,24 +67,23 @@ class DefaultAside extends Component {
       let reqData = {
         roomName
       };
-      axios
-        .post('http://localhost:5000/api/room/enterroom', reqData, {
-          headers: {
-            'milaap-auth-token': localStorage.getItem('milaap-auth-token')
-          }
-        })
-        .then((res) => {
-          console.log(res.data);
-        })
-        .catch((err) => {
-          console.log(err);
-        });
+      // axios
+      //   .post('http://localhost:5000/api/room/enterroom', reqData, {
+      //     headers: {
+      //       'milaap-auth-token': localStorage.getItem('milaap-auth-token')
+      //     }
+      //   })
+      //   .then((res) => {
+      //     console.log(res.data);
+      //   })
+      //   .catch((err) => {
+      //     console.log(err);
+      //   });
       this.setState({ change: !this.state.change });
       var token = localStorage.getItem('milaap-auth-token');
       if (token) {
         const reqHeader = { 'milaap-auth-token': token };
         if (this.props.location.pathname.match('/rooms/')) {
-          var room = this.props.location.pathname.split('/')[2];
           axios
             .post(
               'http://localhost:5000/api/user/getrooms',
@@ -94,9 +93,15 @@ class DefaultAside extends Component {
               }
             )
             .then((res) => {
-              alert(room);
-              if (res.data.rooms.indexOf(room) === -1) {
-                return <Redirect to={{ pathname: '/join', room: room }} />;
+              try {
+                if (res.data.rooms.indexOf(this.state.roomName) === -1) {
+                  this.setState({ redirect: true });
+                } else {
+                  this.props.history.push(`/rooms/${this.state.roomName}`);
+                  // return <Redirect to={{ pathname: `/rooms/${room}` }} />;
+                }
+              } catch {
+                this.setState({ redirect: true });
               }
             })
             .catch((err) => {
@@ -122,130 +127,135 @@ class DefaultAside extends Component {
 
   render() {
     // eslint-disable-next-line
+
     const { children, ...attributes } = this.props;
 
     return (
-      <React.Fragment>
-        <Nav tabs>
-          <NavItem>
-            <NavLink
-              className={classNames({ active: this.state.activeTab === '1' })}
-              onClick={() => {
-                this.toggle('1');
-              }}>
-              <i className="icon-list"></i>
-            </NavLink>
-          </NavItem>
-          <NavItem>
-            <NavLink
-              className={classNames({ active: this.state.activeTab === '2' })}
-              onClick={() => {
-                this.toggle('2');
-              }}>
-              <i className="icon-speech"></i>
-            </NavLink>
-          </NavItem>
-          <NavItem>
-            <NavLink
-              className={classNames({ active: this.state.activeTab === '3' })}
-              onClick={() => {
-                this.toggle('3');
-              }}>
-              <i className="icon-settings"></i>
-            </NavLink>
-          </NavItem>
-        </Nav>
-        <TabContent activeTab={this.state.activeTab}>
-          <TabPane tabId="1">
-            <Controls roomName={this.state.roomName} />
-          </TabPane>
+      <>
+        {this.state.redirect === true && (
+          <Redirect to={{ pathname: '/join', room: this.state.roomName }} />
+        )}
+        <React.Fragment>
+          <Nav tabs>
+            <NavItem>
+              <NavLink
+                className={classNames({ active: this.state.activeTab === '1' })}
+                onClick={() => {
+                  this.toggle('1');
+                }}>
+                <i className="icon-list"></i>
+              </NavLink>
+            </NavItem>
+            <NavItem>
+              <NavLink
+                className={classNames({ active: this.state.activeTab === '2' })}
+                onClick={() => {
+                  this.toggle('2');
+                }}>
+                <i className="icon-speech"></i>
+              </NavLink>
+            </NavItem>
+            <NavItem>
+              <NavLink
+                className={classNames({ active: this.state.activeTab === '3' })}
+                onClick={() => {
+                  this.toggle('3');
+                }}>
+                <i className="icon-settings"></i>
+              </NavLink>
+            </NavItem>
+          </Nav>
+          <TabContent activeTab={this.state.activeTab}>
+            <TabPane tabId="1">
+              <Controls roomName={this.state.roomName} />
+            </TabPane>
 
-          <TabPane tabId="2" className="p-3" key={this.state.change}>
-            <MessageView roomName={this.state.roomName} />
-          </TabPane>
+            <TabPane tabId="2" className="p-3" key={this.state.change}>
+              <MessageView roomName={this.state.roomName} />
+            </TabPane>
 
-          <TabPane tabId="3" className="p-3">
-            <h6>Settings</h6>
+            <TabPane tabId="3" className="p-3">
+              <h6>Settings</h6>
 
-            <div className="aside-options">
-              <div className="clearfix mt-4">
-                <small>
-                  <b>Option 1</b>
-                </small>
-                <AppSwitch
-                  className={'float-right'}
-                  variant={'pill'}
-                  label
-                  color={'success'}
-                  defaultChecked
-                  size={'sm'}
-                />
-              </div>
-              <div>
-                <small className="text-muted">
-                  Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do
-                  eiusmod tempor incididunt ut labore et dolore magna aliqua.
-                </small>
-              </div>
-            </div>
-
-            <div className="aside-options">
-              <div className="clearfix mt-3">
-                <small>
-                  <b>Option 2</b>
-                </small>
-                <AppSwitch
-                  className={'float-right'}
-                  variant={'pill'}
-                  label
-                  color={'success'}
-                  size={'sm'}
-                />
-              </div>
-              <div>
-                <small className="text-muted">
-                  Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do
-                  eiusmod tempor incididunt ut labore et dolore magna aliqua.
-                </small>
-              </div>
-            </div>
-
-            <div className="aside-options">
-              <div className="clearfix mt-3">
-                <small>
-                  <b>Option 3</b>
-                </small>
-                <AppSwitch
-                  className={'float-right'}
-                  variant={'pill'}
-                  label
-                  color={'success'}
-                  defaultChecked
-                  size={'sm'}
-                  disabled
-                />
+              <div className="aside-options">
+                <div className="clearfix mt-4">
+                  <small>
+                    <b>Option 1</b>
+                  </small>
+                  <AppSwitch
+                    className={'float-right'}
+                    variant={'pill'}
+                    label
+                    color={'success'}
+                    defaultChecked
+                    size={'sm'}
+                  />
+                </div>
                 <div>
-                  <small className="text-muted">Option disabled.</small>
+                  <small className="text-muted">
+                    Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do
+                    eiusmod tempor incididunt ut labore et dolore magna aliqua.
+                  </small>
                 </div>
               </div>
-            </div>
 
-            <div className="aside-options">
-              <div className="clearfix mt-3">
-                <small>
-                  <b>Option 4</b>
-                </small>
-                <AppSwitch
-                  className={'float-right'}
-                  variant={'pill'}
-                  label
-                  color={'success'}
-                  defaultChecked
-                  size={'sm'}
-                />
+              <div className="aside-options">
+                <div className="clearfix mt-3">
+                  <small>
+                    <b>Option 2</b>
+                  </small>
+                  <AppSwitch
+                    className={'float-right'}
+                    variant={'pill'}
+                    label
+                    color={'success'}
+                    size={'sm'}
+                  />
+                </div>
+                <div>
+                  <small className="text-muted">
+                    Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do
+                    eiusmod tempor incididunt ut labore et dolore magna aliqua.
+                  </small>
+                </div>
               </div>
-            </div>
-            {/* 
+
+              <div className="aside-options">
+                <div className="clearfix mt-3">
+                  <small>
+                    <b>Option 3</b>
+                  </small>
+                  <AppSwitch
+                    className={'float-right'}
+                    variant={'pill'}
+                    label
+                    color={'success'}
+                    defaultChecked
+                    size={'sm'}
+                    disabled
+                  />
+                  <div>
+                    <small className="text-muted">Option disabled.</small>
+                  </div>
+                </div>
+              </div>
+
+              <div className="aside-options">
+                <div className="clearfix mt-3">
+                  <small>
+                    <b>Option 4</b>
+                  </small>
+                  <AppSwitch
+                    className={'float-right'}
+                    variant={'pill'}
+                    label
+                    color={'success'}
+                    defaultChecked
+                    size={'sm'}
+                  />
+                </div>
+              </div>
+              {/* 
             <hr />
             <h6>System Utilization</h6>
 
@@ -263,7 +273,7 @@ class DefaultAside extends Component {
               </small>
             </div>
             <Progress className="progress-xs" color="warning" value="70" /> */}
-            {/* <small className="text-muted">11444GB/16384MB</small>
+              {/* <small className="text-muted">11444GB/16384MB</small>
 
             <div className="text-uppercase mb-1 mt-2">
               <small><b>SSD 1 Usage</b></small>
@@ -276,9 +286,10 @@ class DefaultAside extends Component {
             </div>
             <Progress className="progress-xs" color="success" value="10" />
             <small className="text-muted">25GB/256GB</small> */}
-          </TabPane>
-        </TabContent>
-      </React.Fragment>
+            </TabPane>
+          </TabContent>
+        </React.Fragment>
+      </>
     );
   }
 }

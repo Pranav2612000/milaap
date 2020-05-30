@@ -241,6 +241,7 @@ router.post('/enterroom', auth, async (req, res) => {
       console.log('not found in users.');
     }
     /* Check if username in in room.tempusers. */
+
     if (userExists == false) {
       room._doc.guests.forEach((val, index) => {
         if (val == username) {
@@ -250,6 +251,25 @@ router.post('/enterroom', auth, async (req, res) => {
       });
       if (i == -1) {
         console.log('not found in guests too.');
+        /* If username not found, add it to temp users. */
+        var guestArray = room._doc.guests;
+        guestArray.push(username);
+        room._doc.guests = guestArray;
+        room.markModified('guests');
+        room.save((err) => {
+          if (err) {
+            console.log('Error Adding user');
+          } else {
+            console.log(room._doc.guests);
+            console.log('Guest User Added successfully');
+            return res.status(200).json({
+              msg: 'Success',
+              msgs: room._doc.msgArray,
+              users: room._doc.users,
+              guests: room._doc.guests
+            });
+          }
+        });
       }
     }
 
@@ -257,7 +277,9 @@ router.post('/enterroom', auth, async (req, res) => {
       /* If username exits return with all userful info. */
       return res.status(200).json({
         msg: 'Success',
-        msgs: room._doc.msgArray
+        msgs: room._doc.msgArray,
+        users: room._doc.users,
+        guests: room._doc.guests
       });
     } else {
       /* If username in none exit with appropriate error msg. */
@@ -265,8 +287,6 @@ router.post('/enterroom', auth, async (req, res) => {
     }
   });
 });
-
-//, inCall: room._doc.online
 
 router.post('/getActive', auth, async (req, res) => {
   const roomName = req.body.roomName;
