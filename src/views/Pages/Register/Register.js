@@ -15,7 +15,7 @@ import {
 } from 'reactstrap';
 import axios from 'axios';
 import ReactNotification, { store } from 'react-notifications-component';
-import { Redirect } from 'react-router-dom';
+import { Redirect, Link } from 'react-router-dom';
 class Register extends Component {
   constructor(props) {
     super(props);
@@ -59,8 +59,25 @@ class Register extends Component {
       })
       .then((res) => {
         console.log(res);
-        this.setState({ redirect: true });
         console.log(res);
+        if(res.data.err == 'UEXIST') {
+          console.log('username exists');
+          store.addNotification({
+            title: 'Error',
+            message: 'You are late! Username already exists, choose a different username.',
+            type: 'warning',
+            // insert: "top",
+            container: 'top-right',
+            animationIn: ['animated', 'fadeIn'],
+            animationOut: ['animated', 'fadeOut'],
+            dismiss: {
+              duration: 3000,
+              pauseOnHover: true
+            }
+          });
+          return;
+        }
+        this.setState({ redirect: true });
       })
       .catch((err) => {
         store.addNotification({
@@ -156,6 +173,9 @@ class Register extends Component {
                         Create Account
                       </Button>
                     </Form>
+                    <center>
+                    <p> Already have an account?<Link to="/login">Login</Link></p>
+                    </center>
                   </CardBody>
                 </Card>
               </Col>

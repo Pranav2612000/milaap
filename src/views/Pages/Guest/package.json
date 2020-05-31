@@ -1,0 +1,6 @@
+{
+  "name": "Guest",
+  "version": "0.0.0",
+  "private": true,
+  "main": "./Guest.js"
+}

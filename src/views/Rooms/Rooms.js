@@ -70,7 +70,7 @@ class Room extends Component {
   render() {
     return (
       <Container className="room">
-        <video id="context" autoPlay></video>
+        <video id="context" controls autoPlay></video>
         <Row className="m-0 p-0" id="videos"></Row>
         <PeerHandler></PeerHandler>
       </Container>

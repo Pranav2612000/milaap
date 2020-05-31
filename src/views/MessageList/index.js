@@ -143,7 +143,7 @@ export default function MessageList(props) {
   }, []);
 
   const renderMessages = () => {
-    // console.clear();
+    // console.clear()
     console.log(messages);
     console.log(messages.length);
     let i = 0;

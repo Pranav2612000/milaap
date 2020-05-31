@@ -5,7 +5,7 @@
   background: white;
   border: 1px solid #eeeef1;
   position: fixed;
-  width: 30%;
+  width: 25%;
   bottom: 10px;
 }
 
@@ -24,13 +24,12 @@
   font-size: 14px;
   height: 40px;
   background: none;
-  width: 20vw;
+  width: 15vw;
 }
 
 .compose-button {
-  float: right;
+  float: left;
   flex: 1;
-  margin-left: 12%;
   border: 1px solid grey;
   color: #5585ff;
   border: 2px solid #5585ff;
@@ -38,7 +37,7 @@
   border-radius: 1.5rem;
   font-size: 17px;
   height: 40px;
-  width: 30px;
+  width: 15px;
   cursor: pointer;
 }
 
