@@ -58,7 +58,6 @@ class Controls extends Component {
     this.startConnection = this.startConnection.bind(this);
     this.sendCallEndedSignal = this.sendCallEndedSignal.bind(this);
 
-
     this.endCall = this.endCall.bind(this);
   }
 
@@ -96,6 +95,7 @@ class Controls extends Component {
     try {
       const context = document.getElementById('context');
       context.srcObject = e.target.srcObject;
+      context.style.display = 'inline';
       context.play();
       $('#context').removeClass().addClass(e.target.id);
     } catch (err) {
@@ -515,6 +515,7 @@ connectedPeers: connectedPeers,
     if (context != null) {
       context.srcObject = null;
     }
+    context.style.display = 'none';
   }
 
   deleteVideoElement(id) {
