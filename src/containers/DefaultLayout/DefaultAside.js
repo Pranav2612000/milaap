@@ -30,14 +30,9 @@ import {
   Container,
   Row,
   Collapse,
-  Fade
+  Fade,
+  Spinner
 } from 'reactstrap';
-
-const propTypes = {
-  children: PropTypes.node
-};
-
-const defaultProps = {};
 
 function getRoomFromLocation(locationString) {
   let room = '';
@@ -50,6 +45,7 @@ function getRoomFromLocation(locationString) {
 class DefaultAside extends Component {
   constructor(props) {
     super(props);
+    console.log(props);
 
     let roomName = getRoomFromLocation(this.props.location.pathname);
     this.toggle = this.toggle.bind(this);
@@ -60,52 +56,11 @@ class DefaultAside extends Component {
       path: props.location.pathname
     };
     this.getRoomInfo = this.getRoomInfo.bind(this);
-    this.getRoomInfo(roomName);
-  }
-  componentDidUpdate(prevProps) {
-    if (this.props.location.pathname != prevProps.location.pathname) {
-      let roomName = getRoomFromLocation(this.props.location.pathname);
-      this.setState({
-        roomName
-      });
-      this.getRoomInfo(roomName);
-      this.setState({ change: !this.state.change });
-    }
   }
 
   getRoomInfo(roomName) {
-    let reqData = {
-      roomName
-    };
-    axios
-      .post('http://localhost:5000/api/room/enterroom', reqData, {
-        headers: {
-          'milaap-auth-token': localStorage.getItem('milaap-auth-token')
-        }
-      })
-      .then((res) => {
-        if (res.data.err == 'UEXISTS') {
-          console.log(
-            'Someone with the same username already exists. Change your username and try again.'
-          );
-          localStorage.removeItem('milaap-auth-token');
-          this.props.history.push('/join/' + this.state.roomName);
-        }
-        if (res.data.err == 'NOROOM') {
-          //localStorage.removeItem('milaap-auth-token');
-          //this.props.history.push("/dashboard");
-        }
-        console.log(res.data);
-        this.setState({
-          msgs: res.data.msgs,
-          users: res.data.users,
-          guests: res.data.guests
-        });
-      })
-      .catch((err, res) => {
-        console.log(err.data);
-        console.log(err.err);
-      });
+    console.log("nothing to say.");
+    return;
   }
 
   componentDidMount() {
@@ -122,7 +77,7 @@ class DefaultAside extends Component {
 
   render() {
     // eslint-disable-next-line
-
+    console.log(this.props);
     const { children, ...attributes } = this.props;
 
     return (
@@ -160,17 +115,17 @@ class DefaultAside extends Component {
           <TabPane tabId="1">
             <Container className="bg-dark">
               <Row>
-                <Controls roomName={this.state.roomName} />
-                <MemberList
-                  users={this.state.users}
-                  guests={this.state.guests}
-                  roomName={this.state.roomName}
-                />
+                <Controls roomName={this.props.roomName} />
+                  <MemberList
+                    users={this.props.users}
+                    guests={this.props.guests}
+                    roomName={this.props.roomName}
+                  />
               </Row>
             </Container>
           </TabPane>
           <TabPane tabId="2" className="p-3 bg-dark" key={this.state.change}>
-            <MessageView roomName={this.state.roomName} />
+            <MessageView roomName={this.props.roomName} msgs={this.props.msgs}/>
           </TabPane>
 
           <TabPane tabId="3" className="p-3 bg-dark">
@@ -291,8 +246,5 @@ class DefaultAside extends Component {
     );
   }
 }
-
-DefaultAside.propTypes = propTypes;
-DefaultAside.defaultProps = defaultProps;
 
 export default withRouter(DefaultAside);

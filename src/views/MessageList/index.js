@@ -12,8 +12,9 @@ import { Col } from 'reactstrap';
 const socket = socketIOClient('http://localhost:5000/');
 
 export default function MessageList(props) {
+  console.log(props);
   var [MY_USER_ID, setID] = useState('');
-  const [messages, setMessages] = useState([]);
+  const [messages, setMessages] = useState(props.msgs);
   const [change, setChange] = useState(false);
   const [lastMsgId, setLastMsgId] = useState(0);
 
@@ -55,23 +56,30 @@ export default function MessageList(props) {
   };
   useEffect(() => {
     init();
-  });
+  }, [props.roomName]);
+
+  useEffect(() => {
+    setMessages(props.msgs);
+  }, [props.roomName])
 
   const getReqData = () => {
     // console.clear()
     return {
       roomName: props.roomName,
-      lastMsgId: messages.length > 0 ? messages[messages.length - 1].id + 1 : -1
+      lastMsgId: messages && messages.length > 0 ? messages[messages.length - 1].id + 1 : -1
     };
   };
   const fetchMessages = (change = false) => {
+    return;
     // console.clear();
     console.log(change);
     var reqData = getReqData();
     // console.clear();
     // console.log(reqData);
     if (change == true) {
-      reqData.lastMsgId = -1;
+      if(reqData) {
+        reqData.lastMsgId = -1;
+      }
     }
     axios
       .post('http://localhost:5000/api/room/getmsgs', reqData, {
@@ -144,6 +152,10 @@ export default function MessageList(props) {
 
   const renderMessages = () => {
     // console.clear()
+    if(!messages) {
+      console.log("no messages");
+      return;
+    }
     console.log(messages);
     console.log(messages.length);
     let i = 0;

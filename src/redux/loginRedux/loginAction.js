@@ -1,4 +1,4 @@
-import { LOGIN_FAILURE, LOGIN_REQUEST, LOGIN_SUCCESS, LOGOUT } from './loginActionTypes';
+import { LOGIN_FAILURE, LOGIN_REQUEST, LOGIN_SUCCESS, LOGOUT, REDIRECT_TO_JOIN } from './loginActionTypes';
 import ReactNotification, { store } from 'react-notifications-component';
 import axios from 'axios';
 import Notifications, { success, error } from 'react-notification-system-redux';
@@ -41,6 +41,12 @@ export const loginFailure = (error) => {
     return {
         type: LOGIN_FAILURE,
         error: error
+    }
+}
+
+export const redirectToJoinPage = () => {
+    return {
+        type: REDIRECT_TO_JOIN,
     }
 }
 

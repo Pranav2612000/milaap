@@ -1,6 +1,7 @@
 import React, { Component, lazy, Suspense } from 'react';
 import './Room.css';
 import { store } from 'react-notifications-component';
+import { connect } from 'react-redux';
 import { Bar, Line } from 'react-chartjs-2';
 import {
   Badge,
@@ -24,6 +25,7 @@ import {
   Row,
   Table
 } from 'reactstrap';
+import * as action from '../../redux/roomRedux/roomAction';
 import { CustomTooltips } from '@coreui/coreui-plugin-chartjs-custom-tooltips';
 import { getStyle, hexToRgba } from '@coreui/coreui/dist/js/coreui-utilities';
 import DefaultAside from '../../containers/DefaultLayout/DefaultAside';
@@ -38,6 +40,7 @@ class Room extends Component {
     this.state = {
       roomName: roomName
     };
+    this.props.enterRoom(roomName);
   }
 
   componentDidUpdate(prevProps) {
@@ -46,6 +49,8 @@ class Room extends Component {
         {
           roomName: this.props.match.params.roomname
         },
+        
+        /*
         () => {
           store.addNotification({
             title: 'Room changed',
@@ -61,13 +66,16 @@ class Room extends Component {
             }
           });
         }
+        */
       );
+      this.props.enterRoom(this.props.match.params.roomname);
     }
   }
 
   loading = () => <div className="animated fadeIn pt-1 text-center">Loading...</div>;
 
   render() {
+    console.log(this.props);
     return (
       <div class="app-body" id="inner-aside-container">
         <main class="main">
@@ -77,11 +85,34 @@ class Room extends Component {
           </Container>
         </main>
         <aside className="aside-menu bg-dark" display="md">
-          <DefaultAside />
+          <DefaultAside 
+            roomName={this.props.roomName}
+            msgs={this.props.msgs}
+            users={this.props.users}
+            guests={this.props.guests}
+            loading={this.props.loading}
+          />
         </aside>
       </div>
     );
   }
 }
 
-export default Room;
+const mapStateToProps = (state) => {
+  console.log(state);
+  return {
+    roomName: state.roomReducer.currentRoom,
+    guests: state.roomReducer.guests,
+    users: state.roomReducer.users,
+    msgs: state.roomReducer.msgs,
+    loading: state.roomReducer.loading
+  };
+}
+
+const mapDispatchToProps = (dispatch) => {
+  return {
+    enterRoom: (room) => dispatch(action.enterRoom(room))
+  };
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(Room);

@@ -1,4 +1,4 @@
-import { LOGIN_FAILURE, LOGIN_REQUEST, LOGIN_SUCCESS, LOGOUT} from './loginActionTypes';
+import { LOGIN_FAILURE, LOGIN_REQUEST, LOGIN_SUCCESS, LOGOUT, REDIRECT_TO_JOIN } from './loginActionTypes';
 
 const initalState = {
     loading: false,
@@ -31,6 +31,14 @@ export const loginReducer = (state = initalState, action) => {
             return {
                 ...state,
                 loggedIn: false,
+            }
+        case REDIRECT_TO_JOIN:
+            console.log('redirecting to join page.');
+            return {
+                ...state,
+                loading: false,
+                loggedIn: false,
+                redirectToJoin: true,
             }
         default: 
             console.log('def');
