@@ -2,7 +2,7 @@ import React, { Component, lazy, Suspense } from 'react';
 import { store } from 'react-notifications-component';
 import { Bar, Line } from 'react-chartjs-2';
 import socketIOClient from 'socket.io-client';
-import axios from "axios";
+import axios from 'axios';
 import {
   Badge,
   Button,
@@ -47,8 +47,8 @@ class MemberList extends Component {
       users: [],
       guests: [],
       newmember: '',
-      modal: false,
-    }
+      modal: false
+    };
     this.toggle = this.toggle.bind(this);
     this.addMember = this.addMember.bind(this);
     this.handleNewMemberChange = this.handleNewMemberChange.bind(this);
@@ -88,7 +88,7 @@ class MemberList extends Component {
       })
       .then((res) => {
         console.log(res);
-        if(res.status == 200) {
+        if (res.status == 200) {
           this.toggle();
           this.setState({
             users: [...this.state.users, reqData.username]
@@ -139,31 +139,28 @@ class MemberList extends Component {
           {this.state.users && this.state.users.length > 0
             ? this.state.users.map((user) => {
                 return (
-                  <ListGroupItem key={Math.random()}>
+                  <ListGroupItem className="bg-dark" key={Math.random()}>
                     {user}
                   </ListGroupItem>
                 );
               })
-              : 'No members yet'}
+            : 'No members yet'}
         </ListGroup>
-        <br/>
+        <br />
         <ListGroup flush>
           <h5> Guests </h5>
           {this.state.guests && this.state.guests.length > 0
             ? this.state.guests.map((user) => {
                 return (
-                  <ListGroupItem key={Math.random()}>
+                  <ListGroupItem className="bg-dark" key={Math.random()}>
                     {user}
                   </ListGroupItem>
                 );
               })
-              : 'No guests yet'}
+            : 'No guests yet'}
         </ListGroup>
 
-        <Modal
-          isOpen={this.state.modal}
-          toggle={this.toggle}
-        >
+        <Modal isOpen={this.state.modal} toggle={this.toggle}>
           <ModalHeader toggle={this.toggle}>Add Members</ModalHeader>
           <ModalBody>
             <Form>

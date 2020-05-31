@@ -272,7 +272,7 @@ class DefaultLayout extends Component {
     return (
       <React.Fragment>
         <div className="app">
-          <AppHeader fixed>
+          <AppHeader className="navbar navbar-dark bg-dark" fixed>
             <Suspense fallback={this.loading()}>
               <DefaultHeader onLogout={(e) => this.signOut(e)} />
             </Suspense>
@@ -312,7 +312,7 @@ class DefaultLayout extends Component {
             </Container>
             {/*
             <Suspense fallback={this.loading()}>
-              <aside className="aside-menu" display="md">
+              <aside className="aside-menu bg-dark" display="md">
                 <DefaultAside />
               </aside>
             </Suspense>
@@ -324,14 +324,13 @@ class DefaultLayout extends Component {
   }
 }
 const mapStateToProps = (state) => {
-  return {
-  };
-}
+  return {};
+};
 
 const mapDispatchToProps = (dispatch) => {
   return {
     logout: () => dispatch(actions.logout())
-  }
-}
+  };
+};
 
 export default connect(mapStateToProps, mapDispatchToProps)(DefaultLayout);

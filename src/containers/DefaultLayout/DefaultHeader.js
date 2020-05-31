@@ -114,7 +114,7 @@ class DefaultHeader extends Component {
 
     /* TODO: Use Protected Route component. */
     if (this.state.username === false) {
-      return <Redirect to="/login" />;//Choose from landing and login page.
+      return <Redirect to="/login" />; //Choose from landing and login page.
     }
     return (
       <React.Fragment>
@@ -154,7 +154,7 @@ class DefaultHeader extends Component {
           <UncontrolledDropdown nav direction="down">
             <DropdownToggle>
               <NavItem>
-                <NavLink to="#" className="nav-link">
+                <NavLink to="#" className="nav-link text-dark">
                   {this.state.username}
                 </NavLink>
               </NavItem>
