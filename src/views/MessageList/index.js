@@ -83,6 +83,7 @@ export default function MessageList(props) {
         let tempMsg = res.data.msgs;
         if (JSON.stringify(tempMsg) === JSON.stringify(messages)) return;
         //console.clear();
+        // console.clear();
         // alert(1)
         console.log(messages);
         console.log(tempMsg);

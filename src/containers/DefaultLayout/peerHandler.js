@@ -2,6 +2,7 @@ import React from 'react';
 import { Button, Input, Row, Col, Jumbotron } from 'reactstrap';
 import Peer from 'peerjs';
 import { Redirect } from 'react-router-dom';
+import ReactNotification, { store } from 'react-notifications-component';
 
 class PeerHandler extends React.Component {
   constructor() {
@@ -70,6 +71,42 @@ class PeerHandler extends React.Component {
       });
     });
   };
+
+  sharelink(id) {
+    // alert(id);
+    const link = document.querySelector('link[rel=canonical]')
+      ? document.querySelector('link[rel=canonical]').href
+      : document.location.href;
+    if (navigator.share) {
+      navigator
+        .share({
+          title: 'Join via Link',
+          url: link
+        })
+        .then(() => {
+          console.log('Link Shared!');
+        })
+        .catch(console.error);
+    } else {
+      navigator.clipboard
+        .writeText(link)
+        .then(() => {
+          store.addNotification({
+            title: 'Link copied',
+            message: 'Link copied to clipboard!',
+            type: 'success',
+            container: 'top-right',
+            animationIn: ['animated', 'fadeIn'],
+            animationOut: ['animated', 'fadeOut'],
+            dismiss: {
+              duration: 3000,
+              pauseOnHover: true
+            }
+          });
+        })
+        .catch(console.log('Sorry try again'));
+    }
+  }
 
   switchContext = (e) => {
     const context = document.getElementById('context');
@@ -261,6 +298,13 @@ class PeerHandler extends React.Component {
           </Button>
           <Button className="m-4" color="info" onClick={this.shareVideo}>
             {self.state.selfVideoStream ? 'Stop sharing video' : 'Share video'}
+          </Button>
+
+          <Button
+            className="m-4"
+            color="info"
+            onClick={() => this.sharelink(self.state.myID)}>
+            Share link
           </Button>
         </div>
         <br />

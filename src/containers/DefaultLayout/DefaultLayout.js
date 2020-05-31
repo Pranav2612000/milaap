@@ -35,11 +35,29 @@ function getGroupElements(rooms) {
     const groupElem = {};
     groupElem.name = item;
     groupElem.url = '/rooms/' + item;
-    groupElem.icon = 'icon-drop';
+    groupElem.icon = 'icon-screen-desktop';
+    groupElem.state = true;
     groupElements.push(groupElem);
   });
   return groupElements;
 }
+
+function getFriendList(active) {
+  const activeUsers = [];
+  if (active === undefined) {
+    return {};
+  }
+  active.forEach((item, index) => {
+    const friend = {};
+    friend.name = item;
+    // groupElem.url = '/rooms/' + item;
+    friend.icon = 'icon-user';
+    friend.state = false;
+    activeUsers.push(friend);
+  });
+  return activeUsers;
+}
+
 class DefaultLayout extends Component {
   getRooms = async () => {
     const token = localStorage.getItem('milaap-auth-token');
@@ -77,37 +95,56 @@ class DefaultLayout extends Component {
         this.setState({ rooms: rooms });
         const PMList = {};
         const GroupList = getGroupElements(rooms);
-        console.log({ ...GroupList });
-        this.setState({
-          navigation: {
-            items: [
-              {
-                title: true,
-                name: 'PMs',
-                icon: 'icon-puzzle'
-              },
-              PMList,
-              {
-                title: true,
-                name: 'Rooms',
-                icon: 'icon-puzzle',
-                children: [
+        axios
+          .post(
+            'http://localhost:5000/api/room/getActive',
+            {},
+            {
+              headers: {
+                'milaap-auth-token': localStorage.getItem('milaap-auth-token')
+              }
+            }
+          )
+          .then((res) => {
+            console.log(res);
+            var active = res.data.active;
+            console.log(active);
+            const FriendList = getFriendList(active);
+            console.log({ ...GroupList });
+            this.setState({
+              navigation: {
+                items: [
                   {
-                    // title: true,
-                    name: 'No Messages Yet.',
+                    title: true,
+                    name: 'Friends',
+                    icon: 'icon-puzzle'
+                  },
+                  ...FriendList,
+                  {
+                    title: true,
+                    name: 'Rooms',
                     icon: 'icon-puzzle',
-                    badge: {
-                      variant: 'info',
-                      text: 'Add'
-                    },
-                    class: ''
-                  }
+                    children: [
+                      {
+                        // title: true,
+                        name: 'No Messages Yet.',
+                        icon: 'icon-puzzle',
+                        badge: {
+                          variant: 'info',
+                          text: 'Add'
+                        },
+                        class: ''
+                      }
+                    ]
+                  },
+                  ...GroupList
                 ]
-              },
-              ...GroupList
-            ]
-          }
-        });
+              }
+            });
+          })
+          .catch((err) => {
+            console.log(err);
+          });
       })
       .catch((err) => {
         console.log(err);
@@ -117,7 +154,8 @@ class DefaultLayout extends Component {
   constructor(props) {
     super(props);
     var rooms;
-    const PMList = {};
+    var friends;
+    const FriendList = getFriendList(friends);
     const GroupList = getGroupElements(rooms);
     this.state = {
       rooms: [],
@@ -126,10 +164,10 @@ class DefaultLayout extends Component {
         items: [
           {
             title: true,
-            name: 'PMs',
+            name: 'Friends',
             icon: 'icon-puzzle'
           },
-          PMList,
+          FriendList,
           {
             title: true,
             name: 'Rooms',
@@ -160,10 +198,10 @@ class DefaultLayout extends Component {
         items: [
           {
             title: true,
-            name: 'PMs',
+            name: 'Friends',
             icon: 'icon-puzzle'
           },
-          PMList,
+          FriendList,
           {
             title: true,
             name: 'Rooms',
@@ -226,6 +264,7 @@ class DefaultLayout extends Component {
       }
       return <Redirect to={{ pathname: '/login' }} />;
     }
+    console.log(this.props);
     return (
       <React.Fragment>
         <div className="app">
