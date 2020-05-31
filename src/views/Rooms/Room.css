@@ -1,4 +1,10 @@
+audio::-webkit-media-controls-timeline,
+video::-webkit-media-controls-timeline {
+  display: none;
+}
+
 #context {
+  display: none;
   margin-left: 130px;
   margin-top: 5vh;
   max-width: 85vw;
