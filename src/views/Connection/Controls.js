@@ -516,7 +516,6 @@ connectedPeers: connectedPeers,
       context.srcObject = null;
       context.style.display = 'none';
     }
-    context.style.display = 'none';
   }
 
   deleteVideoElement(id) {
