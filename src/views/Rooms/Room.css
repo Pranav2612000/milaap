@@ -22,6 +22,7 @@ video::-webkit-media-controls-timeline {
   background-color: rgba(100, 100, 100, 0.5);
   left: 215px;
 }
+
 @media only screen and (max-width: 900px) {
   #videos {
     left: 10px;

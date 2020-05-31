@@ -91,7 +91,7 @@ class DefaultAside extends Component {
         }
         if(res.data.err == "NOROOM") {
           //localStorage.removeItem('milaap-auth-token');
-          this.props.history.push("/dashboard");
+          //this.props.history.push("/dashboard");
         }
         console.log(res.data);
         this.setState({
@@ -155,8 +155,12 @@ class DefaultAside extends Component {
         </Nav>
         <TabContent activeTab={this.state.activeTab}>
           <TabPane tabId="1">
-            <Controls roomName={this.state.roomName} />
-            <MemberList users = {this.state.users} guests = {this.state.guests}/>
+            <Container>
+              <Row>
+                <Controls roomName={this.state.roomName} />
+                <MemberList users = {this.state.users} guests = {this.state.guests} roomName={this.state.roomName}/>
+              </Row>
+            </Container>
           </TabPane>
             <TabPane tabId="2" className="p-3" key={this.state.change}>
               <MessageView roomName={this.state.roomName} />

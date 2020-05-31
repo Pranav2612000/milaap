@@ -55,9 +55,9 @@ router.post('/createroom', auth, async (req, res) => {
 
 router.post('/addusertoroom', auth, async (req, res) => {
   const host = req.user.id;
-  console.log(user);
   const roomName = req.body.roomName;
   const user = req.body.username;
+  console.log(user);
   rooms.findOne({ roomName: roomName }, async function (err, room) {
     if (err) {
       return res.status(400).json({ err: 'Error Creating Room' });
@@ -70,7 +70,7 @@ router.post('/addusertoroom', auth, async (req, res) => {
           return res.status(400).json({ err: 'Error. Try again.' });
         }
         if (!user_found) {
-          return res.status(400).json({ err: 'Error Registering User' });
+          return res.status(400).json({ err: "User doesn't exits" });
         }
 
         //TODO: Check if host has admin access to room.
@@ -79,28 +79,32 @@ router.post('/addusertoroom', auth, async (req, res) => {
           { $addToSet: { rooms: roomName } },
           function (err, result) {
             if (err) {
-              res.send(err);
+              return res.send(err);
             } else {
               console.log('Updated Successfully');
             }
           }
         );
-      });
-      var userArray = room._doc.users;
-      if (userArray === undefined) {
-        userArray = [];
-      }
-      userArray.push(user);
-      room.markModified('users');
-      room.save((err) => {
-        if (err) {
-          return res.status(400).json({ err: 'Error Adding user' });
-        } else {
-          io.emit('userJoined', req.body);
-          // io.emit('newRoom', req.data);
-          console.log('User Added Successfully');
-          return res.status(200).json({ msg: 'User Added successfully' });
+
+        var userArray = room._doc.users;
+        if (userArray === undefined) {
+          userArray = [];
         }
+        if(userArray.includes(user)) {
+            return res.status(400).json({ err: 'User Already has access.' });
+        }
+        userArray.push(user);
+        room.markModified('users');
+        room.save((err) => {
+          if (err) {
+            return res.status(400).json({ err: 'Error Adding user' });
+          } else {
+            io.emit('userJoined', req.body);
+            // io.emit('newRoom', req.data);
+            console.log('User Added Successfully');
+            return res.status(200).json({ msg: 'User Added successfully' });
+          }
+        });
       });
     }
   });
