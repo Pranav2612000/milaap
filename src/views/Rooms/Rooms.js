@@ -69,17 +69,17 @@ class Room extends Component {
 
   render() {
     return (
-          <div class="app-body" id='inner-aside-container'>
-            <main class="main">
-              <Container className="room">
-                <video id="context" controls autoPlay></video>
-                <Row className="m-0 p-0" id="videos"></Row>
-              </Container>
-            </main>
-            <aside class="aside-menu" display="md">
-                <DefaultAside />
-            </aside>
-          </div>
+      <div class="app-body" id="inner-aside-container">
+        <main class="main">
+          <Container className="room">
+            <video id="context" controls autoPlay></video>
+            <Row className="m-0 p-0" id="videos"></Row>
+          </Container>
+        </main>
+        <aside className="aside-menu bg-dark" display="md">
+          <DefaultAside />
+        </aside>
+      </div>
     );
   }
 }

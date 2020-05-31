@@ -154,7 +154,7 @@ class DefaultHeader extends Component {
           <UncontrolledDropdown nav direction="down">
             <DropdownToggle>
               <NavItem>
-                <NavLink to="#" className="nav-link">
+                <NavLink to="#" className="nav-link text-dark">
                   {this.state.username}
                 </NavLink>
               </NavItem>

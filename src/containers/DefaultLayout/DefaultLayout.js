@@ -272,7 +272,7 @@ class DefaultLayout extends Component {
     return (
       <React.Fragment>
         <div className="app">
-          <AppHeader className="navbar navbar-dark bg-dark border-dark" fixed>
+          <AppHeader className="navbar navbar-dark bg-dark" fixed>
             <Suspense fallback={this.loading()}>
               <DefaultHeader onLogout={(e) => this.signOut(e)} />
             </Suspense>

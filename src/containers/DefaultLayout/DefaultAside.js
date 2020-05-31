@@ -130,9 +130,7 @@ class DefaultAside extends Component {
         <Nav tabs>
           <NavItem>
             <NavLink
-              className={classNames({
-                active: this.state.activeTab === '1'
-              })}
+              className={classNames({ active: this.state.activeTab === '1' })}
               onClick={() => {
                 this.toggle('1');
               }}>
@@ -141,9 +139,7 @@ class DefaultAside extends Component {
           </NavItem>
           <NavItem>
             <NavLink
-              className={classNames({
-                active: this.state.activeTab === '2'
-              })}
+              className={classNames({ active: this.state.activeTab === '2' })}
               onClick={() => {
                 this.toggle('2');
               }}>
@@ -152,9 +148,7 @@ class DefaultAside extends Component {
           </NavItem>
           <NavItem>
             <NavLink
-              className={classNames({
-                active: this.state.activeTab === '3'
-              })}
+              className={classNames({ active: this.state.activeTab === '3' })}
               onClick={() => {
                 this.toggle('3');
               }}>
@@ -164,7 +158,7 @@ class DefaultAside extends Component {
         </Nav>
         <TabContent activeTab={this.state.activeTab}>
           <TabPane tabId="1">
-            <Container className="bg-dark border-dark">
+            <Container className="bg-dark">
               <Row>
                 <Controls roomName={this.state.roomName} />
                 <MemberList
@@ -175,14 +169,11 @@ class DefaultAside extends Component {
               </Row>
             </Container>
           </TabPane>
-          <TabPane
-            tabId="2"
-            className="p-3 bg-dark border-dark"
-            key={this.state.change}>
+          <TabPane tabId="2" className="p-3 bg-dark" key={this.state.change}>
             <MessageView roomName={this.state.roomName} />
           </TabPane>
 
-          <TabPane tabId="3" className="p-3 bg-dark border-dark">
+          <TabPane tabId="3" className="p-3 bg-dark">
             <h6>Settings</h6>
 
             <div className="aside-options">
