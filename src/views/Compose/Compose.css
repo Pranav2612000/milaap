@@ -25,14 +25,15 @@
   height: 40px;
   background: none;
   width: 15vw;
+  border: 1px solid #8d8d8d;
 }
 
 .compose-button {
   float: left;
   flex: 1;
   border: 1px solid grey;
-  color: #5585ff;
-  border: 2px solid #5585ff;
+  color: white;
+  border: 1px solid #8d8d8d;
   background-color: transparent;
   border-radius: 1.5rem;
   font-size: 17px;

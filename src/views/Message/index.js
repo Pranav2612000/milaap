@@ -14,11 +14,11 @@ export default function Message(props) {
         `${startsSequence ? 'start' : ''}`,
         `${endsSequence ? 'end' : ''}`
       ].join(' ')}>
-      {showTimestamp && <div className="timestamp">{friendlyTimestamp}</div>}
+      {showTimestamp && <div className="timestamp bg-dark">{friendlyTimestamp}</div>}
 
-      <div className="bubble-container">
+      <div className="bubble-container bg-dark">
         <b>{!isMine && data.author && data.author[0].toUpperCase()}</b>
-        <div className="bubble" title={friendlyTimestamp}>
+        <div className="bubble bg-dark" title={friendlyTimestamp}>
           {data.message}
         </div>
         <b>{isMine && data.author && data.author[0].toUpperCase()}</b>

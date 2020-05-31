@@ -213,7 +213,7 @@ export default function MessageList(props) {
   };
 
   return (
-    <div className="message-list">
+    <div className="message-list bg-dark">
       <Toolbar
         title={props.roomName}
         /*
@@ -225,7 +225,7 @@ export default function MessageList(props) {
            */
       />
 
-      <div className="message-list-container">{renderMessages()}</div>
+      <div className="message-list-container bg-dark">{renderMessages()}</div>
 
       <Compose
         rightItems={[
