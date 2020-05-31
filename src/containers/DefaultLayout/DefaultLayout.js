@@ -8,6 +8,7 @@ import PeerHandler from './peerHandler';
 import { connect } from 'react-redux';
 import ReactNotification, { store } from 'react-notifications-component';
 import * as actions from '../../redux/loginRedux/loginAction';
+import './DefaultLayout.css';
 import {
   AppAside,
   AppFooter,
@@ -291,7 +292,7 @@ class DefaultLayout extends Component {
               <AppSidebarFooter />
               <AppSidebarMinimizer />
             </AppSidebar>
-            <Container fluid>
+            <Container fluid id="main-container">
               <Suspense fallback={this.loading()}>
                 <Switch>
                   {routes.map((route, idx) => {
@@ -309,11 +310,13 @@ class DefaultLayout extends Component {
                 </Switch>
               </Suspense>
             </Container>
+            {/*
             <Suspense fallback={this.loading()}>
               <aside className="aside-menu bg-dark" display="md">
                 <DefaultAside />
               </aside>
             </Suspense>
+            */}
           </div>
         </div>
       </React.Fragment>
