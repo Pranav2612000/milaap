@@ -514,8 +514,8 @@ connectedPeers: connectedPeers,
     const context = document.getElementById('context');
     if (context != null) {
       context.srcObject = null;
+      context.style.display = 'none';
     }
-    context.style.display = 'none';
   }
 
   deleteVideoElement(id) {
