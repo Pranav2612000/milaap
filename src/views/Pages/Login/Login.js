@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { Link, Redirect } from 'react-router-dom';
+import * as action from '../../../redux/loginRedux/loginAction';
 import {
   Button,
   Card,
@@ -15,7 +16,9 @@ import {
   Row
 } from 'reactstrap';
 import axios from 'axios';
+import { connect } from 'react-redux';
 import ReactNotification, { store } from 'react-notifications-component';
+import Notifications from 'react-notification-system-redux';
 class Login extends Component {
   constructor(props) {
     super(props);
@@ -48,6 +51,11 @@ class Login extends Component {
     }
   }
 
+  componentDidUpdate(prevProps) {
+    //if(this.props.error
+    return;
+  }
+
   handleUsernameChange = (e) => {
     this.setState({
       username: e.target.value
@@ -67,6 +75,8 @@ class Login extends Component {
 
   handleSubmit = (e) => {
     e.preventDefault();
+    this.props.login(this.state.username, this.state.password);
+    /*
     var reqData = {
       username: this.state.username,
       password: this.state.password
@@ -82,20 +92,8 @@ class Login extends Component {
       .catch((err) => {
         console.log(err);
         this.setState({ error: true });
-        store.addNotification({
-          title: 'Invalid Username or Password',
-          message: 'Please Try Again',
-          type: 'danger',
-          // insert: "top",
-          container: 'top-right',
-          animationIn: ['animated', 'fadeIn'],
-          animationOut: ['animated', 'fadeOut'],
-          dismiss: {
-            duration: 3000,
-            pauseOnHover: true
-          }
-        });
       });
+      */
   };
 
   render() {
@@ -103,12 +101,13 @@ class Login extends Component {
       /* Add Milaap Logo somewhere on this page. */
       <>
         {console.log(this.state.login)}
-        {this.state.login === true && (
+        {this.props.loggedIn === true && (
           <Redirect to={{ pathname: '/dashboard', state: this.state.username }} />
         )}
         {/* <ReactNotification /> */}
         {/* {this.state.login && console.log("object")} */}
         {this.state.error && <ReactNotification />}
+        {this.props.notifications && <Notifications notifications={this.props.notifications} />}
         <div className="app flex-row align-items-center">
           <Container>
             <Row className="justify-content-center">
@@ -200,4 +199,19 @@ class Login extends Component {
   }
 }
 
-export default Login;
+const mapStateToProps = (state) => {
+  console.log(state);
+  return {
+    loggedIn: state.loginReducer.loggedIn,
+    error: state.loginReducer.error,
+    notifications: state.notifications
+  };
+}
+
+const mapDispatchToProps = (dispatch) => {
+  return {
+    login: (user, password) => dispatch(action.login(user, password))
+  };
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(Login);
