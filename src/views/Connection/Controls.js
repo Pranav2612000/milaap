@@ -92,12 +92,17 @@ class Controls extends Component {
   };
 
   switchContext = (e) => {
+    if (e.target) e = e.target;
     try {
       const context = document.getElementById('context');
-      context.srcObject = e.target.srcObject;
+      if (e.srcObject == context.srcObject) return;
+      const username = e.nextElementSibling.innerText;
       context.style.display = 'inline';
+      context.poster =
+        'https://dummyimage.com/1024x576/2f353a/ffffff.jpg&text=' + username;
+      context.srcObject = e.srcObject;
       context.play();
-      $('#context').removeClass().addClass(e.target.id);
+      $('#context').removeClass().addClass(e.id);
     } catch (err) {
       console.log('The selected stream is old');
       console.log(err);
@@ -494,6 +499,7 @@ connectedPeers: connectedPeers,
     const wrapper = document.createElement('div');
     const video = document.createElement('video');
     const nameTag = document.createElement('div');
+    const context = document.getElementById('context');
     nameTag.classList.add('name-label');
     nameTag.innerText = username || 'me';
     video.width = '200';
@@ -508,6 +514,7 @@ connectedPeers: connectedPeers,
     wrapper.appendChild(video);
     wrapper.appendChild(nameTag);
     document.getElementById('videos').appendChild(wrapper);
+    if (!context.srcObject) self.switchContext(document.getElementById(friendtkn));
   }
 
   clearContext() {
