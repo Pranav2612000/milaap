@@ -31,11 +31,14 @@ import {
   ModalHeader,
   ModalBody,
   ModalFooter,
+  Tooltip,
+  UncontrolledTooltip,
   Jumbotron,
   Progress,
   Row,
   Spinner,
-  Table
+  Table,
+  Label
 } from 'reactstrap';
 import './MemberList.css';
 const socket = socketIOClient('http://localhost:5000/');
@@ -52,6 +55,7 @@ class MemberList extends Component {
     this.toggle = this.toggle.bind(this);
     this.addMember = this.addMember.bind(this);
     this.handleNewMemberChange = this.handleNewMemberChange.bind(this);
+    this.shareLink = this.shareLink.bind(this);
     /*
     socket.on('userJoined', (data) => {
       if (this.state.roomName !== 'dashboard') {
@@ -66,6 +70,41 @@ class MemberList extends Component {
       if (this.state.roomName !== 'dashboard') this.getActive();
     });
     */
+  }
+
+  shareLink() {
+    const link = document.querySelector('link[rel=canonical]')
+      ? document.querySelector('link[rel=canonical]').href
+      : document.location.href;
+    if (navigator.share) {
+      navigator
+        .share({
+          title: 'Join via Link',
+          url: link
+        })
+        .then(() => {
+          console.log('Link Shared!');
+        })
+        .catch(console.error);
+    } else {
+      navigator.clipboard
+        .writeText(link)
+        .then(() => {
+          store.addNotification({
+            title: 'Link copied',
+            message: 'Link copied to clipboard!',
+            type: 'success',
+            container: 'top-right',
+            animationIn: ['animated', 'fadeIn'],
+            animationOut: ['animated', 'fadeOut'],
+            dismiss: {
+              duration: 3000,
+              pauseOnHover: true
+            }
+          });
+        })
+        .catch(console.log('Sorry try again'));
+    }
   }
 
   toggle() {
@@ -129,9 +168,15 @@ class MemberList extends Component {
             <h3> Members </h3>
           </Col>
           <Col>
-            <button class="btn-danger" onClick={this.toggle}>
-              <i class="fa fa-user-plus"></i>
-            </button>
+            {/* <button class="btn-danger"> */}
+            <i
+              style={{ cursor: 'pointer' }}
+              class="fa fa-user-plus"
+              onClick={this.toggle}>
+              {' '}
+              Add
+            </i>
+            {/* </button> */}
           </Col>
         </Row>
         <h5> Admins </h5>
@@ -161,31 +206,50 @@ class MemberList extends Component {
         </ListGroup>
 
         <Modal isOpen={this.state.modal} toggle={this.toggle}>
-          <ModalHeader toggle={this.toggle}>Add Members</ModalHeader>
-          <ModalBody>
+          <ModalHeader className="bg-dark" toggle={this.toggle}>
+            Add Members
+          </ModalHeader>
+          <ModalBody className="bg-dark">
             <Form>
-              <InputGroup className="mb-3">
+              <h4>Existing Members</h4>
+              <InputGroup className="ml-2">
                 <InputGroupAddon addonType="prepend">
-                  <InputGroupText>
+                  <InputGroupText className="bg-dark">
                     <i className="icon-user"></i>
                   </InputGroupText>
                 </InputGroupAddon>
                 <Input
                   type="text"
+                  className="mr-2 bg-dark text-light"
                   placeholder="Username"
                   autoComplete="username"
                   value={this.state.newmember}
                   onChange={this.handleNewMemberChange}
-                />
+                />{' '}
+                <Button color="primary" onClick={this.addMember}>
+                  Add
+                </Button>
               </InputGroup>
+              <br />
+              <h4>Invite Guests</h4>
+              <Label>Share the following link with the guest</Label>
+              <Jumbotron
+                style={{ cursor: 'pointer' }}
+                className="p-2 m-2 bg-secondary text-dark"
+                id="linkHere"
+                onClick={this.shareLink}>
+                {document.querySelector('link[rel=canonical]')
+                  ? document.querySelector('link[rel=canonical]').href
+                  : document.location.href}
+              </Jumbotron>
+              <UncontrolledTooltip placement="bottom" target="linkHere">
+                Click to share
+              </UncontrolledTooltip>
             </Form>
           </ModalBody>
-          <ModalFooter>
-            <Button color="primary" onClick={this.addMember}>
-              Add
-            </Button>{' '}
-            <Button color="secondary" onClick={this.toggle}>
-              Cancel
+          <ModalFooter className="bg-dark">
+            <Button color="success" onClick={this.toggle}>
+              Close
             </Button>
           </ModalFooter>
         </Modal>
