@@ -24,8 +24,8 @@ export default function MessageList(props) {
     tempMsg.forEach((val, index) => {
       let formattedMsg = {};
       formattedMsg.id = val.id;
-      formattedMsg.author = val.sender;
-      formattedMsg.message = val.msg;
+      formattedMsg.sender = val.sender;
+      formattedMsg.msg = val.msg;
       formattedMsg.timestamp = new Date().getTime();
       formattedMsgs.push(formattedMsg);
     });
@@ -43,7 +43,7 @@ export default function MessageList(props) {
         setID(resp.data.username);
         socket.on('newMessage', (data) => {
           // console.clear();
-          console.log('New Message Arrived');
+          console.log('New Message Arrived', data);
 
           if (props.roomName !== 'dashboard' && data !== resp.data.username)
             fetchMessages();
@@ -60,13 +60,14 @@ export default function MessageList(props) {
 
   useEffect(() => {
     setMessages(props.msgs);
-  }, [props.roomName])
+  }, [props.roomName]);
 
   const getReqData = () => {
     // console.clear()
     return {
       roomName: props.roomName,
-      lastMsgId: messages && messages.length > 0 ? messages[messages.length - 1].id + 1 : -1
+      lastMsgId:
+        messages && messages.length > 0 ? messages[messages.length - 1].id + 1 : -1
     };
   };
   const fetchMessages = (change = false) => {
@@ -77,7 +78,7 @@ export default function MessageList(props) {
     // console.clear();
     // console.log(reqData);
     if (change == true) {
-      if(reqData) {
+      if (reqData) {
         reqData.lastMsgId = -1;
       }
     }
@@ -152,8 +153,8 @@ export default function MessageList(props) {
 
   const renderMessages = () => {
     // console.clear()
-    if(!messages) {
-      console.log("no messages");
+    if (!messages) {
+      console.log('no messages');
       return;
     }
     console.log(messages);
