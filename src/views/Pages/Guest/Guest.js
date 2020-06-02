@@ -54,17 +54,17 @@ class Guest extends Component {
   handleSubmit = (e) => {
     e.preventDefault();
     console.log(this.state.roomName);
-    if(this.state.roomName == undefined || this.state.roomName == '') {
-      alert("Enter a roomname to proceed");
+    if (this.state.roomName == undefined || this.state.roomName == '') {
+      alert('Enter a roomname to proceed');
       return;
     }
 
     /* Get a valid token if user doesn't have one. */
-    if(!localStorage.getItem('milaap-auth-token')) {
+    if (!localStorage.getItem('milaap-auth-token')) {
       console.log('exists');
       var reqData = {
         name: this.state.name,
-        roomName: this.state.roomName,
+        roomName: this.state.roomName
       };
       axios
         .post('http://localhost:5000/api/user/gettokenfortempuser', reqData)
@@ -203,9 +203,9 @@ class Guest extends Component {
                             <Button
                               color="primary"
                               className="px-4"
-                              onClick={(e) =>
-                                  this.handleSubmit(e)
-                                  /*
+                              onClick={
+                                (e) => this.handleSubmit(e)
+                                /*
                                 localStorage.getItem('milaap-auth-token')
                                   ? this.handleUserAdd(e)
                                   : this.handleSubmit(e)

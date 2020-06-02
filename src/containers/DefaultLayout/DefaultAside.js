@@ -59,7 +59,7 @@ class DefaultAside extends Component {
   }
 
   getRoomInfo(roomName) {
-    console.log("nothing to say.");
+    console.log('nothing to say.');
     return;
   }
 
@@ -116,16 +116,16 @@ class DefaultAside extends Component {
             <Container className="bg-dark">
               <Row>
                 <Controls roomName={this.props.roomName} />
-                  <MemberList
-                    users={this.props.users}
-                    guests={this.props.guests}
-                    roomName={this.props.roomName}
-                  />
+                <MemberList
+                  users={this.props.users}
+                  guests={this.props.guests}
+                  roomName={this.props.roomName}
+                />
               </Row>
             </Container>
           </TabPane>
           <TabPane tabId="2" className="p-3 bg-dark" key={this.state.change}>
-            <MessageView roomName={this.props.roomName} msgs={this.props.msgs}/>
+            <MessageView roomName={this.props.roomName} msgs={this.props.msgs} />
           </TabPane>
 
           <TabPane tabId="3" className="p-3 bg-dark">
