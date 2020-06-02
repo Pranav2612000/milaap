@@ -27,7 +27,7 @@ export default function Compose(props) {
       });
   }
   return (
-    <div className="compose">
+    <div className="compose bg-dark">
       <input
         type="text"
         className="compose-input"

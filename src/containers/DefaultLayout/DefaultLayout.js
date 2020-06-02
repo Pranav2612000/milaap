@@ -5,7 +5,10 @@ import { Container } from 'reactstrap';
 import axios from 'axios';
 import socketIOClient from 'socket.io-client';
 import PeerHandler from './peerHandler';
+import { connect } from 'react-redux';
 import ReactNotification, { store } from 'react-notifications-component';
+import * as actions from '../../redux/loginRedux/loginAction';
+import './DefaultLayout.css';
 import {
   AppAside,
   AppFooter,
@@ -234,6 +237,7 @@ class DefaultLayout extends Component {
 
   signOut(e) {
     e.preventDefault();
+    this.props.logout();
     localStorage.removeItem('milaap-auth-token');
     this.props.history.push('/login');
   }
@@ -268,7 +272,7 @@ class DefaultLayout extends Component {
     return (
       <React.Fragment>
         <div className="app">
-          <AppHeader fixed>
+          <AppHeader className="navbar navbar-dark bg-dark" fixed>
             <Suspense fallback={this.loading()}>
               <DefaultHeader onLogout={(e) => this.signOut(e)} />
             </Suspense>
@@ -288,7 +292,7 @@ class DefaultLayout extends Component {
               <AppSidebarFooter />
               <AppSidebarMinimizer />
             </AppSidebar>
-            <Container fluid>
+            <Container fluid id="main-container">
               <Suspense fallback={this.loading()}>
                 <Switch>
                   {routes.map((route, idx) => {
@@ -306,16 +310,27 @@ class DefaultLayout extends Component {
                 </Switch>
               </Suspense>
             </Container>
+            {/*
             <Suspense fallback={this.loading()}>
-              <aside className="aside-menu" display="md">
+              <aside className="aside-menu bg-dark" display="md">
                 <DefaultAside />
               </aside>
             </Suspense>
+            */}
           </div>
         </div>
       </React.Fragment>
     );
   }
 }
+const mapStateToProps = (state) => {
+  return {};
+};
 
-export default DefaultLayout;
+const mapDispatchToProps = (dispatch) => {
+  return {
+    logout: () => dispatch(actions.logout())
+  };
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(DefaultLayout);

@@ -48,8 +48,6 @@ video::-webkit-media-controls-timeline {
   padding: 0 !important;
   text-align: center !important;
   justify-content: center !important;
-  width: 90vw;
-  height: 90vh;
 }
 
 .name-label {
@@ -57,4 +55,9 @@ video::-webkit-media-controls-timeline {
   height: 25px;
   z-index: 100;
   margin-top: -10px;
+}
+
+#inner-aside-container {
+  margin-top: 0px;
+  height:100%;
 }
