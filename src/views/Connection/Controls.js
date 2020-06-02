@@ -111,8 +111,8 @@ class Controls extends Component {
 
   createPeer(id) {
     var peer = new Peer(id, {
-      host: 'localhost',
-      port: 9000,
+      host: '7906417bf10b.ngrok.io',
+      port: 80,
       path: '/peerserver',
       config: {
         iceServers: [
@@ -127,7 +127,6 @@ class Controls extends Component {
     });
     return peer;
   }
-
   updateSelfPeerInfo(self, peer, id, type) {
     console.log(self.state);
     var isVideo = type === 'video' ? 1 : 0;
@@ -444,7 +443,7 @@ connectedPeers: connectedPeers,
         console.log(duplicateCall.peer);
         //      calls.delete(duplicateCall);
         // calls.splice(duplicateCallIndex, 1);
-        return;
+        // return;
         // duplicateCall.close();
       }
       // calls.add(call);

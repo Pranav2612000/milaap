@@ -54,6 +54,7 @@ class DefaultHeader extends Component {
 
   componentDidMount() {
     /* To be changed: Use Redux to get username. */
+
     axios
       .get('http://localhost:5000/api/user/getUserName', {
         headers: {
