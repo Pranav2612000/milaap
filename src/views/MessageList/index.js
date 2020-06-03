@@ -41,26 +41,30 @@ export default function MessageList(props) {
       })
       .then((resp) => {
         setID(resp.data.username);
-        socket.on('newMessage', (data) => {
-          // console.clear();
-          console.log('New Message Arrived', data);
-
-          if (props.roomName !== 'dashboard' && data !== resp.data.username)
-            fetchMessages();
-          // if (props.roomName !== "dashboard") fetchMessages();
-        });
       })
       .catch((err) => {
         console.log(err, 'Error in Verifying JWT');
       });
   };
   useEffect(() => {
+    setMessages(props.msgs);
     init();
   }, [props.roomName]);
 
   useEffect(() => {
-    setMessages(props.msgs);
-  }, [props.roomName]);
+    socket.on('newMessage', (data) => {
+      console.log('New Message Arrived', data, MY_USER_ID);
+
+      if (
+        props.roomName !== 'dashboard' &&
+        props.roomName == data['room'] &&
+        messages !== undefined
+      )
+        fetchMessages(true, data);
+      //console.log('Data and Message list : ', messages, data);
+      // if (props.roomName !== "dashboard") fetchMessages();
+    });
+  }, [messages]);
 
   const getReqData = () => {
     // console.clear()
@@ -70,7 +74,20 @@ export default function MessageList(props) {
         messages && messages.length > 0 ? messages[messages.length - 1].id + 1 : -1
     };
   };
-  const fetchMessages = (change = false) => {
+  const fetchMessages = (change = false, data) => {
+    delete data['room'];
+    if (
+      messages !== undefined &&
+      messages !== null &&
+      data !== undefined &&
+      data !== null
+    ) {
+      console.log('Inside');
+      var msg = messages;
+      msg.push(data);
+      setMessages(msg);
+    }
+    console.log('Inside fetch Message', messages, data);
     return;
     // console.clear();
     console.log(change);
@@ -113,43 +130,43 @@ export default function MessageList(props) {
       });
   };
 
-  useEffect(() => {
-    //getMessages();
-    // console.clear();
-    // console.log(props.roomName);
-    if (props.roomName !== 'dashboard') fetchMessages(true);
+  // useEffect(() => {
+  //   //getMessages();
+  //   // console.clear();
+  //   // console.log(props.roomName);
+  //   if (props.roomName !== 'dashboard') fetchMessages(true);
 
-    //If you are on a limited DataPack, Comment this code segment and the one at
-    //the end of useEffect function - (the one with return clearInterval...), to
-    //prevent unnecessary multiple calls to the server
-    /*
-    const interval = setInterval(() => {
-            let reqData = {
-                    roomName: props.roomName,
-                    lastMsgId: lastMsgId
-            };
-            console.log(reqData);
-            axios.post('http://localhost:5000/api/room/getmsgs', reqData)
-                  .then(res => {
-                          console.log(res);
-                          let tempMsg = res.data.msgs;
-                          if(tempMsg == undefined) {
-                                  tempMsg = [];
-                          }
-                          let tempMsgFormatted = formatMsgs(tempMsg);
-                          console.log(tempMsgFormatted[tempMsgFormatted.length - 1].id);
-                          setLastMsgId(tempMsgFormatted[tempMsgFormatted.length - 1].id);
-                          let newMsgs = messages.concat(tempMsgFormatted);
-                          setMessages(newMsgs);
-                  }) .catch(err => {
-                          console.log(err);
-            });
-    }, 10000);
-    */
+  //   //If you are on a limited DataPack, Comment this code segment and the one at
+  //   //the end of useEffect function - (the one with return clearInterval...), to
+  //   //prevent unnecessary multiple calls to the server
+  //   /*
+  //   const interval = setInterval(() => {
+  //           let reqData = {
+  //                   roomName: props.roomName,
+  //                   lastMsgId: lastMsgId
+  //           };
+  //           console.log(reqData);
+  //           axios.post('http://localhost:5000/api/room/getmsgs', reqData)
+  //                 .then(res => {
+  //                         console.log(res);
+  //                         let tempMsg = res.data.msgs;
+  //                         if(tempMsg == undefined) {
+  //                                 tempMsg = [];
+  //                         }
+  //                         let tempMsgFormatted = formatMsgs(tempMsg);
+  //                         console.log(tempMsgFormatted[tempMsgFormatted.length - 1].id);
+  //                         setLastMsgId(tempMsgFormatted[tempMsgFormatted.length - 1].id);
+  //                         let newMsgs = messages.concat(tempMsgFormatted);
+  //                         setMessages(newMsgs);
+  //                 }) .catch(err => {
+  //                         console.log(err);
+  //           });
+  //   }, 10000);
+  //   */
 
-    //Yes this line.
-    //return () => clearInterval(interval);
-  }, []);
+  //   //Yes this line.
+  //   //return () => clearInterval(interval);
+  // }, []);
 
   const renderMessages = () => {
     // console.clear()
