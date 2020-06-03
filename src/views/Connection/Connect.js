@@ -1,22 +1,30 @@
 import SimplePeer from 'simple-peer';
 import socketIOClient from 'socket.io-client';
+import { Emitter } from './emmiter';
 const socket = socketIOClient.connect('http://localhost:5000');//will be replaced by an appropriate room.
 socket.connect();
 socket.on('connect', () => {
   console.log(socket.connected); // true
 });
 
-export class Peer {
+export class Peer extends Emitter{
   constructor(it, stream) {
+    super();
     this.error = null
     this.active = false
     this.stream = null
     this.initiator = it;
     this.peer = new SimplePeer({ initiator: it, stream: stream });
-    this.peer.on( 'error', err => {
-      console.log('errored');
+
+    this.peer.on('error', err => {
+      this.error = err;
+      this.emit('error', err);
+      this.close();
+      console.log('Error Occured while connecting!', err);
     });
+
     this.peer.on('close', _ => {
+      this.close();
       console.log('closed');
     });
     console.log('in constructor');
@@ -48,6 +56,12 @@ export class Peer {
         this.peer.signal(data);
       }
     });
+  }
+
+  close() {
+    this.emit('close')
+    this.active = false
+    this.peer.destroy()
   }
 
   startCall() {
