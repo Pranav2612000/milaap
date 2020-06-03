@@ -9,11 +9,11 @@ const users = require('../models/User.model');
 router.post('/', async (req, res) => {
   const username = req.body.username;
   const password = req.body.password;
-  users.findOne({username: username}, function (err, user) {
-    if(err) {
-      return res.status(400).json({err: 'Error Creating Room.' });
+  users.findOne({ username: username }, function (err, user) {
+    if (err) {
+      return res.status(400).json({ err: 'Error Creating Room.' });
     }
-    if(!user) {
+    if (!user) {
       var user = new userLogins({ username: username, password: password });
       user.save((err) => {
         if (err) {
@@ -31,7 +31,7 @@ router.post('/', async (req, res) => {
       console.log(username);
       console.log(password);
     } else {
-      return res.status(200).json({err: 'UEXIST' });
+      return res.status(200).json({ err: 'UEXIST' });
     }
   });
 });

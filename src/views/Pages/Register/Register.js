@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import * as action from '../../../redux/registerRedux/registerAction';
 import {
   Button,
   Card,
@@ -14,7 +15,9 @@ import {
   Row
 } from 'reactstrap';
 import axios from 'axios';
+import { connect } from 'react-redux';
 import ReactNotification, { store } from 'react-notifications-component';
+import Notifications from 'react-notification-system-redux';
 import { Redirect, Link } from 'react-router-dom';
 class Register extends Component {
   constructor(props) {
@@ -52,60 +55,20 @@ class Register extends Component {
 
   handleSubmit(e) {
     e.preventDefault();
-    axios
-      .post('http://localhost:5000/api/register/', {
-        username: this.state.username,
-        password: this.state.password
-      })
-      .then((res) => {
-        console.log(res);
-        console.log(res);
-        if(res.data.err == 'UEXIST') {
-          console.log('username exists');
-          store.addNotification({
-            title: 'Error',
-            message: 'You are late! Username already exists, choose a different username.',
-            type: 'warning',
-            // insert: "top",
-            container: 'top-right',
-            animationIn: ['animated', 'fadeIn'],
-            animationOut: ['animated', 'fadeOut'],
-            dismiss: {
-              duration: 3000,
-              pauseOnHover: true
-            }
-          });
-          return;
-        }
-        this.setState({ redirect: true });
-      })
-      .catch((err) => {
-        store.addNotification({
-          title: 'Error',
-          message: 'Please Try Again',
-          type: 'warning',
-          // insert: "top",
-          container: 'top-right',
-          animationIn: ['animated', 'fadeIn'],
-          animationOut: ['animated', 'fadeOut'],
-          dismiss: {
-            duration: 3000,
-            pauseOnHover: true
-          }
-        });
-        console.log(err);
-      });
+    this.props.register(this.state.username, this.state.password);
   }
 
   render() {
     return (
       <>
-        {this.state.redirect && (
+        {this.props.registered === true && (
           <Redirect to={{ pathname: '/login', register: true }} />
         )}
 
         <div className="app flex-row align-items-center">
-          <ReactNotification />
+          {this.props.notifications && (
+            <Notifications notifications={this.props.notifications} />
+          )}
           <Container>
             <Row className="justify-content-center">
               <Col md="9" lg="7" xl="6">
@@ -174,7 +137,10 @@ class Register extends Component {
                       </Button>
                     </Form>
                     <center>
-                    <p> Already have an account?<Link to="/login">Login</Link></p>
+                      <p>
+                        {' '}
+                        Already have an account?<Link to="/login">Login</Link>
+                      </p>
                     </center>
                   </CardBody>
                 </Card>
@@ -186,5 +152,19 @@ class Register extends Component {
     );
   }
 }
+const mapStateToProps = (state) => {
+  console.log(state);
+  return {
+    registered: state.registerReducer.registered,
+    error: state.registerReducer.error,
+    notifications: state.notifications
+  };
+};
 
-export default Register;
+const mapDispatchToProps = (dispatch) => {
+  return {
+    register: (user, password) => dispatch(action.register(user, password))
+  };
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(Register);

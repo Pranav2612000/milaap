@@ -13,7 +13,8 @@ import {
   InputGroup,
   InputGroupAddon,
   InputGroupText,
-  Row
+  Row,
+  Alert
 } from 'reactstrap';
 import axios from 'axios';
 import { connect } from 'react-redux';
@@ -27,17 +28,18 @@ class Login extends Component {
       login: false,
       username: '',
       password: '',
-      error: false
+      error: false,
+      fromRegister: false
     };
   }
 
   componentDidMount() {
     if (this.props.location.register === true) {
       console.log(this.props.location);
-
+      this.setState({ fromRegister: true });
       store.addNotification({
-        title: 'Success',
-        message: 'Logging In...',
+        title: 'Successfully Registered',
+        message: 'Login to your Account',
         type: 'success',
         // insert: "top",
         container: 'top-right',
@@ -100,15 +102,18 @@ class Login extends Component {
     return (
       /* Add Milaap Logo somewhere on this page. */
       <>
-        {console.log(this.state.login)}
         {this.props.loggedIn === true && (
           <Redirect to={{ pathname: '/dashboard', state: this.state.username }} />
         )}
         {/* <ReactNotification /> */}
         {/* {this.state.login && console.log("object")} */}
         {this.state.error && <ReactNotification />}
-        {this.props.notifications && <Notifications notifications={this.props.notifications} />}
+        {this.props.notifications && (
+          <Notifications notifications={this.props.notifications} />
+        )}
+
         <div className="app flex-row align-items-center">
+          <ReactNotification />
           <Container>
             <Row className="justify-content-center">
               <Col md="8">
@@ -206,12 +211,12 @@ const mapStateToProps = (state) => {
     error: state.loginReducer.error,
     notifications: state.notifications
   };
-}
+};
 
 const mapDispatchToProps = (dispatch) => {
   return {
     login: (user, password) => dispatch(action.login(user, password))
   };
-}
+};
 
 export default connect(mapStateToProps, mapDispatchToProps)(Login);
