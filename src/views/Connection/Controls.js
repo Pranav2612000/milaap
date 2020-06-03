@@ -115,6 +115,7 @@ class Controls extends Component {
       port: 9000,
       path: '/peerserver',
       config: {
+      
         iceServers: [
           { urls: 'stun:stun.l.google.com:19302' },
           {
@@ -123,6 +124,15 @@ class Controls extends Component {
             username: 'veddandekar6@gmail.com'
           }
         ]
+       
+        /*{ urls: "stun.internetcalls.com:3478" },*/
+      /*iceServers: [{
+          urls: 'stun:turn01.brie.fi:5349',
+        }, {
+          urls: 'turn:turn01.brie.fi:5349',
+          username: 'brie',
+          credential: 'fi',
+        }],*/
       } /* Sample servers, please use appropriate ones */
     });
     return peer;

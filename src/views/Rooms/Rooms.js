@@ -30,6 +30,7 @@ import { CustomTooltips } from '@coreui/coreui-plugin-chartjs-custom-tooltips';
 import { getStyle, hexToRgba } from '@coreui/coreui/dist/js/coreui-utilities';
 import DefaultAside from '../../containers/DefaultLayout/DefaultAside';
 import PeerHandler from '../../containers/DefaultLayout/peerHandler';
+import { Peer } from '../Connection/Connect';
 
 class Room extends Component {
   constructor(props) {
@@ -38,7 +39,8 @@ class Room extends Component {
     const roomName = props.match.params.roomname;
     console.log(roomName);
     this.state = {
-      roomName: roomName
+      roomName: roomName,
+      peer: new Peer()
     };
     this.props.enterRoom(roomName);
   }
@@ -82,6 +84,7 @@ class Room extends Component {
           <Container className="room">
             <video id="context" controls autoPlay></video>
             <Row className="m-0 p-0" id="videos"></Row>
+            <button onClick={this.state.peer.startCall}>Start Call </button>
           </Container>
         </main>
         <aside className="aside-menu bg-dark" display="md">
