@@ -115,7 +115,6 @@ class Controls extends Component {
       port: 9000,
       path: '/peerserver',
       config: {
-      
         iceServers: [
           { urls: 'stun:stun.l.google.com:19302' },
           {
