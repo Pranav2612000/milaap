@@ -17,11 +17,11 @@ export default function Message(props) {
       {showTimestamp && <div className="timestamp bg-dark">{friendlyTimestamp}</div>}
 
       <div className="bubble-container bg-dark">
-        <b>{!isMine && data.author && data.author[0].toUpperCase()}</b>
+        <b>{!isMine && data.sender}</b>
         <div className="bubble bg-dark" title={friendlyTimestamp}>
-          {data.message}
+          {data.msg}
         </div>
-        <b>{isMine && data.author && data.author[0].toUpperCase()}</b>
+        <b>{isMine && data.sender}</b>
       </div>
     </div>
   );
