@@ -37,6 +37,7 @@ class Room extends Component {
     super(props);
 
     const roomName = props.match.params.roomname;
+    console.log(Peer);
     console.log(roomName);
     this.state = {
       roomName: roomName,
@@ -107,7 +108,7 @@ class Room extends Component {
   startCall() {
     this.getMyMediaStream(this, 'video').then((media) => {
       console.log('here');
-      var peer = new Peer(true, this.state.myMediaStreamObj);
+      var peer = new Peer(true, this.state.myMediaStreamObj, this.state.roomName);
       this.setState({ peer: peer });
       return;
     });
@@ -115,7 +116,7 @@ class Room extends Component {
   startCall1() {
     this.getMyMediaStream(this, 'screen').then((media) => {
       console.log('here');
-      var peer = new Peer(true, this.state.myMediaStreamObj);
+      var peer = new Peer(true, this.state.myMediaStreamObj, this.state.roomName);
       this.setState({ peer: peer });
       return;
     });

@@ -8,11 +8,12 @@ socket.on('connect', () => {
 });
 
 export class Peer extends Emitter{
-  constructor(it, stream) {
+  constructor(it, stream, room) {
     super();
     this.error = null
     this.active = false
     this.stream = null
+    this.room = room;
     this.initiator = it;
     this.peer = new SimplePeer({ initiator: it, stream: stream });
 
@@ -30,7 +31,7 @@ export class Peer extends Emitter{
     console.log('in constructor');
     this.peer.on('signal', data => {
       console.log(data);
-      var room = 'room1';
+      var room = this.room;
       socket.emit('signalling',room, data, (resp) => {
         console.log('reply rcvd');
         console.log(data);
