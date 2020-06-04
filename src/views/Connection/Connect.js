@@ -1,4 +1,5 @@
 import SimplePeer from 'simple-peer';
+import $ from 'jquery';
 import socketIOClient from 'socket.io-client';
 import { Emitter } from './emmiter';
 const socket = socketIOClient.connect('http://localhost:5000');//will be replaced by an appropriate room.
@@ -70,7 +71,7 @@ export class Peer extends Emitter{
   }
 }
 
-function createVideoElement(self, stream, friendtkn, username) {
+export function createVideoElement(self, stream, friendtkn, username) {
   const wrapper = document.createElement('div');
   const video = document.createElement('video');
   const nameTag = document.createElement('div');
@@ -85,9 +86,27 @@ function createVideoElement(self, stream, friendtkn, username) {
   video.height = '350';
   video.srcObject = stream;
   video.autoplay = true;
-  //video.onclick = self.switchContext;
+  video.onclick = switchContext;
   wrapper.appendChild(video);
   wrapper.appendChild(nameTag);
   document.getElementById('videos').appendChild(wrapper);
-  //if (!context.srcObject) self.switchContext(document.getElementById(friendtkn));
+  if (!context.srcObject) switchContext(document.getElementById(friendtkn));
 }
+
+export function switchContext(e) {
+  if (e.target) e = e.target;
+  try {
+    const context = document.getElementById('context');
+    if (e.srcObject == context.srcObject) return;
+    const username = e.nextElementSibling.innerText;
+    context.style.display = 'inline';
+    context.poster =
+      'https://dummyimage.com/1024x576/2f353a/ffffff.jpg&text=' + username;
+    context.srcObject = e.srcObject;
+    context.play();
+    $('#context').removeClass().addClass(e.id);
+  } catch (err) {
+    console.log('The selected stream is old');
+    console.log(err);
+  }
+};

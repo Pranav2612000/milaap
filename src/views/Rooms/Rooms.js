@@ -30,7 +30,7 @@ import { CustomTooltips } from '@coreui/coreui-plugin-chartjs-custom-tooltips';
 import { getStyle, hexToRgba } from '@coreui/coreui/dist/js/coreui-utilities';
 import DefaultAside from '../../containers/DefaultLayout/DefaultAside';
 import PeerHandler from '../../containers/DefaultLayout/peerHandler';
-import { Peer } from '../Connection/Connect';
+import { Peer, switchContext, createVideoElement } from '../Connection/Connect';
 
 class Room extends Component {
   constructor(props) {
@@ -48,29 +48,7 @@ class Room extends Component {
     this.startCall1 = this.startCall1.bind(this);
     this.endCall = this.endCall.bind(this);
     this.getMyMediaStream = this.getMyMediaStream.bind(this);
-    this.createVideoElement = this.createVideoElement.bind(this);
-  }
-  // Creates a new video element to show the stream passed to it.
-  createVideoElement(self, stream, friendtkn, username) {
-    const wrapper = document.createElement('div');
-    const video = document.createElement('video');
-    const nameTag = document.createElement('div');
-    const context = document.getElementById('context');
-    nameTag.classList.add('name-label');
-    nameTag.innerText = username || 'me';
-    video.width = '200';
-    video.id = friendtkn;
-    if (video.id == 'me') {
-      video.muted = 'true';
-    }
-    video.height = '350';
-    video.srcObject = stream;
-    video.autoplay = true;
-    //video.onclick = self.switchContext;
-    wrapper.appendChild(video);
-    wrapper.appendChild(nameTag);
-    document.getElementById('videos').appendChild(wrapper);
-    //if (!context.srcObject) self.switchContext(document.getElementById(friendtkn));
+    //this.createVideoElement = this.createVideoElement.bind(this);
   }
   async getMyMediaStream(self, type) {
     if (type === 'screen') {
@@ -85,7 +63,7 @@ class Room extends Component {
           self.setState({
             myMediaStreamObj: media
           });
-          self.createVideoElement(self, media, 'me');
+          createVideoElement(self, media, 'me');
           return media;
         });
     } else if (type === 'video') {
@@ -100,7 +78,7 @@ class Room extends Component {
           self.setState({
             myMediaStreamObj: media
           });
-          self.createVideoElement(self, media, 'me');
+          createVideoElement(self, media, 'me');
           return media;
         });
     }
