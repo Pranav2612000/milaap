@@ -18,8 +18,15 @@ const http = require('http').Server(app);
 var io = require('socket.io')(http);
 // io.origins("http://localhost:3000")
 module.exports = io;
-io.on('connection', () => {
-  console.log('a user is connected');
+io.sockets.on('connection', (client) => {
+  console.log('A user connected to socket server.');
+  client.on('signalling', (room, data) => {
+    client.join(room);
+    console.log(room);
+    console.log('*****************************received signal');
+    console.log(data);
+    client.to(room).emit('signalling', data);
+  });
 });
 const loginRouter = require('./routes/login');
 const registerRouter = require('./routes/register');

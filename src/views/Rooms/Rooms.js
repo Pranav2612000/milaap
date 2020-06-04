@@ -30,6 +30,7 @@ import { CustomTooltips } from '@coreui/coreui-plugin-chartjs-custom-tooltips';
 import { getStyle, hexToRgba } from '@coreui/coreui/dist/js/coreui-utilities';
 import DefaultAside from '../../containers/DefaultLayout/DefaultAside';
 import PeerHandler from '../../containers/DefaultLayout/peerHandler';
+import { Peer } from '../Connection/Connect';
 
 class Room extends Component {
   constructor(props) {
@@ -38,9 +39,91 @@ class Room extends Component {
     const roomName = props.match.params.roomname;
     console.log(roomName);
     this.state = {
-      roomName: roomName
+      roomName: roomName,
+      peer: null
     };
     this.props.enterRoom(roomName);
+    this.startCall = this.startCall.bind(this);
+    this.startCall1 = this.startCall1.bind(this);
+    this.endCall = this.endCall.bind(this);
+    this.getMyMediaStream = this.getMyMediaStream.bind(this);
+    this.createVideoElement = this.createVideoElement.bind(this);
+  }
+  // Creates a new video element to show the stream passed to it.
+  createVideoElement(self, stream, friendtkn, username) {
+    const wrapper = document.createElement('div');
+    const video = document.createElement('video');
+    const nameTag = document.createElement('div');
+    const context = document.getElementById('context');
+    nameTag.classList.add('name-label');
+    nameTag.innerText = username || 'me';
+    video.width = '200';
+    video.id = friendtkn;
+    if (video.id == 'me') {
+      video.muted = 'true';
+    }
+    video.height = '350';
+    video.srcObject = stream;
+    video.autoplay = true;
+    //video.onclick = self.switchContext;
+    wrapper.appendChild(video);
+    wrapper.appendChild(nameTag);
+    document.getElementById('videos').appendChild(wrapper);
+    //if (!context.srcObject) self.switchContext(document.getElementById(friendtkn));
+  }
+  async getMyMediaStream(self, type) {
+    if (type === 'screen') {
+      // TODO: Add try catch to handle case when user denies access
+
+      await navigator.mediaDevices
+        .getDisplayMedia({
+          video: { width: 1024, height: 576 },
+          audio: true
+        })
+        .then((media) => {
+          self.setState({
+            myMediaStreamObj: media
+          });
+          self.createVideoElement(self, media, 'me');
+          return media;
+        });
+    } else if (type === 'video') {
+      // TODO: Add try catch to handle case when user denies access
+
+      await navigator.mediaDevices
+        .getUserMedia({
+          video: { width: 1024, height: 576 },
+          audio: true
+        })
+        .then((media) => {
+          self.setState({
+            myMediaStreamObj: media
+          });
+          self.createVideoElement(self, media, 'me');
+          return media;
+        });
+    }
+  }
+  startCall() {
+    this.getMyMediaStream(this, 'video').then((media) => {
+      console.log('here');
+      var peer = new Peer(true, this.state.myMediaStreamObj);
+      this.setState({ peer: peer });
+      return;
+    });
+  }
+  startCall1() {
+    this.getMyMediaStream(this, 'screen').then((media) => {
+      console.log('here');
+      var peer = new Peer(true, this.state.myMediaStreamObj);
+      this.setState({ peer: peer });
+      return;
+    });
+  }
+  endCall() {
+    console.log(this.state);
+    this.state.myMediaStreamObj.getTracks().forEach((track) => track.stop());
+    this.state.peer.peer.destroy();
   }
 
   componentDidUpdate(prevProps) {
@@ -48,8 +131,8 @@ class Room extends Component {
       this.setState(
         {
           roomName: this.props.match.params.roomname
-        },
-        
+        }
+
         /*
         () => {
           store.addNotification({
@@ -82,10 +165,13 @@ class Room extends Component {
           <Container className="room">
             <video id="context" controls autoPlay></video>
             <Row className="m-0 p-0" id="videos"></Row>
+            <button onClick={this.startCall}>Start Call </button>
+            <button onClick={this.startCall1}>Screen Call </button>
+            <button onClick={this.endCall}>End Call </button>
           </Container>
         </main>
         <aside className="aside-menu bg-dark" display="md">
-          <DefaultAside 
+          <DefaultAside
             roomName={this.props.roomName}
             msgs={this.props.msgs}
             users={this.props.users}
@@ -107,12 +193,12 @@ const mapStateToProps = (state) => {
     msgs: state.roomReducer.msgs,
     loading: state.roomReducer.loading
   };
-}
+};
 
 const mapDispatchToProps = (dispatch) => {
   return {
     enterRoom: (room) => dispatch(action.enterRoom(room))
   };
-}
+};
 
 export default connect(mapStateToProps, mapDispatchToProps)(Room);
