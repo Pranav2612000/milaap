@@ -31,6 +31,7 @@ import { getStyle, hexToRgba } from '@coreui/coreui/dist/js/coreui-utilities';
 import DefaultAside from '../../containers/DefaultLayout/DefaultAside';
 import PeerHandler from '../../containers/DefaultLayout/peerHandler';
 import { Peer, switchContext, createVideoElement } from '../Connection/Connect';
+import { getMyMediaStream } from '../Connection/Connect';
 
 class Room extends Component {
   constructor(props) {
@@ -47,44 +48,12 @@ class Room extends Component {
     this.startCall = this.startCall.bind(this);
     this.startCall1 = this.startCall1.bind(this);
     this.endCall = this.endCall.bind(this);
-    this.getMyMediaStream = this.getMyMediaStream.bind(this);
+    //this.getMyMediaStream = this.getMyMediaStream.bind(this);
     //this.createVideoElement = this.createVideoElement.bind(this);
   }
-  async getMyMediaStream(self, type) {
-    if (type === 'screen') {
-      // TODO: Add try catch to handle case when user denies access
 
-      await navigator.mediaDevices
-        .getDisplayMedia({
-          video: { width: 1024, height: 576 },
-          audio: true
-        })
-        .then((media) => {
-          self.setState({
-            myMediaStreamObj: media
-          });
-          createVideoElement(self, media, 'me');
-          return media;
-        });
-    } else if (type === 'video') {
-      // TODO: Add try catch to handle case when user denies access
-
-      await navigator.mediaDevices
-        .getUserMedia({
-          video: { width: 1024, height: 576 },
-          audio: true
-        })
-        .then((media) => {
-          self.setState({
-            myMediaStreamObj: media
-          });
-          createVideoElement(self, media, 'me');
-          return media;
-        });
-    }
-  }
   startCall() {
-    this.getMyMediaStream(this, 'video').then((media) => {
+    getMyMediaStream(this, 'video').then((media) => {
       console.log('here');
       var peer = new Peer(true, this.state.myMediaStreamObj, this.state.roomName);
       this.setState({ peer: peer });
@@ -92,7 +61,7 @@ class Room extends Component {
     });
   }
   startCall1() {
-    this.getMyMediaStream(this, 'screen').then((media) => {
+    getMyMediaStream(this, 'screen').then((media) => {
       console.log('here');
       var peer = new Peer(true, this.state.myMediaStreamObj, this.state.roomName);
       this.setState({ peer: peer });
