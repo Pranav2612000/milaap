@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import { withRouter } from 'react-router-dom';
 import { Redirect, Route, Switch } from 'react-router-dom';
+import ReactNotification, { store } from 'react-notifications-component';
+
 import {
   Nav,
   NavItem,
@@ -11,6 +13,7 @@ import {
   ListGroup,
   ListGroupItem
 } from 'reactstrap';
+import './DefaultLayout.css';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import { AppSwitch } from '@coreui/react';
@@ -53,10 +56,30 @@ class DefaultAside extends Component {
       activeTab: '1',
       change: false,
       roomName: roomName,
+      roomType: 'Public',
       path: props.location.pathname
     };
     this.getRoomInfo = this.getRoomInfo.bind(this);
   }
+
+  changeRoomType = () => {
+    this.setState({
+      roomType: this.state.roomType === 'Public' ? 'Private' : 'Public'
+    });
+    store.addNotification({
+      title: `Room Type Changed`,
+      message: `Changed room type to ${this.state.roomType}`,
+      type: 'success',
+      // insert: "top",
+      container: 'top-right',
+      animationIn: ['animated', 'fadeIn'],
+      animationOut: ['animated', 'fadeOut'],
+      dismiss: {
+        duration: 3000,
+        pauseOnHover: true
+      }
+    });
+  };
 
   getRoomInfo(roomName) {
     console.log('nothing to say.');
@@ -134,21 +157,25 @@ class DefaultAside extends Component {
             <div className="aside-options">
               <div className="clearfix mt-4">
                 <small>
-                  <b>Option 1</b>
+                  <button class="btn btn-dark">Change Room Icon</button>
                 </small>
-                <AppSwitch
-                  className={'float-right'}
-                  variant={'pill'}
-                  label
-                  color={'success'}
-                  defaultChecked
-                  size={'sm'}
-                />
+              </div>
+              <div>
+                <small className="text-muted">Set the Room Icon.</small>
+              </div>
+            </div>
+
+            <div className="aside-options">
+              <div className="clearfix mt-3">
+                <small>
+                  <button class="btn btn-dark" onClick={this.changeRoomType}>
+                    Change Room Type
+                  </button>
+                </small>
               </div>
               <div>
                 <small className="text-muted">
-                  Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do
-                  eiusmod tempor incididunt ut labore et dolore magna aliqua.
+                  Set the active room to Private / Public.
                 </small>
               </div>
             </div>
@@ -156,48 +183,7 @@ class DefaultAside extends Component {
             <div className="aside-options">
               <div className="clearfix mt-3">
                 <small>
-                  <b>Option 2</b>
-                </small>
-                <AppSwitch
-                  className={'float-right'}
-                  variant={'pill'}
-                  label
-                  color={'success'}
-                  size={'sm'}
-                />
-              </div>
-              <div>
-                <small className="text-muted">
-                  Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do
-                  eiusmod tempor incididunt ut labore et dolore magna aliqua.
-                </small>
-              </div>
-            </div>
-
-            <div className="aside-options">
-              <div className="clearfix mt-3">
-                <small>
-                  <b>Option 3</b>
-                </small>
-                <AppSwitch
-                  className={'float-right'}
-                  variant={'pill'}
-                  label
-                  color={'success'}
-                  defaultChecked
-                  size={'sm'}
-                  disabled
-                />
-                <div>
-                  <small className="text-muted">Option disabled.</small>
-                </div>
-              </div>
-            </div>
-
-            <div className="aside-options">
-              <div className="clearfix mt-3">
-                <small>
-                  <b>Option 4</b>
+                  <b>More settings</b>
                 </small>
                 <AppSwitch
                   className={'float-right'}
@@ -209,37 +195,6 @@ class DefaultAside extends Component {
                 />
               </div>
             </div>
-            {/* 
-            <hr />
-            <h6>System Utilization</h6>
-
-            <div className="text-uppercase mb-1 mt-4">
-              <small>
-                <b>CPU Usage</b>
-              </small>
-            </div>
-            <Progress className="progress-xs" color="info" value="25" />
-            <small className="text-muted">348 Processes. 1/4 Cores.</small>
-
-            <div className="text-uppercase mb-1 mt-2">
-              <small>
-                <b>Memory Usage</b>
-              </small>
-            </div>
-            <Progress className="progress-xs" color="warning" value="70" /> */}
-            {/* <small className="text-muted">11444GB/16384MB</small>
-
-            <div className="text-uppercase mb-1 mt-2">
-              <small><b>SSD 1 Usage</b></small>
-            </div>
-            <Progress className="progress-xs" color="danger" value="95" />
-            <small className="text-muted">243GB/256GB</small>
-
-            <div className="text-uppercase mb-1 mt-2">
-              <small><b>SSD 2 Usage</b></small>
-            </div>
-            <Progress className="progress-xs" color="success" value="10" />
-            <small className="text-muted">25GB/256GB</small> */}
           </TabPane>
         </TabContent>
       </React.Fragment>

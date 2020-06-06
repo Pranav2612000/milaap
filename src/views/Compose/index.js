@@ -28,9 +28,9 @@ export default function Compose(props) {
   }
   return (
     <div className="compose bg-dark">
-      <input
+      <textarea
         type="text"
-        className="compose-input"
+        className="md-textarea form-control"
         placeholder="Type a message, @name"
         value={msg}
         onKeyDown={(e) => {
@@ -41,7 +41,7 @@ export default function Compose(props) {
         }}
       />
       <button className="compose-button" onClick={sendMessage}>
-        Send
+        <span className="icon cui-chevron-right"></span>
       </button>
 
       {props.rightItems}
