@@ -30,7 +30,6 @@ import axios from 'axios';
 import { AppAsideToggler, AppNavbarBrand, AppSidebarToggler } from '@coreui/react';
 import DefaultAside from './DefaultAside';
 import logo from '../../assets/img/brand/logo.png';
-import sygnet from '../../assets/img/brand/sygnet.svg';
 
 const propTypes = {
   children: PropTypes.node
@@ -123,7 +122,7 @@ class DefaultHeader extends Component {
         <AppNavbarBrand
           full={{ src: logo, width: 65, height: 55 }}
           minimized={{
-            src: sygnet,
+            src: logo,
             width: 30,
             height: 30
           }}
