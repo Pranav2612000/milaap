@@ -16,9 +16,9 @@ export default function Message(props) {
       ].join(' ')}>
       {showTimestamp && <div className="timestamp bg-dark">{friendlyTimestamp}</div>}
 
-      <div className="bubble-container bg-dark">
-        <b>{!isMine && data.sender}</b>
-        <div className="bubble bg-dark" title={friendlyTimestamp}>
+      <div className="bubble-container">
+        <b className="sendBy">{!isMine && data.sender}</b>
+        <div className="bubble" title={friendlyTimestamp}>
           {data.msg}
         </div>
         <b>{isMine && data.sender}</b>
