@@ -6,16 +6,17 @@ import Message from '../Message';
 import moment from 'moment';
 import axios from 'axios';
 import socketIOClient from 'socket.io-client';
+import { connect } from 'react-redux';
 import './MessageList.css';
 import { Col } from 'reactstrap';
 
 const socket = socketIOClient('http://localhost:5000/');
 
-export default class MessageList extends Component {
+class MessageList extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      MY_USER_ID: '',
+      MY_USER_ID: this.props.username,
       messages: this.props.msgs,
       change: false,
       lastMsgId: 0
@@ -67,20 +68,20 @@ export default class MessageList extends Component {
   }
 
   init = () => {
-    axios
-      .get('http://localhost:5000/api/user/getUserName', {
-        headers: {
-          'milaap-auth-token': localStorage.getItem('milaap-auth-token')
-        }
-      })
-      .then((resp) => {
-        this.setState({
-          MY_USER_ID: resp.data.username
-        });
-      })
-      .catch((err) => {
-        console.log(err, 'Error in Verifying JWT');
-      });
+    // axios
+    //   .get('http://localhost:5000/api/user/getUserName', {
+    //     headers: {
+    //       'milaap-auth-token': localStorage.getItem('milaap-auth-token')
+    //     }
+    //   })
+    //   .then((resp) => {
+    //     this.setState({
+    //       MY_USER_ID: resp.data.username
+    //     });
+    //   })
+    //   .catch((err) => {
+    //     console.log(err, 'Error in Verifying JWT');
+    //   });
   };
 
   getReqData = () => {
@@ -224,3 +225,12 @@ export default class MessageList extends Component {
     );
   }
 }
+
+const mapStateToProps = (state) => {
+  console.log(state);
+  return {
+    username: state.loginReducer.username
+  };
+};
+
+export default connect(mapStateToProps)(MessageList);

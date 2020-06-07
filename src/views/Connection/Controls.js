@@ -3,6 +3,7 @@ import React, { Component } from 'react';
 import { store } from 'react-notifications-component';
 import { AwesomeButtonProgress } from 'react-awesome-button';
 import 'react-awesome-button/dist/styles.css';
+import { connect } from 'react-redux';
 import {
   Nav,
   NavItem,
@@ -111,8 +112,8 @@ class Controls extends Component {
 
   createPeer(id) {
     var peer = new Peer(id, {
-      host: '7906417bf10b.ngrok.io',
-      port: 80,
+      host: 'localhost',
+      port: 9000,
       path: '/peerserver',
       config: {
         iceServers: [
@@ -224,28 +225,14 @@ class Controls extends Component {
       self.waitForConnections(self, peer);
 
       // Make requests to currently online users.
-      axios
-        .get('http://localhost:5000/api/user/getUserName', {
-          headers: {
-            'milaap-auth-token': localStorage.getItem('milaap-auth-token')
-          }
-        })
-        .then((resp) => {
-          console.log(resp.data);
-          self.setState({
-            myUsername: resp.data.username
-          });
-          onlineArray.forEach((val, index) => {
-            if (val.username === resp.data.username && val.type === type) {
-              return;
-            }
-            console.log('Connecting to ' + onlineArray[index].tkn);
-            self.startConnection(self, onlineArray[index].tkn, peer);
-          });
-        })
-        .catch((err) => {
-          console.log(err, 'Error in Verifying JWT');
-        });
+
+      onlineArray.forEach((val, index) => {
+        if (val.username === this.props.username && val.type === type) {
+          return;
+        }
+        console.log('Connecting to ' + onlineArray[index].tkn);
+        self.startConnection(self, onlineArray[index].tkn, peer);
+      });
     });
   }
 
@@ -665,5 +652,11 @@ videos.empty();
     );
   }
 }
+const mapStateToProps = (state) => {
+  console.log(state);
+  return {
+    username: state.loginReducer.username
+  };
+};
 
-export default Controls;
+export default connect(mapStateToProps)(Controls);

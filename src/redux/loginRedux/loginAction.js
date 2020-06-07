@@ -37,9 +37,10 @@ export const loginRequest = () => {
   };
 };
 
-export const loginSuccess = () => {
+export const loginSuccess = (username) => {
   return {
-    type: LOGIN_SUCCESS
+    type: LOGIN_SUCCESS,
+    username: username
   };
 };
 
@@ -75,7 +76,7 @@ export const login = (username, password) => {
       .then((res) => {
         console.log(res.data);
         localStorage.setItem('milaap-auth-token', res.data.token);
-        dispatch(loginSuccess());
+        dispatch(loginSuccess(username));
       })
       .catch((err) => {
         dispatch(loginFailure(err));
