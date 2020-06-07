@@ -36,12 +36,14 @@ export default class MessageList extends Component {
         this.state.MY_USER_ID !== data['sender']
       )
         this.fetchMessages(true, data);
+
       //console.log('Data and Message list : ', messages, data);
       // if (props.roomName !== "dashboard") fetchMessages();
     });
   }
 
   componentDidUpdate(prevProps) {
+    window.scrollTo(0, document.querySelector('#message-list').scrollHeight);
     if (prevProps.roomName !== this.props.roomName) {
       this.setState({
         messages: this.props.msgs
@@ -123,12 +125,11 @@ export default class MessageList extends Component {
     let i = 0;
     const messageCount = messages.length;
     const tempMessages = [];
-
     while (i < messageCount) {
       const previous = messages[i - 1];
       const current = messages[i];
       const next = messages[i + 1];
-      const isMine = current.author === this.state.MY_USER_ID;
+      const isMine = current.sender === this.state.MY_USER_ID;
       const currentMoment = moment(current.timestamp);
       let prevBySameAuthor = false;
       let nextBySameAuthor = false;
@@ -203,7 +204,9 @@ export default class MessageList extends Component {
              */
         />
 
-        <div className="message-list-container bg-dark">{this.renderMessages()}</div>
+        <div className="message-list-container bg-dark" id="message-list">
+          {this.renderMessages()}
+        </div>
 
         <Compose
           rightItems={[

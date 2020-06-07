@@ -2,4 +2,5 @@
   padding: 10px;
   padding-bottom: 70px;
   max-height: fit-content;
+  scroll-behavior: auto;
 }
