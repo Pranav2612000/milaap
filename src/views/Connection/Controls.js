@@ -115,12 +115,23 @@ class Controls extends Component {
       port: 80,
       path: '/peerserver',
       config: {
+        // iceServers: [
+        //   { urls: 'stun:stun.l.google.com:19302' },
+        //   {
+        //     url: 'turn:numb.viagenie.ca',
+        //     credential: 'HWeF3pu@u2RfeYD',
+        //     username: 'veddandekar6@gmail.com'
+        //   }
+        // ]
+        // { urls: "stun.internetcalls.com:3478" },
         iceServers: [
-          { urls: 'stun:stun.l.google.com:19302' },
           {
-            url: 'turn:numb.viagenie.ca',
-            credential: 'HWeF3pu@u2RfeYD',
-            username: 'veddandekar6@gmail.com'
+            urls: 'stun:turn01.brie.fi:5349'
+          },
+          {
+            urls: 'turn:turn01.brie.fi:5349',
+            username: 'brie',
+            credential: 'fi'
           }
         ]
       } /* Sample servers, please use appropriate ones */
@@ -402,8 +413,8 @@ connectedPeers: connectedPeers,
       console.log(friendtkn);
       console.log(err);
       thiscall.close();
-      self.deleteVideoElement(thiscall.peer);
-      // self.startConnection(self, friendtkn, peer);
+      //self.deleteVideoElement(thiscall.peer);
+      self.startConnection(self, friendtkn, peer);
 
       // If an error is observed, we automatically send another request to start connection,
       // to provide reliability. Since, we dont want both the receiver and username of the stream
@@ -443,7 +454,7 @@ connectedPeers: connectedPeers,
         console.log(duplicateCall.peer);
         //      calls.delete(duplicateCall);
         // calls.splice(duplicateCallIndex, 1);
-        // return;
+        //return;
         // duplicateCall.close();
       }
       // calls.add(call);

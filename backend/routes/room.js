@@ -90,8 +90,8 @@ router.post('/addusertoroom', auth, async (req, res) => {
         if (userArray === undefined) {
           userArray = [];
         }
-        if(userArray.includes(user)) {
-            return res.status(400).json({ err: 'User Already has access.' });
+        if (userArray.includes(user)) {
+          return res.status(400).json({ err: 'User Already has access.' });
         }
         userArray.push(user);
         room.markModified('users');
@@ -216,7 +216,7 @@ router.post('/enterroom', auth, async (req, res) => {
     /* Check if username is in room.users */
     var i = -1;
     var userExists = false;
-    if(room._doc.users == undefined) {
+    if (room._doc.users == undefined) {
       room._doc.users = [];
     }
     room._doc.users.forEach((val, index) => {
@@ -231,7 +231,7 @@ router.post('/enterroom', auth, async (req, res) => {
     /* Check if username in in room.tempusers. */
 
     if (userExists == false) {
-      if(room._doc.guests == undefined) {
+      if (room._doc.guests == undefined) {
         room._doc.guests = [];
       }
       room._doc.guests.forEach((val, index) => {
@@ -264,10 +264,10 @@ router.post('/enterroom', auth, async (req, res) => {
         });
       } else {
         return res.status(200).json({
-              msg: 'Success',
-              msgs: room._doc.msgArray,
-              users: room._doc.users,
-              guests: room._doc.guests
+          msg: 'Success',
+          msgs: room._doc.msgArray,
+          users: room._doc.users,
+          guests: room._doc.guests
         });
       }
     }
@@ -280,7 +280,7 @@ router.post('/enterroom', auth, async (req, res) => {
         users: room._doc.users,
         guests: room._doc.guests
       });
-    } 
+    }
   });
 });
 
