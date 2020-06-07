@@ -27,7 +27,7 @@ export default function Compose(props) {
       });
   }
   return (
-    <div className="compose bg-dark">
+    <div className="compose" style={styleSheet.composeStyles}>
       <input
         type="text"
         className="compose-input"
@@ -39,8 +39,12 @@ export default function Compose(props) {
         onChange={(e) => {
           setMsg(e.target.value);
         }}
+        style={styleSheet.inputStyles}
       />
-      <button className="compose-button" onClick={sendMessage}>
+      <button
+        className="compose-button"
+        onClick={sendMessage}
+        style={styleSheet.buttonStyles}>
         Send
       </button>
 
@@ -48,3 +52,24 @@ export default function Compose(props) {
     </div>
   );
 }
+
+const styleSheet = {
+  inputStyles: {
+    borderRadius: '50px',
+    backgroundColor: 'white',
+    marginRight: '5px',
+    borderWidth: '2.5px',
+    borderColor: 'black'
+  },
+  composeStyles: {
+    backgroundColor: 'transparent',
+    border: 0,
+    position: 'fixed',
+    bottom: '5',
+    margin: 0,
+    padding: 0
+  },
+  buttonStyles: {
+    backgroundColor: 'black'
+  }
+};
