@@ -178,8 +178,9 @@ router.post('/sendmessage', auth, async (req, res) => {
         return res.status(400).json({ err: 'Error Updating Room' });
       } else {
         //the data being sent will be chnaged later as per requirements
-
-        io.emit('newMessage', req.user.id);
+        //console.log('Room and All Messages : ', msgObject, roomName);
+        msgObject['room'] = roomName;
+        io.emit('newMessage', msgObject);
         return res.status(200).json({ status: 'Success', msg: msgObject });
       }
     });
