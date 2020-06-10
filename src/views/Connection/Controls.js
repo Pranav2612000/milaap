@@ -37,7 +37,7 @@ import Peer from 'peerjs';
 import axios from 'axios';
 import $ from 'jquery';
 import './Controls.css';
-const socket = socketIOClient('http://localhost:5000/');
+const socket = socketIOClient(`${global.config.backendURL}/`);
 
 class Controls extends Component {
   constructor(props) {
@@ -165,7 +165,7 @@ class Controls extends Component {
         type: type
       };
       axios
-        .post('http://localhost:5000/api/room/goonline', reqData, {
+        .post(`${global.config.backendURL}/api/room/goonline`, reqData, {
           headers: {
             'milaap-auth-token': localStorage.getItem('milaap-auth-token')
           }
@@ -537,7 +537,7 @@ videos.empty();
       roomName: this.state.roomName
     };
     axios
-      .post('http://localhost:5000/api/room/exitstream', reqData, {
+      .post(`${global.config.backendURL}/api/room/exitstream`, reqData, {
         headers: {
           'milaap-auth-token': localStorage.getItem('milaap-auth-token')
         }
@@ -555,7 +555,7 @@ videos.empty();
       roomName: this.state.roomName
     };
     axios
-      .post('http://localhost:5000/api/room/exitstream', reqData, {
+      .post(`${global.config.backendURL}/api/room/exitstream`, reqData, {
         headers: {
           'milaap-auth-token': localStorage.getItem('milaap-auth-token')
         }

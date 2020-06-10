@@ -7,6 +7,7 @@ import {
 } from './loginActionTypes';
 import ReactNotification, { store } from 'react-notifications-component';
 import axios from 'axios';
+
 import Notifications, { success, error } from 'react-notification-system-redux';
 /*
                 store.addNotification({
@@ -23,6 +24,7 @@ import Notifications, { success, error } from 'react-notification-system-redux';
                   }
                 });
                 */
+
 const notificationOpts = {
   // uid: 'once-please', // you can specify your own uid if required
   title: 'Error',
@@ -72,7 +74,7 @@ export const login = (username, password) => {
   return function (dispatch) {
     dispatch(loginRequest());
     axios
-      .post('http://localhost:5000/api/login', reqData)
+      .post(`${global.config.backendURL}/api/login`, reqData)
       .then((res) => {
         console.log(res.data);
         localStorage.setItem('milaap-auth-token', res.data.token);
