@@ -21,7 +21,6 @@ const Page404 = React.lazy(() => import('./views/Pages/Page404'));
 const Page500 = React.lazy(() => import('./views/Pages/Page500'));
 const Guest = React.lazy(() => import('./views/Pages/Guest/Guest'));
 const Landing = React.lazy(() => import('./views/Pages/Landing/Landing'));
-
 class App extends Component {
   render() {
     return (

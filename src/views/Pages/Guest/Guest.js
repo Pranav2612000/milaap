@@ -67,7 +67,7 @@ class Guest extends Component {
         roomName: this.state.roomName
       };
       axios
-        .post('http://localhost:5000/api/user/gettokenfortempuser', reqData)
+        .post(`${global.config.backendURL}/api/user/gettokenfortempuser`, reqData)
         .then((res) => {
           localStorage.setItem('milaap-auth-token', res.data.token);
           this.setState({

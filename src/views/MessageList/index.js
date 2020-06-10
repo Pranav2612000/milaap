@@ -10,7 +10,7 @@ import { connect } from 'react-redux';
 import './MessageList.css';
 import { Col } from 'reactstrap';
 
-const socket = socketIOClient('http://localhost:5000/');
+const socket = socketIOClient(`${global.config.backendURL}/`);
 
 class MessageList extends Component {
   constructor(props) {
