@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { Link, NavLink, Redirect } from 'react-router-dom';
+import { connect } from 'react-redux';
 import {
   Badge,
   UncontrolledDropdown,
@@ -54,20 +55,20 @@ class DefaultHeader extends Component {
 
   componentDidMount() {
     /* To be changed: Use Redux to get username. */
-    axios
-      .get('http://localhost:5000/api/user/getUserName', {
-        headers: {
-          'milaap-auth-token': localStorage.getItem('milaap-auth-token')
-        }
-      })
-      .then((resp) => {
-        console.log(resp.data.username);
-        this.setState({ username: resp.data.username });
-      })
-      .catch((err) => {
-        console.log(err, 'Error in Verifying JWT');
-        this.setState({ username: false });
-      });
+    // axios
+    //   .get('http://localhost:5000/api/user/getUserName', {
+    //     headers: {
+    //       'milaap-auth-token': localStorage.getItem('milaap-auth-token')
+    //     }
+    //   })
+    //   .then((resp) => {
+    //     console.log(resp.data.username);
+    //     this.setState({ username: resp.data.username });
+    //   })
+    //   .catch((err) => {
+    //     console.log(err, 'Error in Verifying JWT');
+    //     this.setState({ username: false });
+    //   });
   }
 
   addFriend() {
@@ -76,7 +77,7 @@ class DefaultHeader extends Component {
       roomName: this.state.roomName
     };
     axios
-      .post('http://localhost:5000/api/room/createroom', reqData, {
+      .post(`${global.config.backendURL}/api/room/createroom`, reqData, {
         headers: {
           'milaap-auth-token': localStorage.getItem('milaap-auth-token')
         }
@@ -113,7 +114,7 @@ class DefaultHeader extends Component {
     const { children, ...attributes } = this.props;
 
     /* TODO: Use Protected Route component. */
-    if (this.state.username === false) {
+    if (!this.props.username) {
       return <Redirect to="/login" />; //Choose from landing and login page.
     }
     return (
@@ -155,7 +156,7 @@ class DefaultHeader extends Component {
             <DropdownToggle>
               <NavItem>
                 <NavLink to="#" className="nav-link text-dark">
-                  {this.state.username}
+                  {this.props.username}
                 </NavLink>
               </NavItem>
             </DropdownToggle>
@@ -266,4 +267,11 @@ class DefaultHeader extends Component {
 DefaultHeader.propTypes = propTypes;
 DefaultHeader.defaultProps = defaultProps;
 
-export default DefaultHeader;
+const mapStateToProps = (state) => {
+  console.log(state);
+  return {
+    username: state.loginReducer.username
+  };
+};
+
+export default connect(mapStateToProps)(DefaultHeader);

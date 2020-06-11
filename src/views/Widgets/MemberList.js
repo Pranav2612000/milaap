@@ -41,7 +41,7 @@ import {
   Label
 } from 'reactstrap';
 import './MemberList.css';
-const socket = socketIOClient('http://localhost:5000/');
+const socket = socketIOClient(`${global.config.backendURL}/`);
 
 class MemberList extends Component {
   constructor(props) {
@@ -120,7 +120,7 @@ class MemberList extends Component {
     };
     console.log(reqData);
     axios
-      .post('http://localhost:5000/api/room/addusertoroom', reqData, {
+      .post(`${global.config.backendURL}/api/room/addusertoroom`, reqData, {
         headers: {
           'milaap-auth-token': localStorage.getItem('milaap-auth-token')
         }
