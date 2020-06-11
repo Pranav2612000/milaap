@@ -2,7 +2,8 @@ import {
   REGISTER_FAILURE,
   REGISTER_REQUEST,
   REGISTER_SUCCESS,
-  USERNAME_EXISTS
+  USERNAME_EXISTS,
+  GOOGLE_USER
 } from './registerActionTypes';
 import ReactNotification, { store } from 'react-notifications-component';
 import axios from 'axios';
@@ -61,7 +62,13 @@ export const registerFailure = (error) => {
   };
 };
 
-export const register = (username, password) => {
+export const googleUser = () => {
+  return {
+    type: GOOGLE_USER
+  };
+};
+
+export const register = (username, password, google = false) => {
   console.log('registering....');
   var reqData = {
     username: username,
@@ -74,6 +81,10 @@ export const register = (username, password) => {
       .post('http://localhost:5000/api/register/', reqData)
       .then((res) => {
         console.log(res);
+        if (res.data.err == 'UEXIST' && google === true) {
+          dispatch(googleUser());
+          return;
+        }
         if (res.data.err == 'UEXIST') {
           console.log('username exists');
           dispatch(usernameExists(res.data.err));

@@ -3,7 +3,8 @@ import {
   REGISTER_REQUEST,
   REGISTER_SUCCESS,
   REDIRECT_TO_LOGIN,
-  USERNAME_EXISTS
+  USERNAME_EXISTS,
+  GOOGLE_USER
 } from './registerActionTypes';
 
 const initalState = {
@@ -38,6 +39,13 @@ export const registerReducer = (state = initalState, action) => {
         ...state,
         loading: false,
         error: action.error
+      };
+    case GOOGLE_USER:
+      console.log('Google user in db');
+      return {
+        ...state,
+        loading: false,
+        glogin: true
       };
     default:
       console.log('def');
