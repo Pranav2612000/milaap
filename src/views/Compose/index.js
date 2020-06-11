@@ -11,7 +11,7 @@ export default function Compose(props) {
       roomName: props.roomName
     };
     axios
-      .post('http://localhost:5000/api/room/sendmessage', reqData, {
+      .post(`${global.config.backendURL}/api/room/sendmessage`, reqData, {
         headers: {
           'milaap-auth-token': localStorage.getItem('milaap-auth-token')
         }
@@ -39,6 +39,7 @@ export default function Compose(props) {
         onChange={(e) => {
           setMsg(e.target.value);
         }}
+        style={styleSheet.inputStyles}
       />
       <button className="compose-button" onClick={sendMessage}>
         <span className="icon cui-chevron-right"></span>
@@ -48,3 +49,24 @@ export default function Compose(props) {
     </div>
   );
 }
+
+const styleSheet = {
+  inputStyles: {
+    borderRadius: '50px',
+    backgroundColor: 'white',
+    marginRight: '5px',
+    borderWidth: '2.5px',
+    borderColor: 'black'
+  },
+  composeStyles: {
+    backgroundColor: 'transparent',
+    border: 0,
+    position: 'fixed',
+    bottom: '5',
+    margin: 0,
+    padding: 0
+  },
+  buttonStyles: {
+    backgroundColor: 'black'
+  }
+};

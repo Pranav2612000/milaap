@@ -58,7 +58,7 @@ class DefaultHeader extends Component {
       roomName: this.state.roomName
     };
     axios
-      .post(reqData, 'http://localhost:5000/api/user/adduser', {
+      .post(reqData, `${global.config.backendURL}/api/user/adduser`, {
         headers: {
           'milaap-auth-token': localStorage.getItem('milaap-auth-token')
         }

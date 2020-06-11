@@ -3,6 +3,7 @@ import React, { Component } from 'react';
 import { store } from 'react-notifications-component';
 import { AwesomeButtonProgress } from 'react-awesome-button';
 import 'react-awesome-button/dist/styles.css';
+import { connect } from 'react-redux';
 import {
   Nav,
   NavItem,
@@ -36,7 +37,7 @@ import Peer from 'peerjs';
 import axios from 'axios';
 import $ from 'jquery';
 import './Controls.css';
-const socket = socketIOClient('http://localhost:5000/');
+const socket = socketIOClient(`${global.config.backendURL}/`);
 
 class Controls extends Component {
   constructor(props) {
@@ -115,19 +116,29 @@ class Controls extends Component {
       port: 9000,
       path: '/peerserver',
       config: {
+        // iceServers: [
+        //   { urls: 'stun:stun.l.google.com:19302' },
+        //   {
+        //     url: 'turn:numb.viagenie.ca',
+        //     credential: 'HWeF3pu@u2RfeYD',
+        //     username: 'veddandekar6@gmail.com'
+        //   }
+        // ]
+        // { urls: "stun.internetcalls.com:3478" },
         iceServers: [
-          { urls: 'stun:stun.l.google.com:19302' },
           {
-            url: 'turn:numb.viagenie.ca',
-            credential: 'HWeF3pu@u2RfeYD',
-            username: 'veddandekar6@gmail.com'
+            urls: 'stun:turn01.brie.fi:5349'
+          },
+          {
+            urls: 'turn:turn01.brie.fi:5349',
+            username: 'brie',
+            credential: 'fi'
           }
         ]
       } /* Sample servers, please use appropriate ones */
     });
     return peer;
   }
-
   updateSelfPeerInfo(self, peer, id, type) {
     console.log(self.state);
     var isVideo = type === 'video' ? 1 : 0;
@@ -165,7 +176,7 @@ class Controls extends Component {
         type: type
       };
       axios
-        .post('http://localhost:5000/api/room/goonline', reqData, {
+        .post(`${global.config.backendURL}/api/room/goonline`, reqData, {
           headers: {
             'milaap-auth-token': localStorage.getItem('milaap-auth-token')
           }
@@ -225,28 +236,14 @@ class Controls extends Component {
       self.waitForConnections(self, peer);
 
       // Make requests to currently online users.
-      axios
-        .get('http://localhost:5000/api/user/getUserName', {
-          headers: {
-            'milaap-auth-token': localStorage.getItem('milaap-auth-token')
-          }
-        })
-        .then((resp) => {
-          console.log(resp.data);
-          self.setState({
-            myUsername: resp.data.username
-          });
-          onlineArray.forEach((val, index) => {
-            if (val.username === resp.data.username && val.type === type) {
-              return;
-            }
-            console.log('Connecting to ' + onlineArray[index].tkn);
-            self.startConnection(self, onlineArray[index].tkn, peer);
-          });
-        })
-        .catch((err) => {
-          console.log(err, 'Error in Verifying JWT');
-        });
+
+      onlineArray.forEach((val, index) => {
+        if (val.username === this.props.username && val.type === type) {
+          return;
+        }
+        console.log('Connecting to ' + onlineArray[index].tkn);
+        self.startConnection(self, onlineArray[index].tkn, peer);
+      });
     });
   }
 
@@ -405,7 +402,6 @@ connectedPeers: connectedPeers,
       thiscall.close();
       self.deleteVideoElement(thiscall.peer);
       // self.startConnection(self, friendtkn, peer);
-
       // If an error is observed, we automatically send another request to start connection,
       // to provide reliability. Since, we dont want both the receiver and username of the stream
       // to send new calls, only the receiver initiates a new connection.
@@ -551,7 +547,7 @@ videos.empty();
       roomName: this.state.roomName
     };
     axios
-      .post('http://localhost:5000/api/room/exitstream', reqData, {
+      .post(`${global.config.backendURL}/api/room/exitstream`, reqData, {
         headers: {
           'milaap-auth-token': localStorage.getItem('milaap-auth-token')
         }
@@ -569,7 +565,7 @@ videos.empty();
       roomName: this.state.roomName
     };
     axios
-      .post('http://localhost:5000/api/room/exitstream', reqData, {
+      .post(`${global.config.backendURL}/api/room/exitstream`, reqData, {
         headers: {
           'milaap-auth-token': localStorage.getItem('milaap-auth-token')
         }
@@ -666,5 +662,11 @@ videos.empty();
     );
   }
 }
+const mapStateToProps = (state) => {
+  console.log(state);
+  return {
+    username: state.loginReducer.username
+  };
+};
 
-export default Controls;
+export default connect(mapStateToProps)(Controls);

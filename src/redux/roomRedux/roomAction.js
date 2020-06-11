@@ -46,7 +46,7 @@ export const enterRoom = (room) => {
   return function (dispatch) {
     dispatch(enterRoomRequest());
     axios
-      .post('http://localhost:5000/api/room/enterroom', reqData, {
+      .post(`${global.config.backendURL}/api/room/enterroom`, reqData, {
         headers: {
           'milaap-auth-token': localStorage.getItem('milaap-auth-token')
         }

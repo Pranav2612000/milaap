@@ -25,51 +25,52 @@ import { CustomTooltips } from '@coreui/coreui-plugin-chartjs-custom-tooltips';
 import { getStyle, hexToRgba } from '@coreui/coreui/dist/js/coreui-utilities';
 import DefaultAside from '../../containers/DefaultLayout/DefaultAside';
 import PeerHandler from '../../containers/DefaultLayout/peerHandler';
+import { connect } from 'react-redux';
 const axios = require('axios');
 class Dashboard extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      username: localStorage.getItem('uname')
+      // username: localStorage.getItem('uname')
     };
   }
 
   componentDidMount() {
     /* Can be changed by getting the username when user logs in. */
-    console.log(this.state.gID);
-    if (!this.state.gID) {
-      axios
-        .get('http://localhost:5000/api/user/getUserName', {
-          headers: {
-            'milaap-auth-token': localStorage.getItem('milaap-auth-token')
-          }
-        })
-        .then((resp) => {
-          console.log(resp.data.username);
-          this.setState({ username: resp.data.username });
-        })
-        .catch((err) => {
-          console.log(err, 'Error in Verifying JWT');
-          this.setState({ username: false });
-          // browserHistory.push('/login');
-          // redirectTo('/login');
-        });
-    } else {
-      console.log(this.state.username);
-    }
+    // console.log(this.state.gID);
+    // if (!this.state.gID) {
+    //   axios
+    //     .get('http://localhost:5000/api/user/getUserName', {
+    //       headers: {
+    //         'milaap-auth-token': localStorage.getItem('milaap-auth-token')
+    //       }
+    //     })
+    //     .then((resp) => {
+    //       console.log(resp.data.username);
+    //       this.setState({ username: resp.data.username });
+    //     })
+    //     .catch((err) => {
+    //       console.log(err, 'Error in Verifying JWT');
+    //       this.setState({ username: false });
+    //       // browserHistory.push('/login');
+    //       // redirectTo('/login');
+    //     });
+    // } else {
+    //   console.log(this.props.username);
+    // }
   }
 
   loading = () => <div className="animated fadeIn pt-1 text-center">Loading...</div>;
 
   render() {
-    if (this.state.username === false) {
+    if (this.props.username === false) {
       return <Redirect to="/login" />;
     }
     return (
       <>
         <div className="animated fadeIn ">
           <center>
-            <h1>Welcome {`${this.state.username}`}</h1>
+            <h1>Welcome {`${this.props.username}`}</h1>
             <h1>Dashboard</h1>
           </center>
         </div>
@@ -77,5 +78,11 @@ class Dashboard extends Component {
     );
   }
 }
+const mapStateToProps = (state) => {
+  console.log(state);
+  return {
+    username: state.loginReducer.username
+  };
+};
 
-export default Dashboard;
+export default connect(mapStateToProps)(Dashboard);
