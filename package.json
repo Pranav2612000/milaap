@@ -30,7 +30,6 @@
     "jquery": "^3.5.1",
     "node-sass": "^4.14.1",
     "peerjs": "^1.2.0",
-    "prettier": "^2.0.5",
     "prop-types": "^15.7.2",
     "react": "^16.8.6",
     "react-app-polyfill": "^1.0.1",
@@ -49,6 +48,8 @@
     "socket.io-client": "^2.3.0"
   },
   "devDependencies": {
+    "@commitlint/cli": "^8.3.5",
+    "@commitlint/config-conventional": "^8.3.4",
     "babel-eslint": "^10.1.0",
     "concurrently": "^5.2.0",
     "eslint": "^7.1.0",
@@ -60,6 +61,9 @@
     "eslint-plugin-promise": "^4.2.1",
     "eslint-plugin-react": "^7.20.0",
     "eslint-plugin-standard": "^4.0.1",
+    "husky": "^4.2.5",
+    "lint-staged": "^10.2.9",
+    "prettier": "^2.0.5",
     "react-redux": "^7.2.0",
     "react-scripts": "^3.4.1",
     "redux": "^4.0.5",
@@ -75,6 +79,22 @@
     "eject": "react-scripts eject",
     "server": "node backend/index.js",
     "dev": "concurrently \"npm start\" \"npm run server --prefix backend\""
+  },
+  "commitlint": {
+    "extends": [
+      "@commitlint/config-conventional"
+    ]
+  },
+  "husky": {
+    "hooks": {
+      "commit-msg": "commitlint -E HUSKY_GIT_PARAMS",
+      "pre-commit": "lint-staged --allow-empty"
+    }
+  },
+  "lint-staged": {
+    "./**/*.js": [
+      "./node_modules/.bin/eslint . --fix"
+    ]
   },
   "bugs": {
     "url": "https://github.com/coreui/coreui-free-react-admin-template/issues"
