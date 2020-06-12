@@ -259,11 +259,17 @@ class DefaultLayout extends Component {
       });
     }
   }
-
+  getRoomFromLocation = (locationString) => {
+    let room = '';
+    const lastslash = locationString.lastIndexOf('/');
+    room = locationString.slice(lastslash + 1);
+    console.log(room);
+    return room;
+  };
   render() {
     if (localStorage.getItem('milaap-auth-token') === null) {
       if (this.props.location.pathname.match('/rooms/')) {
-        var room = this.props.location.pathname.split('/')[2];
+        var room = this.getRoomFromLocation(this.props.location.pathname);
         return <Redirect to={{ pathname: '/join', room: room }} />;
       }
       return <Redirect to={{ pathname: '/login' }} />;

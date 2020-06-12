@@ -1,0 +1,1 @@
+1 . replace webpack.config.js in this folder with node_modules/react-scripts/config/webpack.config.js

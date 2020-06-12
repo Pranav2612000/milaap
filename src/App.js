@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { Router } from 'react-router';
 import { HashRouter, Route, Switch } from 'react-router-dom';
 // import { renderRoutes } from 'react-router-config';
 import './App.scss';
@@ -13,7 +14,6 @@ const loading = () => (
 
 // Containers
 const DefaultLayout = React.lazy(() => import('./containers/DefaultLayout'));
-
 // Pages
 const Login = React.lazy(() => import('./views/Pages/Login'));
 const Register = React.lazy(() => import('./views/Pages/Register'));
@@ -21,6 +21,29 @@ const Page404 = React.lazy(() => import('./views/Pages/Page404'));
 const Page500 = React.lazy(() => import('./views/Pages/Page500'));
 const Guest = React.lazy(() => import('./views/Pages/Guest/Guest'));
 const Landing = React.lazy(() => import('./views/Pages/Landing/Landing'));
+const BrowsePage = React.lazy(() => import('./views/Pages/browse/BrowsePage'));
+const PartyPage = React.lazy(() => import('./views/Pages/party/PartyPage'));
+const SearchPage = React.lazy(() => import('./views/Pages/search/SearchPage'));
+const ytVideo = React.lazy(() => import('./views/components/app/App'));
+const routes = {
+  path: '/',
+  component: App,
+  childRoutes: [
+    {
+      indexRoute: {
+        component: BrowsePage
+      }
+    },
+    {
+      path: '/party/:partyId',
+      component: PartyPage
+    },
+    {
+      path: '/search/:query',
+      components: SearchPage
+    }
+  ]
+};
 class App extends Component {
   render() {
     return (

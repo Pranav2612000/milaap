@@ -5,7 +5,8 @@ import {
 } from './roomActionTypes';
 
 const initalState = {
-  loading: false
+  loading: false,
+  currentRoom: localStorage.getItem('room')
 };
 
 export const roomReducer = (state = initalState, action) => {

@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { Link, NavLink, Redirect } from 'react-router-dom';
 import { connect } from 'react-redux';
+
 import {
   Badge,
   UncontrolledDropdown,
@@ -268,7 +269,6 @@ DefaultHeader.propTypes = propTypes;
 DefaultHeader.defaultProps = defaultProps;
 
 const mapStateToProps = (state) => {
-  console.log(state);
   return {
     username: state.loginReducer.username
   };

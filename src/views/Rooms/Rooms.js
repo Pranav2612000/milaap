@@ -48,8 +48,8 @@ class Room extends Component {
       this.setState(
         {
           roomName: this.props.match.params.roomname
-        },
-        
+        }
+
         /*
         () => {
           store.addNotification({
@@ -81,11 +81,28 @@ class Room extends Component {
         <main class="main">
           <Container className="room">
             <video id="context" controls autoPlay></video>
+            {/* <VideoPlayer
+              selectedVideo={selectedVideo}
+              partyId={this.props.roomName}
+              userName={userName}
+              videoPlayerIsMuted={videoPlayerIsMuted}
+              videoPlayerIsMaximized={videoPlayerIsMaximized}
+              videoPlayerIsLoaded={videoPlayerIsLoaded}
+              videoProgress={videoProgress}
+              userVideoPlayerState={userVideoPlayerState}
+              partyVideoPlayerState={partyVideoPlayerState}
+              onPlayerStateChange={onPlayerStateChange}
+              emitNewPlayerStateToServer={emitNewPlayerStateForPartyToServer}
+              setPlayerMutedState={setPlayerMutedState}
+              setPlayerProgress={setPlayerProgress}
+              setPlayerIsLoadedState={setPlayerIsLoadedState}
+              handleMaximizeBtnPressed={handleMaximizeBtnPressed}
+            /> */}
             <Row className="m-0 p-0" id="videos"></Row>
           </Container>
         </main>
         <aside className="aside-menu bg-dark" display="md">
-          <DefaultAside 
+          <DefaultAside
             roomName={this.props.roomName}
             msgs={this.props.msgs}
             users={this.props.users}
@@ -107,12 +124,12 @@ const mapStateToProps = (state) => {
     msgs: state.roomReducer.msgs,
     loading: state.roomReducer.loading
   };
-}
+};
 
 const mapDispatchToProps = (dispatch) => {
   return {
     enterRoom: (room) => dispatch(action.enterRoom(room))
   };
-}
+};
 
 export default connect(mapStateToProps, mapDispatchToProps)(Room);

@@ -1,0 +1,8 @@
+.video-list {
+  width: 100vw;
+  display: flex;
+  overflow: auto;
+  display: inline-block;
+  flex-direction: row;
+  /* flex-direction: column; */
+}

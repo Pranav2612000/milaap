@@ -66,6 +66,7 @@ export const enterRoom = (room) => {
           dispatch(enterRoomFailure('NOROOM'));
           return;
         }
+        localStorage.setItem('room', reqData.roomName);
         dispatch(enterRoomSuccess(reqData.roomName, res.data));
       })
       .catch((err) => {

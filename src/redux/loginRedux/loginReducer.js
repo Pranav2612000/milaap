@@ -5,9 +5,9 @@ import {
   LOGOUT,
   REDIRECT_TO_JOIN
 } from './loginActionTypes';
-
 const initalState = {
-  loading: false
+  loading: false,
+  username: localStorage.getItem('username')
 };
 
 export const loginReducer = (state = initalState, action) => {

@@ -78,6 +78,7 @@ export const login = (username, password) => {
       .then((res) => {
         console.log(res.data);
         localStorage.setItem('milaap-auth-token', res.data.token);
+        localStorage.setItem('username', username);
         dispatch(loginSuccess(username));
       })
       .catch((err) => {

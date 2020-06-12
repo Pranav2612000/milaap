@@ -2,6 +2,7 @@ import socketIOClient from 'socket.io-client';
 import React, { Component } from 'react';
 import { store } from 'react-notifications-component';
 import { AwesomeButtonProgress } from 'react-awesome-button';
+import { Redirect, Route, Switch } from 'react-router-dom';
 import 'react-awesome-button/dist/styles.css';
 import { connect } from 'react-redux';
 import {
@@ -43,6 +44,7 @@ class Controls extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      party: false,
       myIds: [0, 0],
       myPeers: [0, 0],
       roomName: this.props.roomName,
@@ -623,11 +625,11 @@ videos.empty();
     // Add by appropriate UI changes which clears the screen.
     this.deleteAllVideoElements();
   }
-
   render() {
     const self = this;
     return (
       <Container>
+        {this.state.party && <Redirect to="/party/dummy" />}
         <br />
         <br />
         <Row className="justify-content-center text-center">
@@ -647,6 +649,16 @@ videos.empty();
             <i className="icon-screen-desktop icons"></i>
             <span> Screen</span>
           </AwesomeButtonProgress>
+          <Button
+            type="primary"
+            size="medium"
+            onClick={(e) => {
+              e.preventDefault();
+              this.setState({ party: true });
+            }}>
+            <i className="icon-screen-desktop icons"></i>
+            <span> Watch Party</span>
+          </Button>
           <AwesomeButtonProgress
             type="primary"
             size="medium"

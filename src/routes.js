@@ -36,6 +36,10 @@ const Widgets = React.lazy(() => import('./views/Widgets/Widgets'));
 const Users = React.lazy(() => import('./views/Users/Users'));
 const User = React.lazy(() => import('./views/Users/User'));
 const Room = React.lazy(() => import('./views/Rooms/Rooms'));
+const BrowsePage = React.lazy(() => import('./views/Pages/browse/BrowsePage'));
+const PartyPage = React.lazy(() => import('./views/Pages/party/PartyPage'));
+const SearchPage = React.lazy(() => import('./views/Pages/search/SearchPage'));
+const ytVideo = React.lazy(() => import('./views/components/app/App'));
 // const Rooms = import('./views/Rooms/Rooms');
 
 // https://github.com/ReactTraining/react-router/tree/master/packages/react-router-config
@@ -102,7 +106,30 @@ const routes = [
   { path: '/charts', name: 'Charts', component: Charts },
   { path: '/users', exact: true, name: 'Users', component: Users },
   { path: '/users/:id', exact: true, name: 'User Details', component: User },
-  { path: '/rooms/:roomname', exact: true, name: 'Room', component: Room }
+  { path: '/rooms/:roomname', exact: true, name: 'Room', component: Room },
+  { path: '/party/:roomname', exact: true, name: 'Party', component: PartyPage }
+
+  // { path: '/browse', exact: true, name: 'Browse', component: BrowsePage },
+  // { path: '/search', exact: true, name: 'Browse', component: SearchPage },
+  // { path: '/party/:roomname', exact: true, name: 'Browse', component: PartyPage },
+  // {
+  //   path: '/ytParty',
+  //   component: ytVideo,
+  //   childRoutes: [
+  //     {
+  //       path: '/browse',
+  //       component: BrowsePage
+  //     },
+  //     {
+  //       path: '/party/:partyId',
+  //       component: PartyPage
+  //     },
+  //     {
+  //       path: '/search/:query',
+  //       components: SearchPage
+  //     }
+  //   ]
+  // }
 ];
 
 export default routes;

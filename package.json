@@ -40,17 +40,24 @@
     "react-notification-system": "^0.4.0",
     "react-notification-system-redux": "^2.0.1",
     "react-notifications-component": "^2.4.0",
+    "react-player": "^2.2.0",
     "react-router-config": "^5.0.1",
     "react-router-dom": "^5.2.0",
     "react-sortablejs": "^2.0.11",
     "react-test-renderer": "^16.8.6",
+    "react-truncate": "^2.4.0",
     "reactstrap": "^8.0.0",
+    "redux-socket.io": "^1.4.0",
+    "seamless-immutable": "^7.1.4",
     "simple-line-icons": "^2.4.1",
     "socket.io-client": "^2.3.0"
   },
   "devDependencies": {
+    "@babel/core": "^7.10.2",
+    "@babel/preset-env": "^7.10.2",
     "babel-eslint": "^10.1.0",
     "concurrently": "^5.2.0",
+    "css-loader": "^3.5.3",
     "eslint": "^7.1.0",
     "eslint-config-prettier": "^6.11.0",
     "eslint-config-standard": "^14.1.1",
@@ -64,7 +71,8 @@
     "react-scripts": "^3.4.1",
     "redux": "^4.0.5",
     "redux-devtools-extension": "^2.13.8",
-    "redux-thunk": "^2.3.0"
+    "redux-thunk": "^2.3.0",
+    "style-loader": "^1.2.1"
   },
   "scripts": {
     "start": "react-scripts start",
