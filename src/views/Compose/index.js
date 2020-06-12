@@ -27,7 +27,6 @@ export default function Compose(props) {
       });
   }
   return (
-<<<<<<< HEAD
     <div className="compose bg-dark">
       <textarea
         type="text"
