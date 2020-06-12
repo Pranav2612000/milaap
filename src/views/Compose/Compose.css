@@ -3,10 +3,12 @@
   display: flex;
   align-items: center;
   background: white;
-  border: 1px solid #eeeef1;
+  /* border: 1px solid #eeeef1; */
   position: fixed;
-  width: 25%;
-  bottom: 10px;
+  width: auto;
+  margin-left: 0em;
+  bottom: 0px;
+  outline: none;
 }
 
 @supports (backdrop-filter: blur(20px)) {
@@ -14,43 +16,40 @@
     border: none;
     background-color: rgba(255, 255, 255, 0.8);
     backdrop-filter: blur(20px);
+    outline: none;
   }
 }
 
-.compose-input {
-  flex: 1;
-  border: none;
-  float: left;
-  font-size: 14px;
-  height: 40px;
-  background: none;
-  width: 15vw;
-  border: 1px solid #8d8d8d;
-}
-
 .compose-button {
-  float: left;
-  flex: 1;
+  float: right;
   border: 1px solid grey;
   color: white;
   border: 1px solid #8d8d8d;
-  background-color: transparent;
+  background-color: white;
   border-radius: 1.5rem;
   font-size: 17px;
-  height: 40px;
-  width: 15px;
+  height: 30px;
+  width: auto;
   cursor: pointer;
+  color: black;
+  margin-left: 50px;
+  font-weight: bold;
+  outline: none;
 }
 
 .compose-input::placeholder {
-  opacity: 0.3;
+  opacity: 0.4;
 }
 
 .compose .toolbar-button {
   color: #bbbbbf;
-  margin-left: 15px;
 }
 
 .compose .toolbar-button:hover {
   color: #99999c;
+  background-color: blue;
+}
+
+.icon-chevron-right {
+  color: black;
 }

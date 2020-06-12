@@ -6,16 +6,17 @@ import Message from '../Message';
 import moment from 'moment';
 import axios from 'axios';
 import socketIOClient from 'socket.io-client';
+import { connect } from 'react-redux';
 import './MessageList.css';
 import { Col } from 'reactstrap';
 
-const socket = socketIOClient('http://localhost:5000/');
+const socket = socketIOClient(`${global.config.backendURL}/`);
 
-export default class MessageList extends Component {
+class MessageList extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      MY_USER_ID: '',
+      MY_USER_ID: this.props.username,
       messages: this.props.msgs,
       change: false,
       lastMsgId: 0
@@ -36,12 +37,14 @@ export default class MessageList extends Component {
         this.state.MY_USER_ID !== data['sender']
       )
         this.fetchMessages(true, data);
+
       //console.log('Data and Message list : ', messages, data);
       // if (props.roomName !== "dashboard") fetchMessages();
     });
   }
 
   componentDidUpdate(prevProps) {
+    window.scrollTo(0, document.querySelector('#message-list').scrollHeight);
     if (prevProps.roomName !== this.props.roomName) {
       this.setState({
         messages: this.props.msgs
@@ -65,20 +68,20 @@ export default class MessageList extends Component {
   }
 
   init = () => {
-    axios
-      .get('http://localhost:5000/api/user/getUserName', {
-        headers: {
-          'milaap-auth-token': localStorage.getItem('milaap-auth-token')
-        }
-      })
-      .then((resp) => {
-        this.setState({
-          MY_USER_ID: resp.data.username
-        });
-      })
-      .catch((err) => {
-        console.log(err, 'Error in Verifying JWT');
-      });
+    // axios
+    //   .get('http://localhost:5000/api/user/getUserName', {
+    //     headers: {
+    //       'milaap-auth-token': localStorage.getItem('milaap-auth-token')
+    //     }
+    //   })
+    //   .then((resp) => {
+    //     this.setState({
+    //       MY_USER_ID: resp.data.username
+    //     });
+    //   })
+    //   .catch((err) => {
+    //     console.log(err, 'Error in Verifying JWT');
+    //   });
   };
 
   getReqData = () => {
@@ -123,12 +126,11 @@ export default class MessageList extends Component {
     let i = 0;
     const messageCount = messages.length;
     const tempMessages = [];
-
     while (i < messageCount) {
       const previous = messages[i - 1];
       const current = messages[i];
       const next = messages[i + 1];
-      const isMine = current.author === this.state.MY_USER_ID;
+      const isMine = current.sender === this.state.MY_USER_ID;
       const currentMoment = moment(current.timestamp);
       let prevBySameAuthor = false;
       let nextBySameAuthor = false;
@@ -203,7 +205,9 @@ export default class MessageList extends Component {
              */
         />
 
-        <div className="message-list-container bg-dark">{this.renderMessages()}</div>
+        <div className="message-list-container bg-dark" id="message-list">
+          {this.renderMessages()}
+        </div>
 
         <Compose
           rightItems={[
@@ -221,3 +225,12 @@ export default class MessageList extends Component {
     );
   }
 }
+
+const mapStateToProps = (state) => {
+  console.log(state);
+  return {
+    username: state.loginReducer.username
+  };
+};
+
+export default connect(mapStateToProps)(MessageList);

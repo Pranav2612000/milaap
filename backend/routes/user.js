@@ -103,13 +103,13 @@ router.post('/gettokenfortempuser', async (req, res) => {
     if (err) {
       return res.status(400).json({ err: 'Error. Try again.' });
     }
-    if(!room) {
-        return res.status(400).json({ err: 'Room does not exist' });
+    if (!room) {
+      return res.status(400).json({ err: 'Room does not exist' });
     } else {
       var i = -1;
       var userExists = false;
       //TODO: Check in all registered users, not just for this room.
-      if(room._doc.users == undefined) {
+      if (room._doc.users == undefined) {
         room._doc.users = [];
       }
       room._doc.users.forEach((val, index) => {
@@ -122,7 +122,7 @@ router.post('/gettokenfortempuser', async (req, res) => {
         console.log('not found in users.');
       }
       if (userExists == false) {
-        if(room._doc.guests == undefined) {
+        if (room._doc.guests == undefined) {
           room._doc.guests = [];
         }
         console.log(room._doc.guests);
@@ -134,22 +134,27 @@ router.post('/gettokenfortempuser', async (req, res) => {
           }
         });
       }
-      if(userExists == false) {
+      if (userExists == false) {
         try {
-          jwt.sign(payload, config.get('jwtSecret'), { expiresIn: 3600 }, (err, token) => {
-            if (err) throw err;
-            res.status(200).json({
-              token,
-              temp_details: {
-                userId: name
-              }
-            });
-          });
-        } catch(e) {
-          res.status(400).json({ err: e});
+          jwt.sign(
+            payload,
+            config.get('jwtSecret'),
+            { expiresIn: 3600 },
+            (err, token) => {
+              if (err) throw err;
+              res.status(200).json({
+                token,
+                temp_details: {
+                  userId: name
+                }
+              });
+            }
+          );
+        } catch (e) {
+          res.status(400).json({ err: e });
         }
       } else {
-        res.status(400).json({ err: "Username already taken"});
+        res.status(400).json({ err: 'Username already taken' });
       }
     }
   });
