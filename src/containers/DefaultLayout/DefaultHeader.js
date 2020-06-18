@@ -114,7 +114,7 @@ class DefaultHeader extends Component {
 
     /* TODO: Use Protected Route component. */
     if (!this.props.username) {
-      return <Redirect to="/login" />; //Choose from landing and login page.
+      return <Redirect to="/landing" />; //Choose from landing and login page.
     }
     return (
       <React.Fragment>
