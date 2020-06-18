@@ -1,0 +1,1 @@
+{"version":3,"sources":["DefaultLayout.css"],"names":[],"mappings":"AAAA,gBACE,cAAiB,CACjB,eACF,CASA,uCACE,aACF","file":"27.5c63d9a5.chunk.css","sourcesContent":["#main-container {\n  margin-right: 0px;\n  padding-right: 0px;\n}\n\n.icon-list {\n  color: aliceblue;\n}\n\n.icon-settings {\n  color: aliceblue;\n}\n.icon-speech {\n  color: aliceblue;\n}\n"]}
