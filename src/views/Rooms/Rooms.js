@@ -48,8 +48,8 @@ class Room extends Component {
       this.setState(
         {
           roomName: this.props.match.params.roomname
-        },
-        
+        }
+
         /*
         () => {
           store.addNotification({
@@ -85,7 +85,7 @@ class Room extends Component {
           </Container>
         </main>
         <aside className="aside-menu bg-dark" display="md">
-          <DefaultAside 
+          <DefaultAside
             roomName={this.props.roomName}
             msgs={this.props.msgs}
             users={this.props.users}
@@ -107,12 +107,12 @@ const mapStateToProps = (state) => {
     msgs: state.roomReducer.msgs,
     loading: state.roomReducer.loading
   };
-}
+};
 
 const mapDispatchToProps = (dispatch) => {
   return {
     enterRoom: (room) => dispatch(action.enterRoom(room))
   };
-}
+};
 
 export default connect(mapStateToProps, mapDispatchToProps)(Room);
