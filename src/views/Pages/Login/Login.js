@@ -20,7 +20,7 @@ import axios from 'axios';
 import { connect } from 'react-redux';
 import ReactNotification, { store } from 'react-notifications-component';
 import Notifications from 'react-notification-system-redux';
-class Login extends Component {
+export class Login extends Component {
   constructor(props) {
     super(props);
 
