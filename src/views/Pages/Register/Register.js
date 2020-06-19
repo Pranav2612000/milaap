@@ -19,7 +19,7 @@ import { connect } from 'react-redux';
 import ReactNotification, { store } from 'react-notifications-component';
 import Notifications from 'react-notification-system-redux';
 import { Redirect, Link } from 'react-router-dom';
-class Register extends Component {
+export class Register extends Component {
   constructor(props) {
     super(props);
     this.state = {
