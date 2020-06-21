@@ -52,12 +52,18 @@ class Controls extends Component {
       calls: new Array(),
       connectedPeers: new Set(),
       friendtkn: '',
-      myUsername: ''
+      myUsername: '',
+      isMuted: false,
+      inCall: false,
+      isWebcamOn: true
     };
     console.log(this.state.roomName);
+    this.joinCall = this.joinCall.bind(this);
     this.startScreenShare = this.startScreenShare.bind(this);
     this.startConnection = this.startConnection.bind(this);
     this.sendCallEndedSignal = this.sendCallEndedSignal.bind(this);
+    this.stopScreenShare = this.stopScreenShare.bind(this);
+    this.muteCall = this.muteCall.bind(this);
 
     this.endCall = this.endCall.bind(this);
   }
@@ -128,6 +134,7 @@ class Controls extends Component {
     });
     return peer;
   }
+
   updateSelfPeerInfo(self, peer, id, type) {
     console.log(self.state);
     var isVideo = type === 'video' ? 1 : 0;
@@ -218,6 +225,21 @@ class Controls extends Component {
         });
     });
   }
+
+  async joinCall(next) {
+    this.startScreenShare('video', next);
+  }
+
+  async muteCall() {
+    {
+      /*console.log('mute call reached');
+    await navigator.mediaDevices
+        audio: false
+      });*/
+    }
+  }
+
+  async stopScreenShare() {}
 
   setUpConnections(self, peer, id, type, onlineArray) {
     self.getMyMediaStream(self, type).then((media) => {
@@ -622,25 +644,79 @@ videos.empty();
           <AwesomeButtonProgress
             type="primary"
             size="medium"
+            disabled={self.state.inCall}
             action={(element, next) => {
-              this.startScreenShare('video', next);
+              this.setState({ inCall: true });
+              this.joinCall(next);
             }}>
-            <i className="icon-user icons"></i>
-            <span> Video</span>
+            {/*<i className="icon-screen-desktop icons"></i>*/}
+            <span> Join Call</span>
+          </AwesomeButtonProgress>
+        </Row>
+        <Row>
+          <AwesomeButtonProgress
+            type="primary"
+            size="medium"
+            disabled={!(self.state.inCall && !self.state.isMuted)}
+            action={(element, next) => {
+              this.setState({ isMuted: true });
+              this.muteCall();
+            }}>
+            <span>Mute</span>
           </AwesomeButtonProgress>
           <AwesomeButtonProgress
             type="primary"
             size="medium"
+            disabled={!(self.state.isMuted && self.state.inCall)}
+            action={(element, next) => {
+              this.setState({ isMuted: false });
+              this.startScreenShare('screen', next);
+            }}>
+            <i className="icon-user icons"></i>
+            <span>UnMute</span>
+          </AwesomeButtonProgress>
+        </Row>
+        <Row>
+          <AwesomeButtonProgress
+            type="primary"
+            size="medium"
+            disabled={!(self.state.inCall && !self.state.isWebcamOn)}
+            action={(element, next) => {
+              this.setState({ isWebcamOn: true });
+              this.startScreenShare('video', next);
+            }}>
+            <span>On Webcam</span>
+          </AwesomeButtonProgress>
+          <AwesomeButtonProgress
+            type="primary"
+            size="medium"
+            disabled={!(self.state.isWebcamOn && self.state.inCall)}
+            action={(element, next) => {
+              this.setState({ isWebcamOn: false });
+              this.stopScreenShare('screen', next);
+            }}>
+            <i className="icon-user icons"></i>
+            <span>Off Webcam</span>
+          </AwesomeButtonProgress>
+        </Row>
+        <Row className="justify-content-center text-center">
+          <AwesomeButtonProgress
+            type="primary"
+            size="medium"
+            disabled={!self.state.inCall}
             action={(element, next) => this.startScreenShare('screen', next)}>
             <i className="icon-screen-desktop icons"></i>
             <span> Screen</span>
           </AwesomeButtonProgress>
+        </Row>
+        <Row className="justify-content-center text-center">
           <AwesomeButtonProgress
             type="primary"
             size="medium"
             // visible={!self.state.calls.length} //use this if we want it completely hidden until needed instead
-            disabled={!self.state.myMediaStreamObj}
+            disabled={!self.state.inCall}
             action={(element, next) => {
+              this.setState({ inCall: false });
               this.endCall(next);
             }}>
             <i className="icon-call-end icons"></i>
