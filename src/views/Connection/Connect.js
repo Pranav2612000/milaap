@@ -16,16 +16,19 @@ export class Peer extends Emitter {
     this.stream = null;
     this.room = room;
     this.initiator = it;
-    this.peer = new SimplePeer({ initiator: it, stream: stream,
-      config: { iceServers: [
+    this.peer = new SimplePeer({
+      initiator: it,
+      stream: stream,
+      config: {
+        iceServers: [
           { urls: 'stun:stun.l.google.com:19302' },
           {
-            url: 'turn:numb.viagenie.ca',
+            urls: 'turn:numb.viagenie.ca',
             credential: 'HWeF3pu@u2RfeYD',
             username: 'veddandekar6@gmail.com'
           }
         ]
-      },
+      }
     });
 
     this.peer.on('error', (err) => {
