@@ -33,7 +33,8 @@ class Landing extends Component {
                         style={{
                           textAlign: 'center',
                           width: '100%',
-                          margin: '10px'
+                          margin: '11px',
+                          color: 'white'
                         }}>
                         Distrideo Chat
                       </h1>
@@ -41,7 +42,8 @@ class Landing extends Component {
                         style={{
                           textAlign: 'center',
                           width: '100%',
-                          margin: '10px'
+                          margin: '10px',
+                          color: 'white'
                         }}>
                         An attempt to make a self-sustaining conferencing application
                         by India, for the World!
@@ -52,7 +54,10 @@ class Landing extends Component {
                         <Col xs="12">
                           <Button
                             color="warning"
-                            style={{ width: '100%', margin: '10px' }}
+                            style={{
+                              width: '100%',
+                              margin: '10px'
+                            }}
                             onClick={() => this.props.history.push('join')}>
                             Join a Meeting
                           </Button>
