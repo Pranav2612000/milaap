@@ -2,7 +2,7 @@ import SimplePeer from 'simple-peer';
 import $ from 'jquery';
 import socketIOClient from 'socket.io-client';
 import { Emitter } from './emmiter';
-const socket = socketIOClient.connect('http://localhost:5000'); //will be replaced by an appropriate room.
+const socket = socketIOClient.connect('http://54.160.110.155:5000'); //will be replaced by an appropriate room.
 socket.connect();
 socket.on('connect', () => {
   console.log(socket.connected); // true
