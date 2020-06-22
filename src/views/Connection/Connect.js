@@ -1,23 +1,31 @@
+/*
+ *
+*/
 import SimplePeer from 'simple-peer';
 import $ from 'jquery';
 import socketIOClient from 'socket.io-client';
 import { Emitter } from './emmiter';
-const socket = socketIOClient.connect('http://54.160.110.155:5000'); //will be replaced by an appropriate room.
+import axios from 'axios';
+//const socket = socketIOClient.connect('http://54.160.110.155:5000'); //will be replaced by an appropriate room.
+const socket = socketIOClient.connect('http://localhost:5000'); 
 socket.connect();
 socket.on('connect', () => {
   console.log(socket.connected); // true
+  console.log(socket.id);
 });
 
 export class Peer extends Emitter {
-  constructor(it, stream, room) {
+  constructor(it, stream, room, initiator, their_id, my_id) {
     super();
     this.error = null;
     this.active = false;
     this.stream = null;
+    this.their_id = their_id;
+    this.my_id = my_id;
     this.room = room;
-    this.initiator = it;
+    this.initiator = initiator;
     this.peer = new SimplePeer({
-      initiator: it,
+      initiator: initiator,
       stream: stream,
       config: {
         iceServers: [
@@ -45,8 +53,10 @@ export class Peer extends Emitter {
     console.log('in constructor');
     this.peer.on('signal', (data) => {
       console.log(data);
+      console.log(this.my_id);
+      console.log(this.their_id);
       var room = this.room;
-      socket.emit('signalling', room, data, (resp) => {
+      socket.emit('signalling', room, data, this.their_id, this.my_id, (resp) => {
         console.log('reply rcvd');
         console.log(data);
       });
@@ -62,8 +72,11 @@ export class Peer extends Emitter {
       console.log('stream received');
       createVideoElement(this, data, 'id', 'test');
     });
-    socket.on('signalling', (data) => {
+    socket.on('signalling', (data, from_id) => {
       console.log(data);
+      console.log(from_id);
+      console.log(this.my_id);
+      console.log(this.their_id);
       console.log(this.peer);
       console.log(this.peer.initiator);
       if (this.peer && !this.peer.destroyed) {
@@ -157,3 +170,91 @@ export async function getMyMediaStream(self, type) {
       });
   }
 }
+export function startCall(self, roomName) {
+      var my_id = socket.id;
+      console.log(my_id);
+  // Go online and get online array from express server.
+      var reqData = {
+        id: my_id,
+        type: 0,
+        roomName: roomName, 
+      };
+      axios
+        .post('http://localhost:5000/api/room/goonlinesimple', reqData, {
+          headers: {
+            'milaap-auth-token': localStorage.getItem('milaap-auth-token')
+          }
+        })
+    .then((res) => {
+      console.log(res);
+      var onlineArray = res.data.online;
+      // Get myMyMediaStream
+      getMyMediaStream(self, "screen")
+        .then((media) => {
+          console.log('media object found');
+          // Add eventhandler for "createConnection" signal, On receiving the signal:
+          socket.on('startconn', (their_id) => {
+            console.log('connection received from server');
+            console.log(their_id);
+            console.log(my_id);
+            console.log(socket.id);
+            var my_id = socket.id;
+            console.log(my_id);
+            // Create a new peer with initiator = false
+            var peer = new Peer(true, self.state.myMediaStreamObj, self.state.roomName, false, their_id, my_id);
+          });
+                
+          axios
+            .get('http://localhost:5000/api/user/getUserName', {
+              headers: {
+                'milaap-auth-token': localStorage.getItem('milaap-auth-token')
+              }
+            })
+            .then((resp) => {
+              // Loop through online Array and make connections to online Peers
+              onlineArray.forEach((val, index) => {
+                console.log(resp.data);
+                // Ignore self;
+                if (val.username === resp.data.username /*&& val.type === type*/) {
+                  return;
+                }
+                console.log('Connecting to ' + onlineArray[index]);
+                var their_id = onlineArray[index].id;
+          //    create a new Peer with initiator = true
+                var my_id = socket.id;
+                socket.emit('startconn', their_id, my_id, (resp) => {
+                  console.log('start conn emited');
+                  console.log(socket.id);
+                  console.log(my_id);
+                  var my_id = socket.id;
+                  var peer = new Peer(true, self.state.myMediaStreamObj, self.state.roomName, true, their_id, my_id);
+                });
+                  console.log('start conn emited');
+                  console.log(socket.id);
+                  console.log(my_id);
+                  var my_id = socket.id;
+                  var peer = new Peer(true, self.state.myMediaStreamObj, self.state.roomName, true, their_id, my_id);
+              });
+            });
+        });
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
