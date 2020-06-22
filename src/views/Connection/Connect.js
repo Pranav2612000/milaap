@@ -6,8 +6,8 @@ import $ from 'jquery';
 import socketIOClient from 'socket.io-client';
 import { Emitter } from './emmiter';
 import axios from 'axios';
-//const socket = socketIOClient.connect('http://54.160.110.155:5000'); //will be replaced by an appropriate room.
-const socket = socketIOClient.connect('http://localhost:5000'); 
+const socket = socketIOClient.connect('http://54.160.110.155:5000'); //will be replaced by an appropriate room.
+//const socket = socketIOClient.connect('http://localhost:5000'); 
 socket.connect();
 socket.on('connect', () => {
   console.log(socket.connected); // true
@@ -73,6 +73,9 @@ export class Peer extends Emitter {
       createVideoElement(this, data, 'id', 'test');
     });
     socket.on('signalling', (data, from_id) => {
+      if(from_id != this.their_id) {
+        return;
+      }
       console.log(data);
       console.log(from_id);
       console.log(this.my_id);
@@ -193,6 +196,9 @@ export function startCall(self, roomName) {
         .then((media) => {
           console.log('media object found');
           // Add eventhandler for "createConnection" signal, On receiving the signal:
+          self.setState({
+            myPeers: []
+          });
           socket.on('startconn', (their_id) => {
             console.log('connection received from server');
             console.log(their_id);
@@ -202,6 +208,10 @@ export function startCall(self, roomName) {
             console.log(my_id);
             // Create a new peer with initiator = false
             var peer = new Peer(true, self.state.myMediaStreamObj, self.state.roomName, false, their_id, my_id);
+            self.setState({
+              myPeers: [...self.state.myPeers, peer]
+            });
+            console.log(self.state.myPeers);
           });
                 
           axios
@@ -227,13 +237,17 @@ export function startCall(self, roomName) {
                   console.log(socket.id);
                   console.log(my_id);
                   var my_id = socket.id;
-                  var peer = new Peer(true, self.state.myMediaStreamObj, self.state.roomName, true, their_id, my_id);
+                  //var peer = new Peer(true, self.state.myMediaStreamObj, self.state.roomName, true, their_id, my_id);
                 });
                   console.log('start conn emited');
                   console.log(socket.id);
                   console.log(my_id);
                   var my_id = socket.id;
                   var peer = new Peer(true, self.state.myMediaStreamObj, self.state.roomName, true, their_id, my_id);
+                  self.setState({
+                    myPeers: [...self.state.myPeers, peer]
+                  });
+                console.log(self.state.myPeers);
               });
             });
         });
