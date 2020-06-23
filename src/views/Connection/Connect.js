@@ -184,7 +184,7 @@ export function startCall(self, roomName) {
         roomName: roomName, 
       };
       axios
-        .post('http://localhost:5000/api/room/goonlinesimple', reqData, {
+        .post(`${global.config.backendURL}/api/room/goonlinesimple`, reqData, {
           headers: {
             'milaap-auth-token': localStorage.getItem('milaap-auth-token')
           }
@@ -216,7 +216,7 @@ export function startCall(self, roomName) {
           });
                 
           axios
-            .get('http://localhost:5000/api/user/getUserName', {
+            .get(`${global.config.backendURL}/api/user/getUserName`, {
               headers: {
                 'milaap-auth-token': localStorage.getItem('milaap-auth-token')
               }
@@ -262,7 +262,7 @@ function sendRequestToEndCall(self) {
     roomName: self.state.roomName
   };
   axios
-    .post('http://localhost:5000/api/room/exitstreamsimple', reqData, {
+    .post(`${global.config.backendURL}/api/room/exitstreamsimple`, reqData, {
       headers: {
         'milaap-auth-token': localStorage.getItem('milaap-auth-token')
       }

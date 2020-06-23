@@ -112,7 +112,7 @@ class Controls extends Component {
 
   createPeer(id) {
     var peer = new Peer(id, {
-      host: 'localhost',
+      host: `${global.config.peerJSServerURL}`,
       port: 9000,
       path: '/peerserver',
       config: {
