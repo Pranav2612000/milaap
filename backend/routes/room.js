@@ -485,4 +485,153 @@ router.post('/goonline', auth, async (req, res) => {
     }
   });
 });
+
+router.post('/goonlinesimple', auth, async (req, res) => {
+  const id = req.body.id;
+  const roomName = req.body.roomName;
+  const username = req.user.id;
+  const type = req.body.type;
+  console.log(req.body);
+  rooms.findOne({ roomName: roomName }, function (err, room) {
+    if (err) {
+      console.log('error 1');
+      return res.status(400).json({ err: 'Error. Try again.' });
+    }
+    if (!room) {
+      console.log('error 2');
+      return res.status(400).json({ err: 'Error. Incorrect roomname.' });
+    }
+    let onlineArray = room.onlineSimple;
+    let onlinePersonObj = {};
+    onlinePersonObj.username = username;
+    onlinePersonObj.id = id;
+    onlinePersonObj.type = type;
+    //First person online
+    if (room._doc.onlineSimple == undefined) {
+      //Update online array and return;
+      rooms.updateOne(
+        { roomName: roomName },
+        { $addToSet: { onlineSimple: onlinePersonObj } },
+        function (err, result) {
+          if (err) {
+            return res.status(400).json({ err: err });
+          } else {
+            io.emit('userOnline', req.body);
+            return res
+              .status(200)
+              .json({ msg: 'Waiting for others', connected: 1, type: type, online: []});
+          }
+        }
+      );
+    } else {
+      let onlineArray = room._doc.onlineSimple;
+      var indexOfCurrentUser = -1;
+      onlineArray.forEach((val, index) => {
+        if (val.username == username && val.type == type) {
+          indexOfCurrentUser = index;
+        }
+      });
+      if (indexOfCurrentUser != -1) {
+        //Return the current entry in array.
+        onlineArray[indexOfCurrentUser].id = id;
+        room._doc.onlineSimple = onlineArray;
+        room.markModified('onlineSimple');
+        room.save((err) => {
+          if (err) {
+            return res.status(400).json({ err: 'Error Exiting Video' });
+          } else {
+            io.emit('userOnline', req.body);
+            return res.status(200).json({
+              msg: 'Waiting for others',
+              connected: onlineArray.length,
+              online: onlineArray,
+              changePeer: false,
+              type: type
+            });
+          }
+        });
+      } else {
+        rooms.updateOne(
+          { roomName: roomName },
+          { $addToSet: { onlineSimple: onlinePersonObj } },
+          function (err, result) {
+            if (err) {
+              return res.status(400).json({ err: err });
+            } else {
+              io.emit('userOnline', req.body);
+              return res.status(200).json({
+                msg: 'Waiting for others',
+                connected: onlineArray.length + 1,
+                online: onlineArray,
+                type: type
+              });
+            }
+          }
+        );
+      }
+    }
+  });
+});
+
+router.post('/exitstreamsimple', auth, async (req, res) => {
+  const roomName = req.body.roomName;
+  const username = req.user.id;
+  var idToBeDestroyed = [];
+  rooms.findOne({ roomName: roomName }, function (err, room) {
+    if (err) {
+      return res.status(400).json({ err: 'Error. Try again.' });
+    }
+    if (!room) {
+      return res.status(400).json({ err: 'Error. Incorrect roomname.' });
+    }
+    let onlineArray = room._doc.onlineSimple;
+    if (onlineArray == undefined) {
+      onlineArray = [];
+      return res.status(200).json({
+        msg: 'Already exited',
+        online: onlineArray,
+        idToBeDestroyed: idToBeDestroyed
+      });
+    }
+    var indicesToBeDeleted = []; // TODO: A peer can be present only 2 times- for audio, video
+    //so this can be optimized to stop if we get two elements.
+    onlineArray.forEach((val, index) => {
+      if (val.username == username) {
+        //indexToBeDeleted = index;
+        indicesToBeDeleted.unshift(index);
+        idToBeDestroyed.unshift(val.tkn);
+      }
+    });
+    console.log(indicesToBeDeleted);
+    console.log(onlineArray);
+    if (indicesToBeDeleted == []) {
+      return res.status(200).json({
+        msg: 'Already exited',
+        online: onlineArray,
+        idToBeDestroyed: idToBeDestroyed
+      });
+    } else {
+      indicesToBeDeleted.forEach((val, index) => {
+        onlineArray.splice(val, 1);
+        console.log(onlineArray);
+      });
+      console.log(onlineArray);
+      room._doc.onlineSimple = onlineArray;
+      room.markModified('onlineSimple');
+      //console.log(room);
+      room.save((err) => {
+        if (err) {
+          return res.status(400).json({ err: 'Error Exiting Video' });
+        } else {
+          io.emit('userExit', req.body);
+          return res.status(200).json({
+            msg: 'Room Exited successfully',
+            online: onlineArray,
+            idToBeDestroyed: idToBeDestroyed
+          });
+        }
+      });
+    }
+  });
+});
 module.exports = router;
