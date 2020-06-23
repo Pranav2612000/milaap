@@ -572,4 +572,66 @@ router.post('/goonlinesimple', auth, async (req, res) => {
     }
   });
 });
+
+router.post('/exitstreamsimple', auth, async (req, res) => {
+  const roomName = req.body.roomName;
+  const username = req.user.id;
+  var idToBeDestroyed = [];
+  rooms.findOne({ roomName: roomName }, function (err, room) {
+    if (err) {
+      return res.status(400).json({ err: 'Error. Try again.' });
+    }
+    if (!room) {
+      return res.status(400).json({ err: 'Error. Incorrect roomname.' });
+    }
+    let onlineArray = room._doc.onlineSimple;
+    if (onlineArray == undefined) {
+      onlineArray = [];
+      return res.status(200).json({
+        msg: 'Already exited',
+        online: onlineArray,
+        idToBeDestroyed: idToBeDestroyed
+      });
+    }
+    var indicesToBeDeleted = []; // TODO: A peer can be present only 2 times- for audio, video
+    //so this can be optimized to stop if we get two elements.
+    onlineArray.forEach((val, index) => {
+      if (val.username == username) {
+        //indexToBeDeleted = index;
+        indicesToBeDeleted.unshift(index);
+        idToBeDestroyed.unshift(val.tkn);
+      }
+    });
+    console.log(indicesToBeDeleted);
+    console.log(onlineArray);
+    if (indicesToBeDeleted == []) {
+      return res.status(200).json({
+        msg: 'Already exited',
+        online: onlineArray,
+        idToBeDestroyed: idToBeDestroyed
+      });
+    } else {
+      indicesToBeDeleted.forEach((val, index) => {
+        onlineArray.splice(val, 1);
+        console.log(onlineArray);
+      });
+      console.log(onlineArray);
+      room._doc.onlineSimple = onlineArray;
+      room.markModified('onlineSimple');
+      //console.log(room);
+      room.save((err) => {
+        if (err) {
+          return res.status(400).json({ err: 'Error Exiting Video' });
+        } else {
+          io.emit('userExit', req.body);
+          return res.status(200).json({
+            msg: 'Room Exited successfully',
+            online: onlineArray,
+            idToBeDestroyed: idToBeDestroyed
+          });
+        }
+      });
+    }
+  });
+});
 module.exports = router;

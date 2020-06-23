@@ -70,7 +70,7 @@ export class Peer extends Emitter {
     });
     this.peer.on('stream', (data) => {
       console.log('stream received');
-      createVideoElement(this, data, 'id', 'test');
+      createVideoElement(this, data, this.their_id, '');
     });
     socket.on('signalling', (data, from_id) => {
       if(from_id != this.their_id) {
@@ -93,6 +93,7 @@ export class Peer extends Emitter {
     this.emit('close');
     this.active = false;
     this.peer.destroy();
+    deleteVideoElement(this.their_id);
   }
 
   startCall() {
@@ -255,6 +256,79 @@ export function startCall(self, roomName) {
     .catch((err) => {
       console.log(err);
     });
+}
+function sendRequestToEndCall(self) {
+  const reqData = {
+    roomName: self.state.roomName
+  };
+  axios
+    .post('http://localhost:5000/api/room/exitstreamsimple', reqData, {
+      headers: {
+        'milaap-auth-token': localStorage.getItem('milaap-auth-token')
+      }
+    })
+    .then((res) => {
+      console.log(res.data);
+      var idToBeDestroyed = res.data.idToBeDestroyed;
+      console.log(self.state.myPeers);
+      self.state.myPeers.forEach((val, index) => {
+        if (val) {
+          console.log(val);
+          val.peer.destroy("Call Ended");
+        }
+      });
+      // Clear all state variables associated with calls.
+      self.setState({
+        myPeers: [],
+      });
+      return;
+    })
+    .catch((err) => {
+      console.log(err);
+      return;
+    });
+}
+export async function endCall(self) {
+    await sendRequestToEndCall(self);
+    if (self.state.myMediaStreamObj) {
+      self.state.myMediaStreamObj.getTracks().forEach((track) => {
+        console.log(track);
+        track.stop();
+      });
+      self.state.myMediaStreamObj.getTracks().forEach((track) => {
+        self.state.myMediaStreamObj.removeTrack(track);
+      });
+      self.setState({
+        myMediaStreamObj: null
+      });
+    }
+    // Add by appropriate UI changes which clears the screen.
+    deleteAllVideoElements();
+}
+
+function deleteAllVideoElements() {
+  $('#videos').empty();
+  //$('#context').empty();
+  clearContext();
+}
+
+function clearContext() {
+  const context = document.getElementById('context');
+  if (context != null) {
+    context.srcObject = null;
+    context.style.display = 'none';
+  }
+}
+function deleteVideoElement(id) {
+  const video = document.getElementById(id);
+  const context = $('#context');
+  if (video) {
+    video.nextElementSibling.remove();
+    video.remove();
+  }
+  if (context.hasClass(id)) {
+    clearContext();
+  }
 }
 
 
