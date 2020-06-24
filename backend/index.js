@@ -33,9 +33,9 @@ io.sockets.on('connection', (client) => {
     //client.to(room).emit('signalling', data);
     io.to(to_id).emit('signalling', data, from_id);
   });
-  client.on('startconn', (to_id, from_id) => {
+  client.on('startconn', (to_id, from_id, from_name) => {
     console.log('recvd startconn from ' + from_id + ' to ' + to_id);
-    io.to(to_id).emit('startconn', from_id);
+    io.to(to_id).emit('startconn', from_id, from_name);
   });
 });
 const loginRouter = require('./routes/login');

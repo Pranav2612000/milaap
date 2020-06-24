@@ -136,7 +136,7 @@ export class Login extends Component {
                 <CardGroup>
                   <Card className="p-4">
                     <CardBody>
-                      <Form>
+                      <Form onSubmit={this.handleSubmit}>
                         <h1>Login</h1>
                         <p className="text-muted">Sign In to your account</p>
                         <InputGroup className="mb-3">
@@ -169,10 +169,7 @@ export class Login extends Component {
                         </InputGroup>
                         <Row>
                           <Col xs="6">
-                            <Button
-                              color="primary"
-                              className="px-4"
-                              onClick={this.handleSubmit}>
+                            <Button type="submit" color="primary" className="px-4">
                               Login
                             </Button>
                           </Col>
