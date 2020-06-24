@@ -70,8 +70,25 @@ export class Peer extends Emitter {
       console.log('connected');
     });
     this.peer.on('stream', (data) => {
+      const self = this;
       console.log('stream received');
-      createVideoElement(this, data, this.their_id, '');
+      var reqData = {
+        id: my_id,
+        type: 0,
+        roomName: this.room
+      };
+      axios
+        .post(`${global.config.backendURL}/api/room/goonlinesimple`, reqData, {
+          headers: {
+            'milaap-auth-token': localStorage.getItem('milaap-auth-token')
+          }
+        })
+        .then((res) => {
+          res.data.online.map((each) => {
+            if (each.id === self.their_id)
+              createVideoElement(self, data, self.their_id, each.username);
+          });
+        });
     });
     socket.on('signalling', (data, from_id) => {
       if (from_id != this.their_id) {
