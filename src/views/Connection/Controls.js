@@ -4,7 +4,12 @@ import { store } from 'react-notifications-component';
 import { AwesomeButtonProgress } from 'react-awesome-button';
 import 'react-awesome-button/dist/styles.css';
 import { connect } from 'react-redux';
-import { getMyMediaStream, startCall, endCall, addScreenShareStream} from '../Connection/Connect';
+import {
+  getMyMediaStream,
+  startCall,
+  endCall,
+  addScreenShareStream
+} from '../Connection/Connect';
 import {
   Nav,
   NavItem,
@@ -680,7 +685,7 @@ videos.empty();
             <span> Join Call</span>
           </AwesomeButtonProgress>
         </Row>
-        <Row>
+        {/* <Row>
           <AwesomeButtonProgress
             type="primary"
             size="medium"
@@ -733,7 +738,7 @@ videos.empty();
             <i className="icon-user icons"></i>
             <span>Off Webcam</span>
           </AwesomeButtonProgress>
-        </Row>
+        </Row> */}
         <Row className="justify-content-center text-center">
           <AwesomeButtonProgress
             type="primary"
@@ -763,7 +768,7 @@ videos.empty();
             <span> End Call</span>
           </AwesomeButtonProgress>
         </Row>
-        { `${global.config.environment}` == 'development' && 
+        {`${global.config.environment}` == 'development' && (
           <Row className="justify-content-center text-center">
             <AwesomeButtonProgress
               type="primary"
@@ -778,7 +783,7 @@ videos.empty();
               <span>Share Screen</span>
             </AwesomeButtonProgress>
           </Row>
-        }
+        )}
         <br />
       </Container>
     );
