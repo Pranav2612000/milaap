@@ -132,7 +132,7 @@ export class Login extends Component {
               </Card>
             </Row>
             <Row className="justify-content-center">
-              <Col md="8">
+              <Col md="6">
                 <CardGroup>
                   <Card className="p-4">
                     <CardBody>
@@ -185,10 +185,33 @@ export class Login extends Component {
                             </Button>
                           </Col>
                         </Row>
+                        <Row className="justify-content-center">
+                          <h2>OR</h2>
+                        </Row>
+                        <Row className="justify-content-center">
+                          <Col>
+                            <div>
+                              <h2>Sign up</h2>
+                              <p>
+                                Don't have an account? It takes just 5 secs to create
+                                a new one.
+                              </p>
+                              <Link to="/register">
+                                <Button
+                                  color="primary"
+                                  className="mt-3"
+                                  active
+                                  tabIndex={-1}>
+                                  Register Now!
+                                </Button>
+                              </Link>
+                            </div>
+                          </Col>
+                        </Row>
                       </Form>
                     </CardBody>
                   </Card>
-                  <Card
+                  {/*<Card
                     className="text-white bg-primary py-5 d-md-down-none"
                     style={{ width: '44%' }}>
                     <CardBody className="text-center">
@@ -209,7 +232,7 @@ export class Login extends Component {
                         </Link>
                       </div>
                     </CardBody>
-                  </Card>
+                  </Card>*/}
                 </CardGroup>
               </Col>
             </Row>
