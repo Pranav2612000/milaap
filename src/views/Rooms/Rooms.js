@@ -135,10 +135,12 @@ class Room extends Component {
           <Container className="room">
             <video id="context" controls autoPlay></video>
             <Row className="m-0 p-0" id="videos"></Row>
+            {/*
             <button onClick={this.submitVideoHandler}>Start Call </button>
             <button onClick={this.submitScreenHandler}>Screen Call </button>
             <button onClick={this.endCallHandler}>End Call </button>
             <button onClick={this.inCallShareHandler}>CallScreenShare </button>
+            */}
           </Container>
         </main>
         <aside className="aside-menu bg-dark" display="md">
