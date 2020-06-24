@@ -56,7 +56,6 @@ class Controls extends Component {
       isMuted: false,
       inCall: false,
       isWebcamOn: true
-
     };
     console.log(this.state.roomName);
     this.joinCall = this.joinCall.bind(this);
@@ -232,8 +231,8 @@ class Controls extends Component {
         });
     });
   }
-  
-setUpConnections(self, peer, id, type, onlineArray) {
+
+  setUpConnections(self, peer, id, type, onlineArray) {
     self.getMyMediaStream(self, type).then((media) => {
       // Wait for new incoming connections.
       self.waitForConnections(self, peer);
@@ -250,7 +249,7 @@ setUpConnections(self, peer, id, type, onlineArray) {
     });
   }
 
-async joinCall(next) {
+  async joinCall(next) {
     this.startScreenShare('video', next);
   }
 
@@ -498,7 +497,7 @@ connectedPeers: connectedPeers,
 
     // self.videoRef.current.srcObject = stream;
   }
- async muteCall() {
+  async muteCall() {
     {
       /*console.log('mute call reached');
     await navigator.mediaDevices
@@ -644,8 +643,8 @@ videos.empty();
     return (
       <Container>
         <br />
-      //by default when call joined , then webcam ON, and NOT Muted
-      // so variables when joined call,  isMute: false, isWebcamOn: true
+        //by default when call joined , then webcam ON, and NOT Muted // so variables
+        when joined call, isMute: false, isWebcamOn: true
         <Row className="justify-content-center text-center">
           <AwesomeButtonProgress
             type="primary"
