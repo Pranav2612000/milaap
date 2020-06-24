@@ -16,12 +16,13 @@ socket.on('connect', () => {
 });
 
 export class Peer extends Emitter {
-  constructor(it, stream, room, initiator, their_id, my_id) {
+  constructor(it, stream, room, initiator, their_id, their_name, my_id) {
     super();
     this.error = null;
     this.active = false;
     this.stream = null;
     this.their_id = their_id;
+    this.their_name = their_name;
     this.my_id = my_id;
     this.room = room;
     this.initiator = initiator;
@@ -72,6 +73,8 @@ export class Peer extends Emitter {
     this.peer.on('stream', (data) => {
       const self = this;
       console.log('stream received');
+      createVideoElement(self, data, self.their_id, self.their_name);
+      /*
       var reqData = {
         id: my_id,
         type: 0,
@@ -89,6 +92,7 @@ export class Peer extends Emitter {
               createVideoElement(self, data, self.their_id, each.username);
           });
         });
+        */
     });
     socket.on('signalling', (data, from_id) => {
       if (from_id != this.their_id) {
@@ -170,7 +174,7 @@ export async function getMyMediaStream(self, type) {
       })
       .then((media) => {
         self.setState({
-          myMediaStreamObj: media
+          myScreenStreamObj: media
         });
         createVideoElement(self, media, 'me');
         return media;
@@ -217,20 +221,29 @@ export function startCall(self, roomName, type) {
         self.setState({
           myPeers: []
         });
-        socket.on('startconn', (their_id) => {
+        socket.on('startconn', (their_id, their_name) => {
           console.log('connection received from server');
           console.log(their_id);
           console.log(my_id);
           console.log(socket.id);
           var my_id = socket.id;
           console.log(my_id);
+          var mediaStream;
+          if(type == 'video') {
+            mediaStream = self.state.myMediaStreamObj;
+          } else if(type == 'screen') {
+            mediaStream = self.state.myScreenStreamObj;
+          } else {
+            mediaStream = null;
+          }
           // Create a new peer with initiator = false
           var peer = new Peer(
             true,
-            self.state.myMediaStreamObj,
+            mediaStream,
             self.state.roomName,
             false,
             their_id,
+            their_name,
             my_id
           );
           self.setState({
@@ -255,25 +268,35 @@ export function startCall(self, roomName, type) {
               }
               console.log('Connecting to ' + onlineArray[index]);
               var their_id = onlineArray[index].id;
+              var their_name = onlineArray[index].username;
+              var my_name = resp.data.username;
               //    create a new Peer with initiator = true
               var my_id = socket.id;
-              socket.emit('startconn', their_id, my_id, (resp) => {
+              socket.emit('startconn', their_id, my_id, my_name, (resp) => {
                 console.log('start conn emited');
-                console.log(socket.id);
-                console.log(my_id);
+                console.log(their_name);
                 var my_id = socket.id;
                 //var peer = new Peer(true, self.state.myMediaStreamObj, self.state.roomName, true, their_id, my_id);
               });
               console.log('start conn emited');
               console.log(socket.id);
               console.log(my_id);
+              var mediaStream; 
+              if(type == 'video') {
+                mediaStream = self.state.myMediaStreamObj;
+              } else if(type == 'screen') {
+                mediaStream = self.state.myScreenStreamObj;
+              } else {
+                mediaStream = null;
+              }
               var my_id = socket.id;
               var peer = new Peer(
                 true,
-                self.state.myMediaStreamObj,
+                mediaStream,
                 self.state.roomName,
                 true,
                 their_id,
+                their_name,
                 my_id
               );
               self.setState({
@@ -333,6 +356,18 @@ export async function endCall(self) {
       myMediaStreamObj: null
     });
   }
+  if (self.state.myScreenStreamObj) {
+    self.state.myScreenStreamObj.getTracks().forEach((track) => {
+      console.log(track);
+      track.stop();
+    });
+    self.state.myScreenStreamObj.getTracks().forEach((track) => {
+      self.state.myScreenStreamObj.removeTrack(track);
+    });
+    self.setState({
+      myScreenStreamObj: null
+    });
+  }
   // Add by appropriate UI changes which clears the screen.
   deleteAllVideoElements();
 }
@@ -360,4 +395,10 @@ function deleteVideoElement(id) {
   if (context.hasClass(id)) {
     clearContext();
   }
+}
+
+export function addScreenShareStream(self) {
+  return;
+  self.state.myPeers.forEach((val, index) => {
+  });
 }
