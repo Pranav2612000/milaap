@@ -16,6 +16,8 @@ import {
 } from 'reactstrap';
 import axios from 'axios';
 import ReactNotification, { store } from 'react-notifications-component';
+import logo from '../../../assets/img/brand/logo.png';
+
 class Guest extends Component {
   constructor(props) {
     super(props);
@@ -54,20 +56,20 @@ class Guest extends Component {
   handleSubmit = (e) => {
     e.preventDefault();
     console.log(this.state.roomName);
-    if(this.state.roomName == undefined || this.state.roomName == '') {
-      alert("Enter a roomname to proceed");
+    if (this.state.roomName == undefined || this.state.roomName == '') {
+      alert('Enter a roomname to proceed');
       return;
     }
 
     /* Get a valid token if user doesn't have one. */
-    if(!localStorage.getItem('milaap-auth-token')) {
+    if (!localStorage.getItem('milaap-auth-token')) {
       console.log('exists');
       var reqData = {
         name: this.state.name,
-        roomName: this.state.roomName,
+        roomName: this.state.roomName
       };
       axios
-        .post('http://localhost:5000/api/user/gettokenfortempuser', reqData)
+        .post(`${global.config.backendURL}/api/user/gettokenfortempuser`, reqData)
         .then((res) => {
           localStorage.setItem('milaap-auth-token', res.data.token);
           this.setState({
@@ -150,6 +152,20 @@ class Guest extends Component {
         {this.state.error && <ReactNotification />}
         <div className="app flex-row align-items-center">
           <Container>
+            <Row
+              className="justify-content-center"
+              style={{ margin: '0%', height: '15%' }}>
+              <Card
+                className="text-white bg-transparent py-5 d-md-down"
+                style={{ width: '59%' }}
+                style={{ backgroundColor: 'transparent', border: 0 }}>
+                <CardBody
+                  className="text-center"
+                  style={{ backgroundColor: 'transparent', border: 0 }}>
+                  <img src={logo} />
+                </CardBody>
+              </Card>
+            </Row>
             <Row className="justify-content-center">
               <Col md="8">
                 <CardGroup>
@@ -203,9 +219,9 @@ class Guest extends Component {
                             <Button
                               color="primary"
                               className="px-4"
-                              onClick={(e) =>
-                                  this.handleSubmit(e)
-                                  /*
+                              onClick={
+                                (e) => this.handleSubmit(e)
+                                /*
                                 localStorage.getItem('milaap-auth-token')
                                   ? this.handleUserAdd(e)
                                   : this.handleSubmit(e)

@@ -24,7 +24,7 @@ import {
 } from '@coreui/react';
 import routes from '../../routes';
 
-const socket = socketIOClient('http://localhost:5000/');
+const socket = socketIOClient(`${global.config.backendURL}/`);
 const DefaultAside = React.lazy(() => import('./DefaultAside'));
 const DefaultFooter = React.lazy(() => import('./DefaultFooter'));
 const DefaultHeader = React.lazy(() => import('./DefaultHeader'));
@@ -67,7 +67,7 @@ class DefaultLayout extends Component {
     const reqHeader = { 'milaap-auth-token': token };
     await axios
       .post(
-        'http://localhost:5000/api/user/getrooms',
+        `${global.config.backendURL}/api/user/getrooms`,
         {},
         {
           headers: reqHeader
@@ -100,7 +100,7 @@ class DefaultLayout extends Component {
         const GroupList = getGroupElements(rooms);
         axios
           .post(
-            'http://localhost:5000/api/room/getActive',
+            `${global.config.backendURL}/api/room/getActive`,
             {},
             {
               headers: {
@@ -239,7 +239,7 @@ class DefaultLayout extends Component {
     e.preventDefault();
     this.props.logout();
     localStorage.removeItem('milaap-auth-token');
-    this.props.history.push('/login');
+    this.props.history.push('/landing');
   }
 
   componentDidMount() {
@@ -266,7 +266,7 @@ class DefaultLayout extends Component {
         var room = this.props.location.pathname.split('/')[2];
         return <Redirect to={{ pathname: '/join', room: room }} />;
       }
-      return <Redirect to={{ pathname: '/login' }} />;
+      return <Redirect to={{ pathname: '/landing' }} />;
     }
     console.log(this.props);
     return (

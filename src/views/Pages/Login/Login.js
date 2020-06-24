@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import { Link, Redirect } from 'react-router-dom';
 import * as action from '../../../redux/loginRedux/loginAction';
-import * as reg from '../../../redux/registerRedux/registerAction';
 import {
   Button,
   Card,
@@ -18,19 +17,12 @@ import {
   Alert
 } from 'reactstrap';
 import axios from 'axios';
-import * as firebase from 'firebase';
-import 'firebase/auth';
-import firebaseConfig from '../../../firebaseConfig';
 import { connect } from 'react-redux';
 import ReactNotification, { store } from 'react-notifications-component';
 import Notifications from 'react-notification-system-redux';
-import './login.scss';
+import logo from '../../../assets/img/brand/logo.png';
 
-const firebaseApp = firebase.initializeApp(firebaseConfig);
-const firebaseAppAuth = firebaseApp.auth();
-var providers = new firebase.auth.GoogleAuthProvider();
-
-class Login extends Component {
+export class Login extends Component {
   constructor(props) {
     super(props);
 
@@ -39,10 +31,8 @@ class Login extends Component {
       username: '',
       password: '',
       error: false,
-      fromRegister: false,
-      googleLogin: false
+      fromRegister: false
     };
-    this.signInWithGoogle = this.signInWithGoogle.bind(this);
   }
 
   componentDidMount() {
@@ -87,38 +77,6 @@ class Login extends Component {
     alert('Work in Progress...');
   };
 
-  signInWithGoogle() {
-    this.setState({
-      googleLogin: true
-    });
-    firebase
-      .auth()
-      .signInWithPopup(providers)
-      .then((res) => {
-        var user = res.user;
-        console.log(user);
-        if (user) {
-          this.setState({
-            login: true,
-            username: user.displayName,
-            password: user.uid
-          });
-          localStorage.setItem('uname', this.state.username);
-          this.props.register(
-            this.state.username,
-            this.state.password,
-            this.state.googleLogin
-          );
-        }
-      })
-      .then(() => {
-        this.props.login(this.state.username, this.state.password);
-      })
-      .catch(function (error) {
-        console.log(error);
-      });
-  }
-
   handleSubmit = (e) => {
     e.preventDefault();
     this.props.login(this.state.username, this.state.password);
@@ -149,6 +107,8 @@ class Login extends Component {
         {this.props.loggedIn === true && (
           <Redirect to={{ pathname: '/dashboard', state: this.state.username }} />
         )}
+        {/* <ReactNotification /> */}
+        {/* {this.state.login && console.log("object")} */}
         {this.state.error && <ReactNotification />}
         {this.props.notifications && (
           <Notifications notifications={this.props.notifications} />
@@ -157,8 +117,22 @@ class Login extends Component {
         <div className="app flex-row align-items-center">
           <ReactNotification />
           <Container>
+            <Row
+              className="justify-content-center"
+              style={{ margin: '0%', height: '15%' }}>
+              <Card
+                className="text-white bg-transparent py-5 d-md-down"
+                style={{ width: '59%' }}
+                style={{ backgroundColor: 'transparent', border: 0 }}>
+                <CardBody
+                  className="text-center"
+                  style={{ backgroundColor: 'transparent', border: 0 }}>
+                  <img src={logo} />
+                </CardBody>
+              </Card>
+            </Row>
             <Row className="justify-content-center">
-              <Col md="8">
+              <Col md="6">
                 <CardGroup>
                   <Card className="p-4">
                     <CardBody>
@@ -202,17 +176,6 @@ class Login extends Component {
                               Login
                             </Button>
                           </Col>
-                          <div class="google-btn">
-                            <div class="google-icon-wrapper">
-                              <img
-                                class="google-icon"
-                                src="https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg"
-                              />
-                            </div>
-                            <button class="btn-text" onClick={this.signInWithGoogle}>
-                              Sign in with google
-                            </button>
-                          </div>
                           <Col xs="6" className="text-right">
                             <Button
                               color="link"
@@ -222,10 +185,33 @@ class Login extends Component {
                             </Button>
                           </Col>
                         </Row>
+                        <Row className="justify-content-center">
+                          <h2>OR</h2>
+                        </Row>
+                        <Row className="justify-content-center">
+                          <Col>
+                            <div>
+                              <h2>Sign up</h2>
+                              <p>
+                                Don't have an account? It takes just 5 secs to create
+                                a new one.
+                              </p>
+                              <Link to="/register">
+                                <Button
+                                  color="primary"
+                                  className="mt-3"
+                                  active
+                                  tabIndex={-1}>
+                                  Register Now!
+                                </Button>
+                              </Link>
+                            </div>
+                          </Col>
+                        </Row>
                       </Form>
                     </CardBody>
                   </Card>
-                  <Card
+                  {/*<Card
                     className="text-white bg-primary py-5 d-md-down-none"
                     style={{ width: '44%' }}>
                     <CardBody className="text-center">
@@ -246,7 +232,7 @@ class Login extends Component {
                         </Link>
                       </div>
                     </CardBody>
-                  </Card>
+                  </Card>*/}
                 </CardGroup>
               </Col>
             </Row>
@@ -262,16 +248,13 @@ const mapStateToProps = (state) => {
   return {
     loggedIn: state.loginReducer.loggedIn,
     error: state.loginReducer.error,
-    notifications: state.notifications,
-    googleLogin: state.registerReducer.glogin
+    notifications: state.notifications
   };
 };
 
 const mapDispatchToProps = (dispatch) => {
   return {
-    login: (user, password) => dispatch(action.login(user, password)),
-    register: (user, password, google) =>
-      dispatch(reg.register(user, password, google))
+    login: (user, password) => dispatch(action.login(user, password))
   };
 };
 

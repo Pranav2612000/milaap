@@ -20,12 +20,22 @@ var io = require('socket.io')(http);
 module.exports = io;
 io.sockets.on('connection', (client) => {
   console.log('A user connected to socket server.');
-  client.on('signalling', (room, data) => {
+  console.log(client.id);
+  client.on('signalling', (room, data, to_id, from_id) => {
     client.join(room);
+    // Add id of client to online array of room.
     console.log(room);
     console.log('*****************************received signal');
     console.log(data);
-    client.to(room).emit('signalling', data);
+    console.log('*************************************toandfrom');
+    console.log(to_id);
+    console.log(from_id);
+    //client.to(room).emit('signalling', data);
+    io.to(to_id).emit('signalling', data, from_id);
+  });
+  client.on('startconn', (to_id, from_id) => {
+    console.log('recvd startconn from ' + from_id + ' to ' + to_id);
+    io.to(to_id).emit('startconn', from_id);
   });
 });
 const loginRouter = require('./routes/login');
@@ -42,6 +52,7 @@ app.get('/', (req, res) => res.send('Hello World!'));
 
 // While deploying/local testing uncomment this line and change peerServer throughout the application to use our peerServer.
 const peerServer = PeerServer({ port: 9000, path: '/peerserver' });
+
 http.listen(port, () => {
   console.log(`Server listening on port ${port}`);
 });

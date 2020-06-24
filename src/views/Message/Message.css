@@ -1,6 +1,7 @@
 .message {
   display: flex;
   flex-direction: column;
+  overflow: auto;
 }
 
 .message .timestamp {
@@ -16,49 +17,45 @@
 .message .bubble-container {
   font-size: 14px;
   display: flex;
+  border-top-right-radius: 20px;
 }
 
 .message.mine .bubble-container {
   justify-content: flex-end;
-}
-
-.message.start .bubble-container .bubble {
-  /* margin-top: 10px; */
   border-top-left-radius: 20px;
-}
-
-.message.end .bubble-container .bubble {
-  border-bottom-left-radius: 20px;
-  /* margin-bottom: 10px; */
-}
-
-.message.mine.start .bubble-container .bubble {
-  margin-top: 10px;
-  border-top-right-radius: 20px;
-}
-
-.message.mine.end .bubble-container .bubble {
-  border-bottom-right-radius: 20px;
-  margin-bottom: 10px;
 }
 
 .message .bubble-container .bubble {
   margin: 1px 0px;
-  background: #f4f4f8;
+  background: #9d9da0;
   padding: 10px 15px;
   border-radius: 20px;
   max-width: 75%;
   border-top-left-radius: 2px;
-  border-bottom-left-radius: 2px;
-  border-top-right-radius: 20px;
-  border-bottom-right-radius: 20px;
+}
+
+.bubble {
+  background: rgba(51, 51, 51, 0.2);
+  color: black;
+}
+
+.sendBy {
+  font-size: 14px;
+  margin-right: 10px;
+}
+
+.sendBy .mine {
+  font-size: 14px;
+  margin-left: 10px;
 }
 
 .message.mine .bubble-container .bubble {
   background: #007aff;
-  color: white;
-  border-top-left-radius: 20px;
-  border-bottom-left-radius: 20px;
+  margin: 1px 0px;
+  margin-right: 10px;
+  padding: 10px 15px;
+  border-radius: 20px;
+  max-width: 75%;
   border-top-right-radius: 2px;
-  border-bottom-right-radius: 2px;
+  color: white;
 }

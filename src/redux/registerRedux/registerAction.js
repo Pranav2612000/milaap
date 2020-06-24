@@ -78,7 +78,7 @@ export const register = (username, password, google = false) => {
     dispatch(registerRequest());
 
     axios
-      .post('http://localhost:5000/api/register/', reqData)
+      .post(`${global.config.backendURL}/api/register/`, reqData)
       .then((res) => {
         console.log(res);
         if (res.data.err == 'UEXIST' && google === true) {
