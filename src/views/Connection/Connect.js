@@ -397,8 +397,10 @@ function deleteVideoElement(id) {
   }
 }
 
-export function addScreenShareStream(self) {
-  return;
-  self.state.myPeers.forEach((val, index) => {
+export async function addScreenShareStream(self) {
+  getMyMediaStream(self, "screen").then((media) => {
+      self.state.myPeers.forEach((val, index) => {
+        val.peer.addStream(self.state.myScreenStreamObj);
+      });
   });
 }
