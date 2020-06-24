@@ -4,7 +4,8 @@ import {
   FETCH_USERS_SUCCESS
 } from './userActionTypes';
 import axios from 'axios';
-
+import { loginSuccess } from '../loginRedux/loginAction';
+import Notifications, { success, error } from 'react-notification-system-redux';
 export const fetchUserRequest = () => {
   return {
     type: FETCH_USERS_REQUEST
