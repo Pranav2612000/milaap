@@ -123,6 +123,13 @@ export class Peer extends Emitter {
   }
 }
 
+function muteVideo(self, id) {
+  const userStream = document.getElementById(id).srcObject;
+  if (userStream.getAudioTracks()[0].enabled)
+    userStream.getAudioTracks()[0].enabled = false;
+  else userStream.getAudioTracks()[0].enabled = true;
+}
+
 export function createVideoElement(self, stream, friendtkn, username) {
   const wrapper = document.createElement('div');
   const video = document.createElement('video');
@@ -139,6 +146,15 @@ export function createVideoElement(self, stream, friendtkn, username) {
   video.srcObject = stream;
   video.autoplay = true;
   video.onclick = switchContext;
+  video.addEventListener(
+    'contextmenu',
+    function (e) {
+      e.preventDefault();
+      muteVideo(self, friendtkn);
+    },
+    false
+  );
+
   wrapper.appendChild(video);
   wrapper.appendChild(nameTag);
   document.getElementById('videos').appendChild(wrapper);
@@ -229,9 +245,9 @@ export function startCall(self, roomName, type) {
           var my_id = socket.id;
           console.log(my_id);
           var mediaStream;
-          if(type == 'video') {
+          if (type == 'video') {
             mediaStream = self.state.myMediaStreamObj;
-          } else if(type == 'screen') {
+          } else if (type == 'screen') {
             mediaStream = self.state.myScreenStreamObj;
           } else {
             mediaStream = null;
@@ -281,10 +297,10 @@ export function startCall(self, roomName, type) {
               console.log('start conn emited');
               console.log(socket.id);
               console.log(my_id);
-              var mediaStream; 
-              if(type == 'video') {
+              var mediaStream;
+              if (type == 'video') {
                 mediaStream = self.state.myMediaStreamObj;
-              } else if(type == 'screen') {
+              } else if (type == 'screen') {
                 mediaStream = self.state.myScreenStreamObj;
               } else {
                 mediaStream = null;
@@ -399,6 +415,5 @@ function deleteVideoElement(id) {
 
 export function addScreenShareStream(self) {
   return;
-  self.state.myPeers.forEach((val, index) => {
-  });
+  self.state.myPeers.forEach((val, index) => {});
 }
