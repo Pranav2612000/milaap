@@ -128,29 +128,20 @@ class DefaultHeader extends Component {
           }}
         />
         <AppSidebarToggler className="d-md-down-none" display="lg" />
-
-        <Nav className="d-md-down-none" navbar>
-          <NavItem className="px-3">
+        <Nav className="d-block d-md-down " navbar>
+          <NavItem className="px-2">
             <NavLink to="/dashboard" className="nav-link">
               Dashboard
             </NavLink>
           </NavItem>
-          <NavItem className="px-3">
+          <NavItem className="px-2">
             <NavLink to="#" className="nav-link" onClick={this.toggle}>
               Create Room
             </NavLink>
           </NavItem>
         </Nav>
+
         <Nav className="ml-auto" navbar>
-          {/* <NavItem className="d-md-down-none">
-            <NavLink to="#" className="nav-link"><i className="icon-bell"></i><Badge pill color="danger">5</Badge></NavLink>
-          </NavItem>
-          <NavItem className="d-md-down-none">
-            <NavLink to="#" className="nav-link"><i className="icon-list"></i></NavLink>
-          </NavItem>
-          <NavItem className="d-md-down-none">
-            <NavLink to="#" className="nav-link"><i className="icon-location-pin"></i></NavLink>
-          </NavItem> */}
           <UncontrolledDropdown nav direction="down">
             <DropdownToggle>
               <NavItem>
@@ -217,22 +208,6 @@ class DefaultHeader extends Component {
           <ModalHeader toggle={this.toggle}>Create Room</ModalHeader>
           <ModalBody>
             <Form>
-              {/*
-              <InputGroup className="mb-3">
-                <InputGroupAddon addonType="prepend">
-                  <InputGroupText>
-                    <i className="icon-user"></i>
-                  </InputGroupText>
-                </InputGroupAddon>
-                <Input
-                  type="text"
-                  placeholder="Username"
-                  autoComplete="username"
-                  value={this.state.friendid}
-                  onChange={this.handleFriendChange}
-                />
-              </InputGroup>
-              */}
               <InputGroup className="mb-3">
                 <InputGroupAddon addonType="prepend">
                   <InputGroupText>
