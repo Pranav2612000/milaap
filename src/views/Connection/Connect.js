@@ -174,7 +174,7 @@ export async function getMyMediaStream(self, type) {
       });
   }
 }
-export function startCall(self, roomName) {
+export function startCall(self, roomName, type) {
       var my_id = socket.id;
       console.log(my_id);
   // Go online and get online array from express server.
@@ -193,7 +193,7 @@ export function startCall(self, roomName) {
       console.log(res);
       var onlineArray = res.data.online;
       // Get myMyMediaStream
-      getMyMediaStream(self, "screen")
+      getMyMediaStream(self, type)
         .then((media) => {
           console.log('media object found');
           // Add eventhandler for "createConnection" signal, On receiving the signal:

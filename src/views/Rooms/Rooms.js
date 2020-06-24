@@ -48,7 +48,8 @@ class Room extends Component {
     //this.startCall = this.startCall.bind(this);
     this.startCall1 = this.startCall1.bind(this);
     //this.endCall = this.endCall.bind(this);
-    this.submitHandler = this.submitHandler.bind(this);
+    this.submitVideoHandler = this.submitVideoHandler.bind(this);
+    this.submitScreenHandler = this.submitScreenHandler.bind(this);
     this.endCallHandler = this.endCallHandler.bind(this);
     //this.getMyMediaStream = this.getMyMediaStream.bind(this);
     //this.createVideoElement = this.createVideoElement.bind(this);
@@ -64,8 +65,11 @@ class Room extends Component {
     });
   }
   */
-  submitHandler() {
-    startCall(this, this.state.roomName);
+  submitVideoHandler() {
+    startCall(this, this.state.roomName, "video");
+  }
+  submitScreenHandler() {
+    startCall(this, this.state.roomName, "screen");
   }
 
   endCallHandler() {
@@ -127,8 +131,8 @@ class Room extends Component {
           <Container className="room">
             <video id="context" controls autoPlay></video>
             <Row className="m-0 p-0" id="videos"></Row>
-            <button onClick={this.submitHandler}>Start Call </button>
-            <button onClick={this.startCall1}>Screen Call </button>
+            <button onClick={this.submitVideoHandler}>Start Call </button>
+            <button onClick={this.submitScreenHandler}>Screen Call </button>
             <button onClick={this.endCallHandler}>End Call </button>
           </Container>
         </main>
