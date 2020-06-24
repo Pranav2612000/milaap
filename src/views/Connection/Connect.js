@@ -7,7 +7,7 @@ import socketIOClient from 'socket.io-client';
 import { Emitter } from './emmiter';
 import axios from 'axios';
 //const socket = socketIOClient.connect('http://54.160.110.155:5000'); //will be replaced by an appropriate room.
-const socket = socketIOClient.connect('https://distrideo.ml'); //will be replaced by an appropriate room.
+const socket = socketIOClient.connect(`${global.config.backendURL}`); //will be replaced by an appropriate room.
 //const socket = socketIOClient.connect('http://localhost:5000');
 socket.connect();
 socket.on('connect', () => {
