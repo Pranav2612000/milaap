@@ -30,18 +30,67 @@ import { CustomTooltips } from '@coreui/coreui-plugin-chartjs-custom-tooltips';
 import { getStyle, hexToRgba } from '@coreui/coreui/dist/js/coreui-utilities';
 import DefaultAside from '../../containers/DefaultLayout/DefaultAside';
 import PeerHandler from '../../containers/DefaultLayout/peerHandler';
+import { Peer, switchContext, createVideoElement } from '../Connection/Connect';
+import { getMyMediaStream, startCall, endCall } from '../Connection/Connect';
 
 class Room extends Component {
   constructor(props) {
     super(props);
 
     const roomName = props.match.params.roomname;
+    console.log(Peer);
     console.log(roomName);
     this.state = {
-      roomName: roomName
+      roomName: roomName,
+      peer: null
     };
     this.props.enterRoom(roomName);
+    //this.startCall = this.startCall.bind(this);
+    this.startCall1 = this.startCall1.bind(this);
+    //this.endCall = this.endCall.bind(this);
+    this.submitVideoHandler = this.submitVideoHandler.bind(this);
+    this.submitScreenHandler = this.submitScreenHandler.bind(this);
+    this.endCallHandler = this.endCallHandler.bind(this);
+    //this.getMyMediaStream = this.getMyMediaStream.bind(this);
+    //this.createVideoElement = this.createVideoElement.bind(this);
   }
+
+  /*
+  startCall() {
+    getMyMediaStream(this, 'video').then((media) => {
+      console.log('here');
+      var peer = new Peer(true, this.state.myMediaStreamObj, this.state.roomName);
+      this.setState({ peer: peer });
+      return;
+    });
+  }
+  */
+  submitVideoHandler() {
+    startCall(this, this.state.roomName, 'video');
+  }
+  submitScreenHandler() {
+    startCall(this, this.state.roomName, 'screen');
+  }
+
+  endCallHandler() {
+    endCall(this);
+  }
+
+  startCall1() {
+    getMyMediaStream(this, 'screen').then((media) => {
+      console.log('here');
+      var peer = new Peer(true, this.state.myMediaStreamObj, this.state.roomName);
+      this.setState({ peer: peer });
+      return;
+    });
+  }
+  /*
+  endCall() {
+    console.log(this.state);
+    this.state.myMediaStreamObj.getTracks().forEach((track) => track.stop());
+    this.state.peer.peer.destroy();
+  }
+  */
 
   componentDidUpdate(prevProps) {
     if (this.props.match.params.roomname !== prevProps.match.params.roomname) {
@@ -82,6 +131,9 @@ class Room extends Component {
           <Container className="room">
             <video id="context" controls autoPlay></video>
             <Row className="m-0 p-0" id="videos"></Row>
+            <button onClick={this.submitVideoHandler}>Start Call </button>
+            <button onClick={this.submitScreenHandler}>Screen Call </button>
+            <button onClick={this.endCallHandler}>End Call </button>
           </Container>
         </main>
         <aside className="aside-menu bg-dark" display="md">

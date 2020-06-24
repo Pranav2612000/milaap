@@ -37,7 +37,6 @@ class MessageList extends Component {
         this.state.MY_USER_ID !== data['sender']
       )
         this.fetchMessages(true, data);
-
       //console.log('Data and Message list : ', messages, data);
       // if (props.roomName !== "dashboard") fetchMessages();
     });

@@ -20,6 +20,8 @@ import axios from 'axios';
 import { connect } from 'react-redux';
 import ReactNotification, { store } from 'react-notifications-component';
 import Notifications from 'react-notification-system-redux';
+import logo from '../../../assets/img/brand/logo.png';
+
 export class Login extends Component {
   constructor(props) {
     super(props);
@@ -115,8 +117,22 @@ export class Login extends Component {
         <div className="app flex-row align-items-center">
           <ReactNotification />
           <Container>
+            <Row
+              className="justify-content-center"
+              style={{ margin: '0%', height: '15%' }}>
+              <Card
+                className="text-white bg-transparent py-5 d-md-down"
+                style={{ width: '59%' }}
+                style={{ backgroundColor: 'transparent', border: 0 }}>
+                <CardBody
+                  className="text-center"
+                  style={{ backgroundColor: 'transparent', border: 0 }}>
+                  <img src={logo} />
+                </CardBody>
+              </Card>
+            </Row>
             <Row className="justify-content-center">
-              <Col md="8">
+              <Col md="6">
                 <CardGroup>
                   <Card className="p-4">
                     <CardBody>
@@ -169,10 +185,33 @@ export class Login extends Component {
                             </Button>
                           </Col>
                         </Row>
+                        <Row className="justify-content-center">
+                          <h2>OR</h2>
+                        </Row>
+                        <Row className="justify-content-center">
+                          <Col>
+                            <div>
+                              <h2>Sign up</h2>
+                              <p>
+                                Don't have an account? It takes just 5 secs to create
+                                a new one.
+                              </p>
+                              <Link to="/register">
+                                <Button
+                                  color="primary"
+                                  className="mt-3"
+                                  active
+                                  tabIndex={-1}>
+                                  Register Now!
+                                </Button>
+                              </Link>
+                            </div>
+                          </Col>
+                        </Row>
                       </Form>
                     </CardBody>
                   </Card>
-                  <Card
+                  {/*<Card
                     className="text-white bg-primary py-5 d-md-down-none"
                     style={{ width: '44%' }}>
                     <CardBody className="text-center">
@@ -193,7 +232,7 @@ export class Login extends Component {
                         </Link>
                       </div>
                     </CardBody>
-                  </Card>
+                  </Card>*/}
                 </CardGroup>
               </Col>
             </Row>

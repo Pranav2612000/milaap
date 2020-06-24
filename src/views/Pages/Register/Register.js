@@ -16,10 +16,12 @@ import {
 } from 'reactstrap';
 import axios from 'axios';
 import { connect } from 'react-redux';
+import logo from '../../../assets/img/brand/logo.png';
 import ReactNotification, { store } from 'react-notifications-component';
 import Notifications from 'react-notification-system-redux';
 import { Redirect, Link } from 'react-router-dom';
-class Register extends Component {
+
+export class Register extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -70,6 +72,20 @@ class Register extends Component {
             <Notifications notifications={this.props.notifications} />
           )}
           <Container>
+            <Row
+              className="justify-content-center"
+              style={{ margin: '0%', height: '15%' }}>
+              <Card
+                className="text-white bg-transparent py-5 d-md-down"
+                style={{ width: '59%' }}
+                style={{ backgroundColor: 'transparent', border: 0 }}>
+                <CardBody
+                  className="text-center"
+                  style={{ backgroundColor: 'transparent', border: 0 }}>
+                  <img src={logo} />
+                </CardBody>
+              </Card>
+            </Row>
             <Row className="justify-content-center">
               <Col md="9" lg="7" xl="6">
                 <Card className="mx-4">

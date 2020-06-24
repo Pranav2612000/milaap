@@ -1,3 +1,4 @@
 module.exports = global.config = {
-  backendURL: 'http://localhost:5000'
+  backendURL: 'https://distrideo.ml',
+  peerJSServerURL: 'distrideo.ml'
 };

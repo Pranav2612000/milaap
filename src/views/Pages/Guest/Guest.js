@@ -16,6 +16,8 @@ import {
 } from 'reactstrap';
 import axios from 'axios';
 import ReactNotification, { store } from 'react-notifications-component';
+import logo from '../../../assets/img/brand/logo.png';
+
 class Guest extends Component {
   constructor(props) {
     super(props);
@@ -150,6 +152,20 @@ class Guest extends Component {
         {this.state.error && <ReactNotification />}
         <div className="app flex-row align-items-center">
           <Container>
+            <Row
+              className="justify-content-center"
+              style={{ margin: '0%', height: '15%' }}>
+              <Card
+                className="text-white bg-transparent py-5 d-md-down"
+                style={{ width: '59%' }}
+                style={{ backgroundColor: 'transparent', border: 0 }}>
+                <CardBody
+                  className="text-center"
+                  style={{ backgroundColor: 'transparent', border: 0 }}>
+                  <img src={logo} />
+                </CardBody>
+              </Card>
+            </Row>
             <Row className="justify-content-center">
               <Col md="8">
                 <CardGroup>
