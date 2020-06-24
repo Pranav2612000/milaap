@@ -238,7 +238,7 @@ class DefaultLayout extends Component {
   signOut(e) {
     e.preventDefault();
     this.props.logout();
-    localStorage.removeItem('milaap-auth-token');
+    localStorage.clear();
     this.props.history.push('/landing');
   }
 

@@ -7,7 +7,11 @@ import {
 } from './loginActionTypes';
 
 const initalState = {
-  loading: false
+  loading: false,
+  username:
+    localStorage.getItem('username') == null
+      ? undefined
+      : localStorage.getItem('username')
 };
 
 export const loginReducer = (state = initalState, action) => {
