@@ -517,9 +517,12 @@ router.post('/goonlinesimple', auth, async (req, res) => {
             return res.status(400).json({ err: err });
           } else {
             io.emit('userOnline', req.body);
-            return res
-              .status(200)
-              .json({ msg: 'Waiting for others', connected: 1, type: type, online: []});
+            return res.status(200).json({
+              msg: 'Waiting for others',
+              connected: 1,
+              type: type,
+              online: []
+            });
           }
         }
       );

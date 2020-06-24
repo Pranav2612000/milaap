@@ -66,10 +66,10 @@ class Room extends Component {
   }
   */
   submitVideoHandler() {
-    startCall(this, this.state.roomName, "video");
+    startCall(this, this.state.roomName, 'video');
   }
   submitScreenHandler() {
-    startCall(this, this.state.roomName, "screen");
+    startCall(this, this.state.roomName, 'screen');
   }
 
   endCallHandler() {

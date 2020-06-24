@@ -125,7 +125,7 @@ class Controls extends Component {
           }
         ]
         /*{ urls: "stun.internetcalls.com:3478" },*/
-      /*iceServers: [{
+        /*iceServers: [{
           urls: 'stun:turn01.brie.fi:5349',
         }, {
           urls: 'turn:turn01.brie.fi:5349',
