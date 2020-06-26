@@ -31,7 +31,12 @@ import { getStyle, hexToRgba } from '@coreui/coreui/dist/js/coreui-utilities';
 import DefaultAside from '../../containers/DefaultLayout/DefaultAside';
 import PeerHandler from '../../containers/DefaultLayout/peerHandler';
 import { Peer, switchContext, createVideoElement } from '../Connection/Connect';
-import { getMyMediaStream, startCall, endCall } from '../Connection/Connect';
+import {
+  getMyMediaStream,
+  startCall,
+  endCall,
+  addScreenShareStream
+} from '../Connection/Connect';
 
 class Room extends Component {
   constructor(props) {
@@ -51,6 +56,7 @@ class Room extends Component {
     this.submitVideoHandler = this.submitVideoHandler.bind(this);
     this.submitScreenHandler = this.submitScreenHandler.bind(this);
     this.endCallHandler = this.endCallHandler.bind(this);
+    this.inCallShareHandler = this.inCallShareHandler.bind(this);
     //this.getMyMediaStream = this.getMyMediaStream.bind(this);
     //this.createVideoElement = this.createVideoElement.bind(this);
   }
@@ -70,6 +76,9 @@ class Room extends Component {
   }
   submitScreenHandler() {
     startCall(this, this.state.roomName, 'screen');
+  }
+  inCallShareHandler() {
+    addScreenShareStream(this);
   }
 
   endCallHandler() {
@@ -131,9 +140,12 @@ class Room extends Component {
           <Container className="room">
             <video id="context" controls autoPlay></video>
             <Row className="m-0 p-0" id="videos"></Row>
+            {/*
             <button onClick={this.submitVideoHandler}>Start Call </button>
             <button onClick={this.submitScreenHandler}>Screen Call </button>
             <button onClick={this.endCallHandler}>End Call </button>
+            <button onClick={this.inCallShareHandler}>CallScreenShare </button>
+            */}
           </Container>
         </main>
         <aside className="aside-menu bg-dark" display="md">

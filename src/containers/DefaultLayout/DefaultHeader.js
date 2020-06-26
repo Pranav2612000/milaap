@@ -128,7 +128,8 @@ class DefaultHeader extends Component {
           }}
         />
         <AppSidebarToggler className="d-md-down-none" display="lg" />
-        <Nav className="d-block d-md-down " navbar>
+
+        <Nav className="d-block d-md-down" navbar>
           <NavItem className="px-2">
             <NavLink to="/dashboard" className="nav-link">
               Dashboard
