@@ -10,7 +10,7 @@ const connectDB = async () => {
       useCreateIndex: true,
       useFindAndModify: false,
       useUnifiedTopology: true
-      // dbName:I//
+      // dbName: I
     });
     console.log('MongoDB connected.');
   } catch (err) {
