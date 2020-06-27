@@ -174,7 +174,10 @@ class Room extends Component {
             */}
           </Container>
         </main>
-        <aside className="aside-menu bg-dark" display="xs">
+        <aside
+          className="aside-menu bg-dark"
+          display="md"
+          style={{ position: 'relative' }}>
           <DefaultAside
             roomName={this.props.roomName}
             msgs={this.props.msgs}
