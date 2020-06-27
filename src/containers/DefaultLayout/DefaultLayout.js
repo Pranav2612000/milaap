@@ -215,6 +215,7 @@ class DefaultLayout extends Component {
   }
 
   render() {
+    console.log('here');
     if (localStorage.getItem('milaap-auth-token') === null) {
       if (this.props.location.pathname.match('/rooms/')) {
         var room = this.props.location.pathname.split('/')[2];

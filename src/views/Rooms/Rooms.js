@@ -4,7 +4,6 @@ import { connect } from 'react-redux';
 import { Container, Row } from 'reactstrap';
 import * as action from '../../redux/roomRedux/roomAction';
 import DefaultAside from '../../containers/DefaultLayout/DefaultAside';
-import { Peer, switchContext, createVideoElement } from '../Connection/Connect';
 import {
   getMyMediaStream,
   startCall,
@@ -17,7 +16,6 @@ class Room extends Component {
     super(props);
 
     const roomName = props.match.params.roomname;
-    console.log(Peer);
     console.log(roomName);
     this.state = {
       roomName: roomName,
@@ -25,7 +23,6 @@ class Room extends Component {
     };
     this.props.enterRoom(roomName);
     //this.startCall = this.startCall.bind(this);
-    this.startCall1 = this.startCall1.bind(this);
     //this.endCall = this.endCall.bind(this);
     this.submitVideoHandler = this.submitVideoHandler.bind(this);
     this.submitScreenHandler = this.submitScreenHandler.bind(this);
@@ -59,14 +56,6 @@ class Room extends Component {
     endCall(this);
   }
 
-  startCall1() {
-    getMyMediaStream(this, 'screen').then((media) => {
-      console.log('here');
-      var peer = new Peer(true, this.state.myMediaStreamObj, this.state.roomName);
-      this.setState({ peer: peer });
-      return;
-    });
-  }
   /*
   endCall() {
     console.log(this.state);
