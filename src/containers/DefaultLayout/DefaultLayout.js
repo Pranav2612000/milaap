@@ -238,8 +238,8 @@ class DefaultLayout extends Component {
   signOut(e) {
     e.preventDefault();
     this.props.logout();
-    localStorage.removeItem('milaap-auth-token');
-    this.props.history.push('/login');
+    localStorage.clear();
+    this.props.history.push('/landing');
   }
 
   componentDidMount() {
@@ -266,7 +266,7 @@ class DefaultLayout extends Component {
         var room = this.props.location.pathname.split('/')[2];
         return <Redirect to={{ pathname: '/join', room: room }} />;
       }
-      return <Redirect to={{ pathname: '/login' }} />;
+      return <Redirect to={{ pathname: '/landing' }} />;
     }
     console.log(this.props);
     return (

@@ -78,11 +78,34 @@ export const login = (username, password) => {
       .then((res) => {
         console.log(res.data);
         localStorage.setItem('milaap-auth-token', res.data.token);
+        localStorage.setItem('username', username);
         dispatch(loginSuccess(username));
       })
       .catch((err) => {
         dispatch(loginFailure(err));
         dispatch(Notifications.error(notificationOpts));
+      });
+  };
+};
+
+export const getTokenForTempUser = (reqData) => {
+  return function (dispatch) {
+    axios
+      .post(`${global.config.backendURL}/api/user/gettokenfortempuser`, reqData)
+      .then((res) => {
+        localStorage.setItem('milaap-auth-token', res.data.token);
+        localStorage.setItem('username', reqData.username);
+        dispatch(loginSuccess(reqData.username));
+      })
+      .catch((err) => {
+        dispatch(
+          Notifications.error({
+            title: 'Invalid Room',
+            message: 'Room Not Found',
+            position: 'tr',
+            autoDismiss: 2
+          })
+        );
       });
   };
 };

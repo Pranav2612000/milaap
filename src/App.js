@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { HashRouter, Route, Switch } from 'react-router-dom';
+import { BrowserRouter, Route, Switch } from 'react-router-dom';
 // import { renderRoutes } from 'react-router-config';
 import './App.scss';
 
@@ -25,7 +25,7 @@ class App extends Component {
   render() {
     return (
       <Provider store={store}>
-        <HashRouter>
+        <BrowserRouter>
           <React.Suspense fallback={loading()}>
             <Switch>
               <Route
@@ -70,7 +70,7 @@ class App extends Component {
               />
             </Switch>
           </React.Suspense>
-        </HashRouter>
+        </BrowserRouter>
       </Provider>
     );
   }

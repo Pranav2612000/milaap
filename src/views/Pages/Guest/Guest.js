@@ -14,8 +14,13 @@ import {
   InputGroupText,
   Row
 } from 'reactstrap';
+
 import axios from 'axios';
 import ReactNotification, { store } from 'react-notifications-component';
+import logo from '../../../assets/img/brand/logo.png';
+import * as action from '../../../redux//loginRedux/loginAction';
+import Notifications from 'react-notification-system-redux';
+import { connect } from 'react-redux';
 class Guest extends Component {
   constructor(props) {
     super(props);
@@ -25,7 +30,8 @@ class Guest extends Component {
       name: '',
       room: false,
       roomName: '',
-      error: false
+      error: false,
+      disabled: false
     };
   }
 
@@ -33,7 +39,10 @@ class Guest extends Component {
     this.setState({ room: this.props.location.room });
     this.setState({ roomName: this.props.location.room });
   }
-
+  componentDidUpdate(prevProps) {
+    if (prevProps.loggedIn !== this.props.loggedIn)
+      this.setState({ disabled: true });
+  }
   handlenameChange = (e) => {
     this.setState({
       name: e.target.value
@@ -64,33 +73,35 @@ class Guest extends Component {
       console.log('exists');
       var reqData = {
         name: this.state.name,
-        roomName: this.state.roomName
+        roomName: this.state.roomName,
+        username: this.state.name
       };
-      axios
-        .post(`${global.config.backendURL}/api/user/gettokenfortempuser`, reqData)
-        .then((res) => {
-          localStorage.setItem('milaap-auth-token', res.data.token);
-          this.setState({
-            login: true
-          });
-          return;
-        })
-        .catch((err) => {
-          console.log(err);
-          this.setState({ error: true });
-          store.addNotification({
-            title: 'Invalid Room',
-            message: 'Room Not Found',
-            type: 'danger',
-            container: 'top-right',
-            animationIn: ['animated', 'fadeIn'],
-            animationOut: ['animated', 'fadeOut'],
-            dismiss: {
-              duration: 3000,
-              pauseOnHover: true
-            }
-          });
-        });
+      this.props.getTokenForTempUser(reqData);
+      // axios
+      //   .post(`${global.config.backendURL}/api/user/gettokenfortempuser`, reqData)
+      //   .then((res) => {
+      //     localStorage.setItem('milaap-auth-token', res.data.token);
+      //     this.setState({
+      //       login: true
+      //     });
+      //     return;
+      //   })
+      //   .catch((err) => {
+      //     console.log(err);
+      //     this.setState({ error: true });
+      //     store.addNotification({
+      //       title: 'Invalid Room',
+      //       message: 'Room Not Found',
+      //       type: 'danger',
+      //       container: 'top-right',
+      //       animationIn: ['animated', 'fadeIn'],
+      //       animationOut: ['animated', 'fadeOut'],
+      //       dismiss: {
+      //         duration: 3000,
+      //         pauseOnHover: true
+      //       }
+      //     });
+      //   });
     } else {
       this.setState({
         login: true
@@ -138,7 +149,7 @@ class Guest extends Component {
     return (
       /* Add Milaap Logo somewhere on this page. */
       <>
-        {console.log(this.state.login)}
+        {console.log(this.state.loggedIn)}
         {this.state.login === true && (
           <Redirect
             to={{
@@ -147,9 +158,29 @@ class Guest extends Component {
             }}
           />
         )}
-        {this.state.error && <ReactNotification />}
+        {this.props.notifications && (
+          <Notifications notifications={this.props.notifications} />
+        )}
         <div className="app flex-row align-items-center">
           <Container>
+            <Row
+              className="justify-content-center"
+              style={{ margin: '0%', height: '15%' }}>
+              <Card
+                className="text-white bg-transparent py-5 d-md-down"
+                style={{ width: '59%' }}
+                style={{ backgroundColor: 'transparent', border: 0 }}>
+                <CardBody
+                  className="text-center"
+                  style={{ backgroundColor: 'transparent', border: 0 }}>
+                  <img
+                    src={logo}
+                    onClick={() => this.props.history.push('landing')}
+                    style={{ cursor: 'pointer' }}
+                  />
+                </CardBody>
+              </Card>
+            </Row>
             <Row className="justify-content-center">
               <Col md="8">
                 <CardGroup>
@@ -191,6 +222,7 @@ class Guest extends Component {
                             </InputGroupAddon>
                             <Input
                               type="text"
+                              disabled={this.state.disabled}
                               placeholder="Enter Room Name to Join"
                               value={this.state.roomName}
                               onChange={this.handleroomNameChange}
@@ -246,5 +278,19 @@ class Guest extends Component {
     );
   }
 }
+const mapStateToProps = (state) => {
+  console.log(state);
+  return {
+    loggedIn: state.loginReducer.loggedIn,
+    error: state.loginReducer.error,
+    notifications: state.notifications
+  };
+};
 
-export default Guest;
+const mapDispatchToProps = (dispatch) => {
+  return {
+    getTokenForTempUser: (payload) => dispatch(action.getTokenForTempUser(payload))
+  };
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(Guest);

@@ -2,7 +2,7 @@
 <br />
 <p align="center">
   <a href="https://github.com/Pranav2612000/distrideochat/">
-    <img src="public/assets/img/logo.png" alt="Logo" width="130" height="130">
+    <img src="public/assets/img/finallogo.png" alt="Logo" width="130" height="130">
   </a>
 
   <h3 align="center">Distrideo Chat</h3>

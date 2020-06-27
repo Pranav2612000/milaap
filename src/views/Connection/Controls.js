@@ -5,6 +5,12 @@ import { AwesomeButtonProgress } from 'react-awesome-button';
 import 'react-awesome-button/dist/styles.css';
 import { connect } from 'react-redux';
 import {
+  getMyMediaStream,
+  startCall,
+  endCall,
+  addScreenShareStream
+} from '../Connection/Connect';
+import {
   Nav,
   NavItem,
   NavLink,
@@ -52,14 +58,24 @@ class Controls extends Component {
       calls: new Array(),
       connectedPeers: new Set(),
       friendtkn: '',
-      myUsername: ''
+      myUsername: '',
+      isMuted: false,
+      inCall: false,
+      isWebcamOn: true
     };
     console.log(this.state.roomName);
+    this.joinCall = this.joinCall.bind(this);
     this.startScreenShare = this.startScreenShare.bind(this);
     this.startConnection = this.startConnection.bind(this);
     this.sendCallEndedSignal = this.sendCallEndedSignal.bind(this);
-
+    this.stopScreenShare = this.stopScreenShare.bind(this);
+    this.muteCall = this.muteCall.bind(this);
     this.endCall = this.endCall.bind(this);
+
+    this.submitVideoHandler = this.submitVideoHandler.bind(this);
+    this.submitScreenHandler = this.submitScreenHandler.bind(this);
+    this.endCallHandler = this.endCallHandler.bind(this);
+    this.inCallShareHandler = this.inCallShareHandler.bind(this);
   }
 
   componentWillUnmount() {
@@ -75,6 +91,20 @@ class Controls extends Component {
       });
       this.endCall();
     }
+  }
+
+  submitVideoHandler() {
+    startCall(this, this.state.roomName, 'video');
+  }
+  submitScreenHandler() {
+    startCall(this, this.state.roomName, 'screen');
+  }
+  inCallShareHandler() {
+    addScreenShareStream(this);
+  }
+
+  endCallHandler() {
+    endCall(this);
   }
 
   createNotif = (title, msg, type) => {
@@ -112,7 +142,7 @@ class Controls extends Component {
 
   createPeer(id) {
     var peer = new Peer(id, {
-      host: 'localhost',
+      host: `${global.config.peerJSServerURL}`,
       port: 9000,
       path: '/peerserver',
       config: {
@@ -124,6 +154,14 @@ class Controls extends Component {
             username: 'veddandekar6@gmail.com'
           }
         ]
+        /*{ urls: "stun.internetcalls.com:3478" },*/
+        /*iceServers: [{
+          urls: 'stun:turn01.brie.fi:5349',
+        }, {
+          urls: 'turn:turn01.brie.fi:5349',
+          username: 'brie',
+          credential: 'fi',
+        }],*/
       } /* Sample servers, please use appropriate ones */
     });
     return peer;
@@ -236,6 +274,11 @@ class Controls extends Component {
     });
   }
 
+  async joinCall(next) {
+    this.startScreenShare('video', next);
+  }
+
+  async stopScreenShare() {}
   // Function to get the media stream for the user and store it in state so that it
   // can be used multiple times without requiring permission.
   async getMyMediaStream(self, type) {
@@ -430,6 +473,7 @@ connectedPeers: connectedPeers,
         console.log(duplicateCall.peer);
         //      calls.delete(duplicateCall);
         // calls.splice(duplicateCallIndex, 1);
+        return;
         // duplicateCall.close();
       }
       // calls.add(call);
@@ -478,7 +522,14 @@ connectedPeers: connectedPeers,
 
     // self.videoRef.current.srcObject = stream;
   }
-
+  async muteCall() {
+    {
+      /*console.log('mute call reached');
+    await navigator.mediaDevices
+        audio: false
+      });*/
+    }
+  }
   // Creates a new video element to show the stream passed to it.
   createVideoElement(self, stream, friendtkn, username) {
     const wrapper = document.createElement('div');
@@ -617,36 +668,122 @@ videos.empty();
     return (
       <Container>
         <br />
-        <br />
+        By default when call joined, then webcam ON, and NOT Muted.
+        {/*so variables when joined call, isMute: false, isWebcamOn: true*/}
         <Row className="justify-content-center text-center">
           <AwesomeButtonProgress
             type="primary"
             size="medium"
+            disabled={self.state.inCall}
             action={(element, next) => {
-              this.startScreenShare('video', next);
+              this.setState({ inCall: true });
+              this.submitVideoHandler();
+              next();
+              //this.joinCall(next);
             }}>
-            <i className="icon-user icons"></i>
-            <span> Video</span>
+            {/*<i className="icon-screen-desktop icons"></i>*/}
+            <span> Join Call</span>
+          </AwesomeButtonProgress>
+        </Row>
+        {/* <Row>
+          <AwesomeButtonProgress
+            type="primary"
+            size="medium"
+            disabled={!(self.state.inCall && !self.state.isMuted)}
+            action={(element, next) => {
+              this.setState({ isMuted: true });
+              alert('muting');
+              next();
+              //this.muteCall();
+            }}>
+            <span>Mute</span>
           </AwesomeButtonProgress>
           <AwesomeButtonProgress
             type="primary"
             size="medium"
-            action={(element, next) => this.startScreenShare('screen', next)}>
-            <i className="icon-screen-desktop icons"></i>
-            <span> Screen</span>
+            disabled={!(self.state.isMuted && self.state.inCall)}
+            action={(element, next) => {
+              this.setState({ isMuted: false });
+              alert('unmuting');
+              next();
+              //this.startScreenShare('screen', next);
+            }}>
+            <i className="icon-user icons"></i>
+            <span>UnMute</span>
           </AwesomeButtonProgress>
+        </Row>
+        <Row>
+          <AwesomeButtonProgress
+            type="primary"
+            size="medium"
+            disabled={!(self.state.inCall && !self.state.isWebcamOn)}
+            action={(element, next) => {
+              this.setState({ isWebcamOn: true });
+              //this.startScreenShare('video', next);
+              alert('switching your camera on');
+              next();
+            }}>
+            <span>On Webcam</span>
+          </AwesomeButtonProgress>
+          <AwesomeButtonProgress
+            type="primary"
+            size="medium"
+            disabled={!(self.state.isWebcamOn && self.state.inCall)}
+            action={(element, next) => {
+              this.setState({ isWebcamOn: false });
+              //this.stopScreenShare('screen', next);
+              alert('closing your camera');
+              next();
+            }}>
+            <i className="icon-user icons"></i>
+            <span>Off Webcam</span>
+          </AwesomeButtonProgress>
+        </Row> */}
+        <Row className="justify-content-center text-center">
+          <AwesomeButtonProgress
+            type="primary"
+            size="medium"
+            disabled={!self.state.inCall}
+            action={(element, next) => {
+              this.inCallShareHandler();
+              next();
+            }}>
+            <i className="icon-screen-desktop icons"></i>
+            <span>Share Screen</span>
+          </AwesomeButtonProgress>
+        </Row>
+        <Row className="justify-content-center text-center">
           <AwesomeButtonProgress
             type="primary"
             size="medium"
             // visible={!self.state.calls.length} //use this if we want it completely hidden until needed instead
-            disabled={!self.state.myMediaStreamObj}
+            disabled={!self.state.inCall}
             action={(element, next) => {
-              this.endCall(next);
+              this.setState({ inCall: false });
+              //this.endCall(next);
+              this.endCallHandler();
+              next();
             }}>
             <i className="icon-call-end icons"></i>
             <span> End Call</span>
           </AwesomeButtonProgress>
         </Row>
+        {`${global.config.environment}` == 'development' && (
+          <Row className="justify-content-center text-center">
+            <AwesomeButtonProgress
+              type="primary"
+              size="medium"
+              disabled={self.state.inCall}
+              action={(element, next) => {
+                this.submitScreenHandler();
+                this.setState({ inCall: true });
+                next();
+              }}>
+              <i className="icon-screen-desktop icons"></i>
+              <span>Share Screen</span>
+            </AwesomeButtonProgress>
+          </Row>
+        )}
         <br />
       </Container>
     );

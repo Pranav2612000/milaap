@@ -1,15 +1,21 @@
 {
-  "short_name": "CoreUI-React",
-  "name": "CoreUI-React sample",
+  "name": "DistriDeo Chat",
+  "short_name": "DistriDeo Chat",
   "icons": [
     {
-      "src": "./assets/img/favicon.png",
-      "sizes": "100x100",
+      "src": "img/logo.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    },
+    {
+      "src": "img/logo.png",
+      "sizes": "144x144",
       "type": "image/png"
     }
   ],
-  "start_url": ".",
+  "start_url": "/",
   "display": "standalone",
-  "theme_color": "#000000",
-  "background_color": "#ffffff"
+  "orientation": "portrait",
+  "background_color": "#f0f2f5",
+  "theme_color": "#96f2d7"
 }
