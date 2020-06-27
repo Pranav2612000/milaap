@@ -6,6 +6,7 @@ import 'react-awesome-button/dist/styles.css';
 import * as actions from '../../redux/userRedux/userAction';
 import { connect } from 'react-redux';
 import {
+  toggleVideo,
   getMyMediaStream,
   startCall,
   endCall,
@@ -457,6 +458,7 @@ connectedPeers: connectedPeers,
         calls: [...calls, thiscall]
         // calls: calls,
       });
+      console.log(friendtkn);
       self.createStream(self, stream, friendtkn, username);
     });
   }
@@ -651,6 +653,10 @@ videos.empty();
             action={(element, next) => {
               this.setState({ inCall: true });
               this.submitVideoHandler();
+              setTimeout(() => {
+                console.clear();
+                console.log(document.getElementById('videos').childElementCount);
+              }, 1000);
               next();
               //this.joinCall(next);
             }}>
@@ -693,10 +699,7 @@ videos.empty();
             action={(element, next) => {
               this.setState({ isWebcamOn: true });
               this.props.toggleVideo();
-              // this.submitVideoHandler();
-              // next();
-              //this.startScreenShare('video', next);
-              // alert('switching your camera on');
+              toggleVideo(self);
               next();
             }}>
             <span>On Webcam</span>
@@ -708,10 +711,7 @@ videos.empty();
             action={(element, next) => {
               this.setState({ isWebcamOn: false });
               this.props.toggleVideo();
-              // this.submitVideoHandler();
-              // next();
-              //this.stopScreenShare('screen', next);
-              // alert('closing your camera');
+              toggleVideo(self);
               next();
             }}>
             <i className="icon-user icons"></i>
@@ -780,5 +780,4 @@ const mapDispatchToProps = (dispatch) => {
     toggleVideo: () => dispatch(actions.toggleVideo())
   };
 };
-
 export default connect(mapStateToProps, mapDispatchToProps)(Controls);
