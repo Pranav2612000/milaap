@@ -156,6 +156,14 @@ class Guest extends Component {
             }}
           />
         )}
+        {this.props.loggedIn === true && (
+          <Redirect
+            to={{
+              pathname: `/rooms/${this.state.roomName}`,
+              state: this.state.name
+            }}
+          />
+        )}
         {this.props.notifications && (
           <Notifications notifications={this.props.notifications} />
         )}

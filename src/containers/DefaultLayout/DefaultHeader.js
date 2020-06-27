@@ -104,7 +104,8 @@ class DefaultHeader extends Component {
   render() {
     // eslint-disable-next-line
     const { children, ...attributes } = this.props;
-
+    const showHamburger =
+      window.location.href.split('/').pop() !== 'dashboard' ? true : false;
     /* TODO: Use Protected Route component. */
     if (!this.props.username) {
       return <Redirect to="/landing" />; //Choose from landing and login page.
@@ -137,7 +138,7 @@ class DefaultHeader extends Component {
 
         <Nav className="ml-auto" navbar>
           <UncontrolledDropdown nav direction="down">
-            <DropdownToggle>
+            <DropdownToggle style={{ marginRight: '5px' }}>
               <NavItem>
                 <NavLink to="#" className="nav-link text-dark">
                   {this.props.username}
@@ -156,7 +157,11 @@ class DefaultHeader extends Component {
               </DropdownItem>
             </DropdownMenu>
           </UncontrolledDropdown>
-          <AppAsideToggler className="d-xs-none" display="xs" />
+          <AppAsideToggler
+            className="d-xs-none"
+            display="xs"
+            style={{ display: showHamburger ? 'block' : 'none' }}
+          />
         </Nav>
 
         {/* Migrate the Modal to a new file. */}

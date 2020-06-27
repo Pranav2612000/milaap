@@ -10,7 +10,8 @@ import {
   getMyMediaStream,
   startCall,
   endCall,
-  addScreenShareStream
+  addScreenShareStream,
+  changeCameraFacing
 } from '../Connection/Connect';
 import {
   Nav,
@@ -61,7 +62,8 @@ class Controls extends Component {
       myUsername: '',
       isMuted: false,
       inCall: false,
-      isWebcamOn: true
+      isWebcamOn: true,
+      facing: 'user'
     };
     console.log(this.state.roomName);
     this.joinCall = this.joinCall.bind(this);
@@ -76,6 +78,7 @@ class Controls extends Component {
     this.submitScreenHandler = this.submitScreenHandler.bind(this);
     this.endCallHandler = this.endCallHandler.bind(this);
     this.inCallShareHandler = this.inCallShareHandler.bind(this);
+    this.changeCamera = this.changeCamera.bind(this);
   }
 
   componentWillUnmount() {
@@ -93,6 +96,14 @@ class Controls extends Component {
     }
   }
 
+  changeCamera() {
+    if (!this.state.inCall) return;
+    const facing = this.state.facing === 'user' ? 'environment' : 'user';
+    changeCameraFacing(this, facing);
+    this.setState({
+      facing: facing
+    });
+  }
   submitVideoHandler() {
     startCall(this, this.state.roomName, 'video');
   }
@@ -763,6 +774,23 @@ videos.empty();
             </AwesomeButtonProgress>
           </Row>
         )}
+        <Row className="justify-content-center text-center">
+          <AwesomeButtonProgress
+            type="primary"
+            size="medium"
+            // visible={!self.state.calls.length} //use this if we want it completely hidden until needed instead
+            disabled={
+              !/iPhone|iPad|iPod|Android/i.test(navigator.userAgent) ||
+              !this.state.inCall
+            }
+            action={(element, next) => {
+              this.changeCamera();
+              next();
+            }}>
+            <i className="icon-call-end icons"></i>
+            <span> Flip Camera</span>
+          </AwesomeButtonProgress>
+        </Row>
         <br />
       </Container>
     );

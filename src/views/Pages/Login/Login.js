@@ -13,7 +13,8 @@ import {
   InputGroup,
   InputGroupAddon,
   InputGroupText,
-  Row
+  Row,
+  Spinner
 } from 'reactstrap';
 import { connect } from 'react-redux';
 import ReactNotification, { store } from 'react-notifications-component';
@@ -29,7 +30,8 @@ export class Login extends Component {
       username: '',
       password: '',
       error: false,
-      fromRegister: false
+      fromRegister: false,
+      loading: false
     };
   }
 
@@ -55,6 +57,7 @@ export class Login extends Component {
 
   componentDidUpdate(prevProps) {
     //if(this.props.error
+    if (this.props.error) this.state.error = true;
     return;
   }
 
@@ -77,6 +80,12 @@ export class Login extends Component {
 
   handleSubmit = (e) => {
     e.preventDefault();
+
+    this.setState({
+      loading: true,
+      error: false
+    });
+
     this.props.login(this.state.username, this.state.password);
     /*
     var reqData = {
@@ -111,7 +120,6 @@ export class Login extends Component {
         {this.props.notifications && (
           <Notifications notifications={this.props.notifications} />
         )}
-
         <div className="app flex-row align-items-center">
           <ReactNotification />
           <Container>
@@ -170,9 +178,17 @@ export class Login extends Component {
                         </InputGroup>
                         <Row>
                           <Col xs="6">
-                            <Button type="submit" color="primary" className="px-4">
-                              Login
-                            </Button>
+                            {this.state.loading && !this.state.error ? (
+                              <Button color="primary" className="px-4">
+                                <Spinner
+                                  animation={'grow'}
+                                  variant="primary"></Spinner>
+                              </Button>
+                            ) : (
+                              <Button type="submit" color="primary" className="px-4">
+                                Login
+                              </Button>
+                            )}
                           </Col>
                           <Col xs="6" className="text-right">
                             <Button
@@ -182,6 +198,13 @@ export class Login extends Component {
                               Forgot password?
                             </Button>
                           </Col>
+                        </Row>
+                        <Row>
+                          <br />
+                          <br />
+                          <Link to="/join">Join as a Guest?</Link>
+                          <br />
+                          <br />
                         </Row>
                         <Row className="justify-content-center">
                           <h2>OR</h2>
@@ -246,7 +269,8 @@ const mapStateToProps = (state) => {
   return {
     loggedIn: state.loginReducer.loggedIn,
     error: state.loginReducer.error,
-    notifications: state.notifications
+    notifications: state.notifications,
+    loading: state.loading
   };
 };
 
