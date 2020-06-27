@@ -73,49 +73,49 @@ class DefaultLayout extends Component {
         var rooms = res.data.rooms;
         this.setState({ rooms: rooms });
         const GroupList = getGroupElements(rooms);
-        axios
-          .post(
-            `${global.config.backendURL}/api/room/getActive`,
-            {},
-            {
-              headers: {
-                'milaap-auth-token': localStorage.getItem('milaap-auth-token')
-              }
-            }
-          )
-          .then((res) => {
-            console.log(res);
-            var active = res.data.active;
-            console.log(active);
-            console.log({ ...GroupList });
-            this.setState({
-              navigation: {
-                items: [
+        // axios
+        //   .post(
+        //     `${global.config.backendURL}/api/room/getActive`,
+        //     {},
+        //     {
+        //       headers: {
+        //         'milaap-auth-token': localStorage.getItem('milaap-auth-token')
+        //       }
+        //     }
+        //   )
+        //   .then((res) => {
+        //     console.log(res);
+        //     var active = res.data.active;
+        //     console.log(active);
+        //     console.log({ ...GroupList });
+        this.setState({
+          navigation: {
+            items: [
+              {
+                title: true,
+                name: 'Rooms',
+                icon: 'icon-puzzle',
+                children: [
                   {
-                    title: true,
-                    name: 'Rooms',
+                    // title: true,
+                    name: 'No Messages Yet.',
                     icon: 'icon-puzzle',
-                    children: [
-                      {
-                        // title: true,
-                        name: 'No Messages Yet.',
-                        icon: 'icon-puzzle',
-                        badge: {
-                          variant: 'info',
-                          text: 'Add'
-                        },
-                        class: ''
-                      }
-                    ]
-                  },
-                  ...GroupList
+                    badge: {
+                      variant: 'info',
+                      text: 'Add'
+                    },
+                    class: ''
+                  }
                 ]
-              }
-            });
-          })
-          .catch((err) => {
-            console.log(err);
-          });
+              },
+              ...GroupList
+            ]
+          }
+        });
+        // })
+        // .catch((err) => {
+        //   console.log(err);
+        // });
       })
       .catch((err) => {
         console.log(err);

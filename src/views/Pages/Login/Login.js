@@ -102,7 +102,7 @@ export class Login extends Component {
     return (
       /* Add Milaap Logo somewhere on this page. */
       <>
-        {this.props.loggedIn === true && (
+        {this.props.loggedIn === true && this.props.guest === false && (
           <Redirect to={{ pathname: '/dashboard', state: this.state.username }} />
         )}
         {/* <ReactNotification /> */}
@@ -184,11 +184,11 @@ export class Login extends Component {
                           </Col>
                         </Row>
                         <Row>
-                          <br/>
-                          <br/>
-                          <Link to='/join'>Join as a Guest?</Link>
-                          <br/>
-                          <br/>
+                          <br />
+                          <br />
+                          <Link to="/join">Join as a Guest?</Link>
+                          <br />
+                          <br />
                         </Row>
                         <Row className="justify-content-center">
                           <h2>OR</h2>
@@ -253,7 +253,8 @@ const mapStateToProps = (state) => {
   return {
     loggedIn: state.loginReducer.loggedIn,
     error: state.loginReducer.error,
-    notifications: state.notifications
+    notifications: state.notifications,
+    guest: state.loginReducer.guest
   };
 };
 

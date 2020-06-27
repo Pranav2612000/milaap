@@ -38,10 +38,12 @@ export const loginRequest = () => {
   };
 };
 
-export const loginSuccess = (username) => {
+export const loginSuccess = (username, guest = false) => {
   return {
+    loggedIn: true,
     type: LOGIN_SUCCESS,
-    username: username
+    username: username,
+    guest: guest
   };
 };
 
@@ -78,7 +80,7 @@ export const login = (username, password) => {
         console.log(res.data);
         localStorage.setItem('milaap-auth-token', res.data.token);
         localStorage.setItem('username', username);
-        dispatch(loginSuccess(username));
+        dispatch(loginSuccess(username, false));
       })
       .catch((err) => {
         dispatch(loginFailure(err));
@@ -94,7 +96,7 @@ export const getTokenForTempUser = (reqData) => {
       .then((res) => {
         localStorage.setItem('milaap-auth-token', res.data.token);
         localStorage.setItem('username', reqData.username);
-        dispatch(loginSuccess(reqData.username));
+        dispatch(loginSuccess(reqData.username, true));
       })
       .catch((err) => {
         dispatch(

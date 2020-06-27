@@ -147,7 +147,7 @@ class Guest extends Component {
     return (
       /* Add Milaap Logo somewhere on this page. */
       <>
-        {console.log(this.state.loggedIn)}
+        {console.log(this.state.login)}
         {this.state.login === true && (
           <Redirect
             to={{
