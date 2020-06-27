@@ -22,7 +22,6 @@ io.sockets.on('connection', (client) => {
   console.log('A user connected to socket server.');
   console.log(client.id);
   client.on('signalling', (room, data, to_id, from_id) => {
-    client.join(room);
     // Add id of client to online array of room.
     console.log(room);
     console.log('*****************************received signal');

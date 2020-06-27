@@ -22,6 +22,8 @@ export class Peer extends Emitter {
   constructor(it, stream, room, initiator, their_id, their_name, my_id) {
     super();
     this.error = null;
+    this.ended = false;
+    this.num_retries = 0;
     this.active = false;
     this.stream = stream;
     this.their_id = their_id;
@@ -113,11 +115,30 @@ export class Peer extends Emitter {
     });
   }
 
-  close() {
-    this.emit('close');
-    this.active = false;
-    this.peer.destroy();
-    deleteVideoElement(this.their_id);
+  async close() {
+    console.log(this.ended);
+    if(this.ended) {
+      this.emit('close');
+      this.active = false;
+      this.peer.destroy();
+      deleteVideoElement(this.their_id);
+    } else {
+      //Trying to reconnect.
+      this.num_retries = this.num_retries + 1;
+      if(this.num_retries > 3) {
+        console.log('Too many retries.. Device facing connection issue');
+        return;
+      }
+      var peer = new Peer(
+        false,
+        this.stream,
+        this.room,
+        this.initiator,
+        this.their_id,
+        this.their_name,
+        this.my_id
+      );
+    }
   }
 
   startCall() {
@@ -463,6 +484,7 @@ function sendRequestToEndCall(self) {
       self.state.myPeers.forEach((val, index) => {
         if (val) {
           console.log(val);
+          val.ended = true;
           val.peer.destroy('Call Ended');
         }
       });
