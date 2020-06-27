@@ -14,6 +14,7 @@ import {
   InputGroupText,
   Row
 } from 'reactstrap';
+
 import axios from 'axios';
 import ReactNotification, { store } from 'react-notifications-component';
 import logo from '../../../assets/img/brand/logo.png';
@@ -172,7 +173,11 @@ class Guest extends Component {
                 <CardBody
                   className="text-center"
                   style={{ backgroundColor: 'transparent', border: 0 }}>
-                  <img src={logo} />
+                  <img
+                    src={logo}
+                    onClick={() => this.props.history.push('landing')}
+                    style={{ cursor: 'pointer' }}
+                  />
                 </CardBody>
               </Card>
             </Row>
