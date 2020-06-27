@@ -133,6 +133,9 @@ export function createVideoElement(self, stream, friendtkn, username) {
   video.srcObject = stream;
   video.autoplay = true;
   video.onclick = switchContext;
+  if (video.id == 'me') {
+    video.muted = 'true';
+  }
   wrapper.appendChild(video);
   row.appendChild(nameTag);
   row.appendChild(audioIcon);
@@ -151,6 +154,10 @@ export function switchContext(e) {
     context.poster =
       'https://dummyimage.com/1024x576/2f353a/ffffff.jpg&text=' + username;
     context.srcObject = e.srcObject;
+    console.log(e); 
+    if(e.id == "me") {
+      context.muted = 'true';
+    }
     context.play();
     $('#context').removeClass().addClass(e.id);
   } catch (err) {
@@ -395,6 +402,7 @@ function deleteVideoElement(id) {
 export async function addScreenShareStream(self) {
   getMyMediaStream(self, 'screen').then((media) => {
     self.state.myPeers.forEach((val, index) => {
+      console.log(val);
       val.peer.addStream(self.state.myScreenStreamObj);
     });
   });
