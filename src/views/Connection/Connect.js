@@ -188,7 +188,7 @@ export async function getMyMediaStream(self, type) {
     await navigator.mediaDevices
       .getUserMedia({
         video: { width: 1024, height: 576 },
-        audio: true
+        audio: { echoCancellation: true, noiseSuppression: true} 
       })
       .then((media) => {
         self.setState({
