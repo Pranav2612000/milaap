@@ -100,39 +100,43 @@ export class Peer extends Emitter {
 }
 
 function muteVideo(self, id) {
+  console.log('TEST');
   const userStream = document.getElementById(id).srcObject;
-  if (userStream.getAudioTracks()[0].enabled)
+  const deets = document.getElementById(id).nextElementSibling;
+  if (userStream.getAudioTracks()[0].enabled) {
     userStream.getAudioTracks()[0].enabled = false;
-  else userStream.getAudioTracks()[0].enabled = true;
+    deets.children[1].classList.remove('icon-volume-2');
+    deets.children[1].classList.add('icon-volume-off');
+  } else {
+    userStream.getAudioTracks()[0].enabled = true;
+    deets.children[1].classList.add('icon-volume-2');
+    deets.children[1].classList.remove('icon-volume-off');
+  }
 }
 
 export function createVideoElement(self, stream, friendtkn, username) {
   const wrapper = document.createElement('div');
   const video = document.createElement('video');
+  const row = document.createElement('div');
+  row.classList.add('row', 'video-details');
   const nameTag = document.createElement('div');
+  const audioIcon = document.createElement('i');
   const context = document.getElementById('context');
+  audioIcon.classList.add('icon-volume-2', 'audio-icon');
+  audioIcon.addEventListener('click', () => muteVideo(self, friendtkn));
+  if (friendtkn == 'me') audioIcon.style.display = 'none';
   nameTag.classList.add('name-label');
   nameTag.innerText = username || 'me';
   video.width = '200';
   video.id = friendtkn;
-  if (video.id == 'me') {
-    video.muted = 'true';
-  }
   video.height = '350';
   video.srcObject = stream;
   video.autoplay = true;
   video.onclick = switchContext;
-  video.addEventListener(
-    'contextmenu',
-    function (e) {
-      e.preventDefault();
-      muteVideo(self, friendtkn);
-    },
-    false
-  );
-
   wrapper.appendChild(video);
-  wrapper.appendChild(nameTag);
+  row.appendChild(nameTag);
+  row.appendChild(audioIcon);
+  wrapper.appendChild(row);
   document.getElementById('videos').appendChild(wrapper);
   if (!context.srcObject) switchContext(document.getElementById(friendtkn));
 }
@@ -366,7 +370,6 @@ export async function endCall(self) {
 
 function deleteAllVideoElements() {
   $('#videos').empty();
-  //$('#context').empty();
   clearContext();
 }
 
