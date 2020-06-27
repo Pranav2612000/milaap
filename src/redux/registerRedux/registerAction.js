@@ -5,9 +5,8 @@ import {
   USERNAME_EXISTS,
   GOOGLE_USER
 } from './registerActionTypes';
-import ReactNotification, { store } from 'react-notifications-component';
 import axios from 'axios';
-import Notifications, { success, error } from 'react-notification-system-redux';
+import Notifications from 'react-notification-system-redux';
 /*
                 store.addNotification({
                   title: 'Invalid Username or Password',
