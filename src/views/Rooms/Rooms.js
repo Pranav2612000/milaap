@@ -31,7 +31,12 @@ import { getStyle, hexToRgba } from '@coreui/coreui/dist/js/coreui-utilities';
 import DefaultAside from '../../containers/DefaultLayout/DefaultAside';
 import PeerHandler from '../../containers/DefaultLayout/peerHandler';
 import { Peer, switchContext, createVideoElement } from '../Connection/Connect';
-import { getMyMediaStream, startCall, endCall, addScreenShareStream} from '../Connection/Connect';
+import {
+  getMyMediaStream,
+  startCall,
+  endCall,
+  addScreenShareStream
+} from '../Connection/Connect';
 
 class Room extends Component {
   constructor(props) {
@@ -143,7 +148,10 @@ class Room extends Component {
             */}
           </Container>
         </main>
-        <aside className="aside-menu bg-dark" display="md">
+        <aside
+          className="aside-menu bg-dark"
+          display="md"
+          style={{ position: 'relative' }}>
           <DefaultAside
             roomName={this.props.roomName}
             msgs={this.props.msgs}
