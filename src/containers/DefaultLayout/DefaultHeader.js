@@ -129,13 +129,13 @@ class DefaultHeader extends Component {
         />
         <AppSidebarToggler className="d-md-down-none" display="lg" />
 
-        <Nav className="d-md-down-none" navbar>
-          <NavItem className="px-3">
+        <Nav className="d-block d-md-down" navbar>
+          <NavItem className="px-2">
             <NavLink to="/dashboard" className="nav-link">
               Dashboard
             </NavLink>
           </NavItem>
-          <NavItem className="px-3">
+          <NavItem className="px-2">
             <NavLink to="#" className="nav-link" onClick={this.toggle}>
               Create Room
             </NavLink>

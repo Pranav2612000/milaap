@@ -9,6 +9,7 @@ import {
   ButtonToolbar,
   Card,
   CardBody,
+  Container,
   CardFooter,
   CardHeader,
   CardTitle,
@@ -26,6 +27,8 @@ import { getStyle, hexToRgba } from '@coreui/coreui/dist/js/coreui-utilities';
 import DefaultAside from '../../containers/DefaultLayout/DefaultAside';
 import PeerHandler from '../../containers/DefaultLayout/peerHandler';
 import { connect } from 'react-redux';
+import logo from '../../assets/img/brand/logo.png';
+
 const axios = require('axios');
 class Dashboard extends Component {
   constructor(props) {
@@ -68,10 +71,50 @@ class Dashboard extends Component {
     }
     return (
       <>
-        <div className="animated fadeIn ">
+        <div className="text-center" style={{ color: 'white', opacity: '0.5' }}>
           <center>
-            <h1>Welcome {`${this.props.username}`}</h1>
-            <h1>Dashboard</h1>
+            <br />
+            <br />
+            <h1>Welcome {`${this.props.username}`}!</h1>
+            <br />
+            <h1>Distrideo Chat - Dashboard</h1>
+            <br />
+            <Container>
+              <Row
+                className="justify-content-center"
+                style={{ margin: '0%', height: '25%', padding: '0' }}>
+                <Card
+                  className="text-white bg-transparent py-5 d-md-down"
+                  style={{ width: '80%' }}
+                  style={{
+                    backgroundColor: 'transparent',
+                    border: 0,
+                    padding: '0'
+                  }}>
+                  <CardBody
+                    className="text-center"
+                    style={{
+                      backgroundColor: 'transparent',
+                      border: 0,
+                      padding: '0'
+                    }}>
+                    <img
+                      src={logo}
+                      width={'100%'}
+                      height={'100%'}
+                      onClick={() => this.props.history.push('dashboard')}
+                      style={{ cursor: 'pointer' }}
+                    />
+                  </CardBody>
+                </Card>
+              </Row>
+            </Container>
+            <br />
+            <h4>1. To create a room, click on 'Create Room', at the top</h4>
+            <br />
+            <h4>
+              2. To join a room, click on the room to enter, visible on your left
+            </h4>
           </center>
         </div>
       </>

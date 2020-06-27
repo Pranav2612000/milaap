@@ -5,6 +5,12 @@ import { AwesomeButtonProgress } from 'react-awesome-button';
 import 'react-awesome-button/dist/styles.css';
 import { connect } from 'react-redux';
 import {
+  getMyMediaStream,
+  startCall,
+  endCall,
+  addScreenShareStream
+} from '../Connection/Connect';
+import {
   Nav,
   NavItem,
   NavLink,
@@ -65,6 +71,11 @@ class Controls extends Component {
     this.stopScreenShare = this.stopScreenShare.bind(this);
     this.muteCall = this.muteCall.bind(this);
     this.endCall = this.endCall.bind(this);
+
+    this.submitVideoHandler = this.submitVideoHandler.bind(this);
+    this.submitScreenHandler = this.submitScreenHandler.bind(this);
+    this.endCallHandler = this.endCallHandler.bind(this);
+    this.inCallShareHandler = this.inCallShareHandler.bind(this);
   }
 
   componentWillUnmount() {
@@ -80,6 +91,20 @@ class Controls extends Component {
       });
       this.endCall();
     }
+  }
+
+  submitVideoHandler() {
+    startCall(this, this.state.roomName, 'video');
+  }
+  submitScreenHandler() {
+    startCall(this, this.state.roomName, 'screen');
+  }
+  inCallShareHandler() {
+    addScreenShareStream(this);
+  }
+
+  endCallHandler() {
+    endCall(this);
   }
 
   createNotif = (title, msg, type) => {
@@ -643,8 +668,8 @@ videos.empty();
     return (
       <Container>
         <br />
-        //by default when call joined , then webcam ON, and NOT Muted // so variables
-        when joined call, isMute: false, isWebcamOn: true
+        By default when call joined, then webcam ON, and NOT Muted.
+        {/*so variables when joined call, isMute: false, isWebcamOn: true*/}
         <Row className="justify-content-center text-center">
           <AwesomeButtonProgress
             type="primary"
@@ -652,20 +677,24 @@ videos.empty();
             disabled={self.state.inCall}
             action={(element, next) => {
               this.setState({ inCall: true });
-              this.joinCall(next);
+              this.submitVideoHandler();
+              next();
+              //this.joinCall(next);
             }}>
             {/*<i className="icon-screen-desktop icons"></i>*/}
             <span> Join Call</span>
           </AwesomeButtonProgress>
         </Row>
-        <Row>
+        {/* <Row>
           <AwesomeButtonProgress
             type="primary"
             size="medium"
             disabled={!(self.state.inCall && !self.state.isMuted)}
             action={(element, next) => {
               this.setState({ isMuted: true });
-              this.muteCall();
+              alert('muting');
+              next();
+              //this.muteCall();
             }}>
             <span>Mute</span>
           </AwesomeButtonProgress>
@@ -675,7 +704,9 @@ videos.empty();
             disabled={!(self.state.isMuted && self.state.inCall)}
             action={(element, next) => {
               this.setState({ isMuted: false });
-              this.startScreenShare('screen', next);
+              alert('unmuting');
+              next();
+              //this.startScreenShare('screen', next);
             }}>
             <i className="icon-user icons"></i>
             <span>UnMute</span>
@@ -688,7 +719,9 @@ videos.empty();
             disabled={!(self.state.inCall && !self.state.isWebcamOn)}
             action={(element, next) => {
               this.setState({ isWebcamOn: true });
-              this.startScreenShare('video', next);
+              //this.startScreenShare('video', next);
+              alert('switching your camera on');
+              next();
             }}>
             <span>On Webcam</span>
           </AwesomeButtonProgress>
@@ -698,20 +731,25 @@ videos.empty();
             disabled={!(self.state.isWebcamOn && self.state.inCall)}
             action={(element, next) => {
               this.setState({ isWebcamOn: false });
-              this.stopScreenShare('screen', next);
+              //this.stopScreenShare('screen', next);
+              alert('closing your camera');
+              next();
             }}>
             <i className="icon-user icons"></i>
             <span>Off Webcam</span>
           </AwesomeButtonProgress>
-        </Row>
+        </Row> */}
         <Row className="justify-content-center text-center">
           <AwesomeButtonProgress
             type="primary"
             size="medium"
             disabled={!self.state.inCall}
-            action={(element, next) => this.startScreenShare('screen', next)}>
+            action={(element, next) => {
+              this.inCallShareHandler();
+              next();
+            }}>
             <i className="icon-screen-desktop icons"></i>
-            <span> Screen</span>
+            <span>Share Screen</span>
           </AwesomeButtonProgress>
         </Row>
         <Row className="justify-content-center text-center">
@@ -722,12 +760,30 @@ videos.empty();
             disabled={!self.state.inCall}
             action={(element, next) => {
               this.setState({ inCall: false });
-              this.endCall(next);
+              //this.endCall(next);
+              this.endCallHandler();
+              next();
             }}>
             <i className="icon-call-end icons"></i>
             <span> End Call</span>
           </AwesomeButtonProgress>
         </Row>
+        {`${global.config.environment}` == 'development' && (
+          <Row className="justify-content-center text-center">
+            <AwesomeButtonProgress
+              type="primary"
+              size="medium"
+              disabled={self.state.inCall}
+              action={(element, next) => {
+                this.submitScreenHandler();
+                this.setState({ inCall: true });
+                next();
+              }}>
+              <i className="icon-screen-desktop icons"></i>
+              <span>Share Screen</span>
+            </AwesomeButtonProgress>
+          </Row>
+        )}
         <br />
       </Container>
     );

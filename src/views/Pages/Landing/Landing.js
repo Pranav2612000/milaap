@@ -81,7 +81,11 @@ class Landing extends Component {
                     <CardBody
                       className="text-center"
                       style={{ backgroundColor: 'transparent', border: 0 }}>
-                      <img src={logo} />
+                      <img
+                        src={logo}
+                        onClick={() => this.props.history.push('landing')}
+                        style={{ cursor: 'pointer' }}
+                      />
                     </CardBody>
                   </Card>
                 </CardGroup>
