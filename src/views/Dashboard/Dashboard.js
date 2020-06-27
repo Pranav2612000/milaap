@@ -1,68 +1,10 @@
-import React, { Component, lazy, Suspense } from 'react';
-import { Bar, Line } from 'react-chartjs-2';
+import React, { Component } from 'react';
 import { Redirect } from 'react-router-dom';
-import {
-  Badge,
-  Button,
-  ButtonDropdown,
-  ButtonGroup,
-  ButtonToolbar,
-  Card,
-  CardBody,
-  Container,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-  Col,
-  Dropdown,
-  DropdownItem,
-  DropdownMenu,
-  DropdownToggle,
-  Progress,
-  Row,
-  Table
-} from 'reactstrap';
-import { CustomTooltips } from '@coreui/coreui-plugin-chartjs-custom-tooltips';
-import { getStyle, hexToRgba } from '@coreui/coreui/dist/js/coreui-utilities';
-import DefaultAside from '../../containers/DefaultLayout/DefaultAside';
-import PeerHandler from '../../containers/DefaultLayout/peerHandler';
+import { Card, CardBody, Container, Row } from 'reactstrap';
 import { connect } from 'react-redux';
 import logo from '../../assets/img/brand/logo.png';
 
-const axios = require('axios');
 class Dashboard extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      // username: localStorage.getItem('uname')
-    };
-  }
-
-  componentDidMount() {
-    /* Can be changed by getting the username when user logs in. */
-    // console.log(this.state.gID);
-    // if (!this.state.gID) {
-    //   axios
-    //     .get('http://localhost:5000/api/user/getUserName', {
-    //       headers: {
-    //         'milaap-auth-token': localStorage.getItem('milaap-auth-token')
-    //       }
-    //     })
-    //     .then((resp) => {
-    //       console.log(resp.data.username);
-    //       this.setState({ username: resp.data.username });
-    //     })
-    //     .catch((err) => {
-    //       console.log(err, 'Error in Verifying JWT');
-    //       this.setState({ username: false });
-    //       // browserHistory.push('/login');
-    //       // redirectTo('/login');
-    //     });
-    // } else {
-    //   console.log(this.props.username);
-    // }
-  }
-
   loading = () => <div className="animated fadeIn pt-1 text-center">Loading...</div>;
 
   render() {

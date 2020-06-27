@@ -15,8 +15,6 @@ import {
   Row
 } from 'reactstrap';
 
-import axios from 'axios';
-import ReactNotification, { store } from 'react-notifications-component';
 import logo from '../../../assets/img/brand/logo.png';
 import * as action from '../../../redux//loginRedux/loginAction';
 import Notifications from 'react-notification-system-redux';
