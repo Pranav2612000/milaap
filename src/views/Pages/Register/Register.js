@@ -11,7 +11,8 @@ import {
   InputGroup,
   InputGroupAddon,
   InputGroupText,
-  Row
+  Row,
+  Spinner
 } from 'reactstrap';
 import { connect } from 'react-redux';
 import logo from '../../../assets/img/brand/logo.png';
@@ -26,7 +27,9 @@ export class Register extends Component {
       password: '',
       repassword: '',
       match: true,
-      redirect: false
+      redirect: false,
+      loading: false,
+      error: false
     };
     this.handleUsernameChange = this.handleUsernameChange.bind(this);
     this.handlePasswordChange = this.handlePasswordChange.bind(this);
@@ -34,6 +37,10 @@ export class Register extends Component {
     this.handleSubmit = this.handleSubmit.bind(this);
   }
 
+  componentDidUpdate = () => {
+    if (this.props.error) this.state.error = true;
+    return;
+  };
   handleUsernameChange(e) {
     this.setState({
       username: e.target.value
@@ -54,6 +61,10 @@ export class Register extends Component {
 
   handleSubmit(e) {
     e.preventDefault();
+    this.setState({
+      loading: true,
+      error: false
+    });
     this.props.register(this.state.username, this.state.password);
   }
 
@@ -74,7 +85,11 @@ export class Register extends Component {
               style={{ margin: '0%', height: '15%' }}>
               <Card
                 className="text-white bg-transparent py-5 d-md-down"
-                style={{ width: '59%', backgroundColor: 'transparent', border: 0 }}>
+                style={{
+                  width: '59%',
+                  backgroundColor: 'transparent',
+                  border: 0
+                }}>
                 <CardBody
                   className="text-center"
                   style={{ backgroundColor: 'transparent', border: 0 }}>
@@ -149,9 +164,16 @@ export class Register extends Component {
                           }}
                         />
                       </InputGroup>
-                      <Button color="success" block>
-                        Create Account
-                      </Button>
+
+                      {this.state.loading && !this.state.error ? (
+                        <Button color="success" block>
+                          <Spinner></Spinner>
+                        </Button>
+                      ) : (
+                        <Button color="success" block>
+                          Create Account
+                        </Button>
+                      )}
                     </Form>
                     <center>
                       <p>
