@@ -13,3 +13,7 @@
 .icon-speech {
   color: aliceblue;
 }
+
+.tab-pane {
+  max-height: 75vh;
+}
