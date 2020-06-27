@@ -3,6 +3,7 @@ import React, { Component } from 'react';
 import { store } from 'react-notifications-component';
 import { AwesomeButtonProgress } from 'react-awesome-button';
 import 'react-awesome-button/dist/styles.css';
+import * as actions from '../../redux/userRedux/userAction';
 import { connect } from 'react-redux';
 import {
   getMyMediaStream,
@@ -290,7 +291,6 @@ class Controls extends Component {
         });
     } else if (type === 'video') {
       // TODO: Add try catch to handle case when user denies access
-
       await navigator.mediaDevices
         .getUserMedia({
           video: { width: 1024, height: 576 },
@@ -703,8 +703,11 @@ videos.empty();
             disabled={!(self.state.inCall && !self.state.isWebcamOn)}
             action={(element, next) => {
               this.setState({ isWebcamOn: true });
+              this.props.toggleVideo();
+              this.submitVideoHandler();
+              next();
               //this.startScreenShare('video', next);
-              alert('switching your camera on');
+              // alert('switching your camera on');
               next();
             }}>
             <span>On Webcam</span>
@@ -715,8 +718,11 @@ videos.empty();
             disabled={!(self.state.isWebcamOn && self.state.inCall)}
             action={(element, next) => {
               this.setState({ isWebcamOn: false });
+              this.props.toggleVideo();
+              this.submitVideoHandler();
+              next();
               //this.stopScreenShare('screen', next);
-              alert('closing your camera');
+              // alert('closing your camera');
               next();
             }}>
             <i className="icon-user icons"></i>
@@ -791,10 +797,16 @@ videos.empty();
   }
 }
 const mapStateToProps = (state) => {
-  console.log(state);
   return {
+    video: state.userReducer.video,
     username: state.loginReducer.username
   };
 };
 
-export default connect(mapStateToProps)(Controls);
+const mapDispatchToProps = (dispatch) => {
+  return {
+    toggleVideo: () => dispatch(actions.toggleVideo())
+  };
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(Controls);
