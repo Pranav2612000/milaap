@@ -704,8 +704,8 @@ videos.empty();
             action={(element, next) => {
               this.setState({ isWebcamOn: true });
               this.props.toggleVideo();
-              this.submitVideoHandler();
-              next();
+              // this.submitVideoHandler();
+              // next();
               //this.startScreenShare('video', next);
               // alert('switching your camera on');
               next();
@@ -719,8 +719,8 @@ videos.empty();
             action={(element, next) => {
               this.setState({ isWebcamOn: false });
               this.props.toggleVideo();
-              this.submitVideoHandler();
-              next();
+              // this.submitVideoHandler();
+              // next();
               //this.stopScreenShare('screen', next);
               // alert('closing your camera');
               next();
