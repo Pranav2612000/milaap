@@ -113,7 +113,39 @@ export class Peer extends Emitter {
     console.log('starting call');
   }
 }
+export async function toggleVideo(self) {
+  var webCam = getVideoState();
 
+  navigator.mediaDevices
+    .getUserMedia(
+      webCam
+        ? {
+            video: { width: 1024, height: 576 },
+            audio: true
+          }
+        : {
+            audio: true
+          }
+    )
+    .then((stream) => {
+      console.log(self);
+      console.clear();
+      console.log(stream);
+      if (self.state.myPeers)
+        self.state.myPeers.map((eachPeer) => {
+          if (self.state.myMediaStreamObj.getVideoTracks)
+            eachPeer.peer.replaceTrack(
+              self.state.myMediaStreamObj.getVideoTracks()[0],
+              stream.getVideoTracks()[0],
+              self.state.myMediaStreamObj
+            );
+          // eachPeer.peer.removeTrack(
+          //   self.state.myMediaStreamObj.getVideoTracks()[0],
+          //   self.state.myMediaStreamObj
+          // );
+        });
+    });
+}
 function muteVideo(self, id) {
   console.log('TEST');
   const userStream = document.getElementById(id).srcObject;
@@ -204,21 +236,13 @@ export async function changeCameraFacing(self, facing) {
 }
 
 export async function getMyMediaStream(self, type) {
-  var webCam = getVideoState();
-
   if (type === 'screen') {
     // TODO: Add try catch to handle case when user denies access
     await navigator.mediaDevices
-      .getDisplayMedia(
-        webCam
-          ? {
-              video: { width: 0, height: 0 },
-              audio: true
-            }
-          : {
-              audio: true
-            }
-      )
+      .getDisplayMedia({
+        video: { width: 1024, height: 576 },
+        audio: true
+      })
       .then((media) => {
         self.setState({
           myScreenStreamObj: media
@@ -235,8 +259,8 @@ export async function getMyMediaStream(self, type) {
       })*/
     }
 
-    await navigator.mediaDevices
-      .getUserMedia(
+    {
+      /*.getUserMedia(
         webCam
           ? {
               video: { width: 0, height: 0 },
@@ -248,7 +272,15 @@ export async function getMyMediaStream(self, type) {
               noiseSuppression: true
             }
       )
+      */
+    }
 
+    await navigator.mediaDevices
+      .getUserMedia({
+        video: { width: 1024, height: 576 },
+        echoCancellation: true,
+        noiseSuppression: true
+      })
       .then((media) => {
         self.setState({
           myMediaStreamObj: media
@@ -256,7 +288,7 @@ export async function getMyMediaStream(self, type) {
         createVideoElement(self, media, 'me');
         return media;
       });
-    alert(self.state.myMediaStreamObj);
+    // alert(self.state.myMediaStreamObj);
   }
 }
 export function startCall(self, roomName, type) {
