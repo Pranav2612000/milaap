@@ -4,11 +4,9 @@ import Toolbar from '../Toolbar';
 import ToolbarButton from '../ToolbarButton';
 import Message from '../Message';
 import moment from 'moment';
-import axios from 'axios';
 import socketIOClient from 'socket.io-client';
 import { connect } from 'react-redux';
 import './MessageList.css';
-import { Col } from 'reactstrap';
 
 const socket = socketIOClient(`${global.config.backendURL}/`);
 
@@ -37,8 +35,6 @@ class MessageList extends Component {
         this.state.MY_USER_ID !== data['sender']
       )
         this.fetchMessages(true, data);
-      //console.log('Data and Message list : ', messages, data);
-      // if (props.roomName !== "dashboard") fetchMessages();
     });
   }
 

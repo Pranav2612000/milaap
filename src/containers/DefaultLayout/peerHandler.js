@@ -1,8 +1,7 @@
 import React from 'react';
 import { Button, Input, Row, Col, Jumbotron } from 'reactstrap';
 import Peer from 'peerjs';
-import { Redirect } from 'react-router-dom';
-import ReactNotification, { store } from 'react-notifications-component';
+import { store } from 'react-notifications-component';
 
 class PeerHandler extends React.Component {
   constructor() {

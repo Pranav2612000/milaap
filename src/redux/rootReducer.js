@@ -4,9 +4,7 @@ import { userReducer } from './userRedux/userReducer';
 import { loginReducer } from './loginRedux/loginReducer';
 import { roomReducer } from './roomRedux/roomReducer';
 import { registerReducer } from './registerRedux/registerReducer';
-//import { nameOfReducer } from './folderName/reducerName';
 
-//inside combine reducers name of imported reducers - combineReducers({nameOfReducer, nameOfReducer2});
 export const rootReducer = combineReducers({
   notifications,
   userReducer,

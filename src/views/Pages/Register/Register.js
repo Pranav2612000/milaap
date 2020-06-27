@@ -4,7 +4,6 @@ import {
   Button,
   Card,
   CardBody,
-  CardFooter,
   Col,
   Container,
   Form,
@@ -14,10 +13,8 @@ import {
   InputGroupText,
   Row
 } from 'reactstrap';
-import axios from 'axios';
 import { connect } from 'react-redux';
 import logo from '../../../assets/img/brand/logo.png';
-import ReactNotification, { store } from 'react-notifications-component';
 import Notifications from 'react-notification-system-redux';
 import { Redirect, Link } from 'react-router-dom';
 
@@ -77,8 +74,7 @@ export class Register extends Component {
               style={{ margin: '0%', height: '15%' }}>
               <Card
                 className="text-white bg-transparent py-5 d-md-down"
-                style={{ width: '59%' }}
-                style={{ backgroundColor: 'transparent', border: 0 }}>
+                style={{ width: '59%', backgroundColor: 'transparent', border: 0 }}>
                 <CardBody
                   className="text-center"
                   style={{ backgroundColor: 'transparent', border: 0 }}>
@@ -86,6 +82,7 @@ export class Register extends Component {
                     src={logo}
                     onClick={() => this.props.history.push('landing')}
                     style={{ cursor: 'pointer' }}
+                    alt={'logo'}
                   />
                 </CardBody>
               </Card>
