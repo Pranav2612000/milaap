@@ -668,8 +668,8 @@ videos.empty();
     return (
       <Container>
         <br />
-        //by default when call joined , then webcam ON, and NOT Muted // so variables
-        when joined call, isMute: false, isWebcamOn: true
+        By default when call joined, then webcam ON, and NOT Muted.
+        {/*so variables when joined call, isMute: false, isWebcamOn: true*/}
         <Row className="justify-content-center text-center">
           <AwesomeButtonProgress
             type="primary"
