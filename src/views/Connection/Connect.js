@@ -1,9 +1,17 @@
+import { Component } from 'react';
 import SimplePeer from 'simple-peer';
 import $ from 'jquery';
-import socketIOClient from 'socket.io-client';
+import socketIOClient, { connect } from 'socket.io-client';
 import { Emitter } from './emmiter';
 import axios from 'axios';
+import { store } from '../../redux/store';
 const socket = socketIOClient.connect(`${global.config.backendURL}`); //will be replaced by an appropriate room.
+store.subscribe(getVideoState);
+function getVideoState() {
+  let state = store.getState();
+  return state.userReducer.video;
+}
+
 socket.connect();
 socket.on('connect', () => {
   console.log(socket.connected); // true
@@ -103,12 +111,15 @@ function muteVideo(self, id) {
   console.log('TEST');
   const userStream = document.getElementById(id).srcObject;
   const deets = document.getElementById(id).nextElementSibling;
+  console.log(userStream);
   if (userStream.getAudioTracks()[0].enabled) {
     userStream.getAudioTracks()[0].enabled = false;
+    // userStream.getVideoTracks()[0].enabled = false;
     deets.children[1].classList.remove('icon-volume-2');
     deets.children[1].classList.add('icon-volume-off');
   } else {
     userStream.getAudioTracks()[0].enabled = true;
+    // userStream.getVideoTracks()[0].enabled = true;
     deets.children[1].classList.add('icon-volume-2');
     deets.children[1].classList.remove('icon-volume-off');
   }
@@ -160,14 +171,21 @@ export function switchContext(e) {
 }
 
 export async function getMyMediaStream(self, type) {
+  var webCam = getVideoState();
+
   if (type === 'screen') {
     // TODO: Add try catch to handle case when user denies access
-
     await navigator.mediaDevices
-      .getDisplayMedia({
-        video: { width: 1024, height: 576 },
-        audio: true
-      })
+      .getDisplayMedia(
+        webCam
+          ? {
+              video: { width: 0, height: 0 },
+              audio: true
+            }
+          : {
+              audio: true
+            }
+      )
       .then((media) => {
         self.setState({
           myScreenStreamObj: media
@@ -179,10 +197,16 @@ export async function getMyMediaStream(self, type) {
     // TODO: Add try catch to handle case when user denies access
 
     await navigator.mediaDevices
-      .getUserMedia({
-        video: { width: 1024, height: 576 },
-        audio: true
-      })
+      .getUserMedia(
+        webCam
+          ? {
+              video: { width: 0, height: 0 },
+              audio: true
+            }
+          : {
+              audio: true
+            }
+      )
       .then((media) => {
         self.setState({
           myMediaStreamObj: media
@@ -190,6 +214,7 @@ export async function getMyMediaStream(self, type) {
         createVideoElement(self, media, 'me');
         return media;
       });
+    alert(self.state.myMediaStreamObj);
   }
 }
 export function startCall(self, roomName, type) {
