@@ -27,7 +27,7 @@ export default function Compose(props) {
       });
   }
   return (
-    <div className="compose bg-dark">
+    <div className="compose bg-dark" style={{ borderTop: 'white solid 1px' }}>
       <textarea
         type="text"
         className="md-textarea form-control"
@@ -42,7 +42,7 @@ export default function Compose(props) {
         style={styleSheet.inputStyles}
       />
       <button className="compose-button" onClick={sendMessage}>
-        <span className="icon cui-chevron-right"></span>
+        <i class="fa fa-paper-plane" aria-hidden="true"></i>
       </button>
 
       {props.rightItems}
