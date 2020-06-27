@@ -695,7 +695,7 @@ videos.empty();
             <i className="icon-user icons"></i>
             <span>UnMute</span>
           </AwesomeButtonProgress>
-        </Row>
+          </Row>*/}
         <Row>
           <AwesomeButtonProgress
             type="primary"
@@ -722,7 +722,7 @@ videos.empty();
             <i className="icon-user icons"></i>
             <span>Off Webcam</span>
           </AwesomeButtonProgress>
-        </Row> */}
+        </Row>
         <Row className="justify-content-center text-center">
           <AwesomeButtonProgress
             type="primary"
