@@ -1,14 +1,9 @@
-/*
- *
- */
 import SimplePeer from 'simple-peer';
 import $ from 'jquery';
 import socketIOClient from 'socket.io-client';
 import { Emitter } from './emmiter';
 import axios from 'axios';
-//const socket = socketIOClient.connect('http://54.160.110.155:5000'); //will be replaced by an appropriate room.
 const socket = socketIOClient.connect(`${global.config.backendURL}`); //will be replaced by an appropriate room.
-//const socket = socketIOClient.connect('http://localhost:5000');
 socket.connect();
 socket.on('connect', () => {
   console.log(socket.connected); // true
@@ -74,25 +69,6 @@ export class Peer extends Emitter {
       const self = this;
       console.log('stream received');
       createVideoElement(self, data, self.their_id, self.their_name);
-      /*
-      var reqData = {
-        id: my_id,
-        type: 0,
-        roomName: this.room
-      };
-      axios
-        .post(`${global.config.backendURL}/api/room/goonlinesimple`, reqData, {
-          headers: {
-            'milaap-auth-token': localStorage.getItem('milaap-auth-token')
-          }
-        })
-        .then((res) => {
-          res.data.online.map((each) => {
-            if (each.id === self.their_id)
-              createVideoElement(self, data, self.their_id, each.username);
-          });
-        });
-        */
     });
     socket.on('signalling', (data, from_id) => {
       if (from_id != this.their_id) {
@@ -124,39 +100,43 @@ export class Peer extends Emitter {
 }
 
 function muteVideo(self, id) {
+  console.log('TEST');
   const userStream = document.getElementById(id).srcObject;
-  if (userStream.getAudioTracks()[0].enabled)
+  const deets = document.getElementById(id).nextElementSibling;
+  if (userStream.getAudioTracks()[0].enabled) {
     userStream.getAudioTracks()[0].enabled = false;
-  else userStream.getAudioTracks()[0].enabled = true;
+    deets.children[1].classList.remove('icon-volume-2');
+    deets.children[1].classList.add('icon-volume-off');
+  } else {
+    userStream.getAudioTracks()[0].enabled = true;
+    deets.children[1].classList.add('icon-volume-2');
+    deets.children[1].classList.remove('icon-volume-off');
+  }
 }
 
 export function createVideoElement(self, stream, friendtkn, username) {
   const wrapper = document.createElement('div');
   const video = document.createElement('video');
+  const row = document.createElement('div');
+  row.classList.add('row', 'video-details');
   const nameTag = document.createElement('div');
+  const audioIcon = document.createElement('i');
   const context = document.getElementById('context');
+  audioIcon.classList.add('icon-volume-2', 'audio-icon');
+  audioIcon.addEventListener('click', () => muteVideo(self, friendtkn));
+  if (friendtkn == 'me') audioIcon.style.display = 'none';
   nameTag.classList.add('name-label');
   nameTag.innerText = username || 'me';
   video.width = '200';
   video.id = friendtkn;
-  if (video.id == 'me') {
-    video.muted = 'true';
-  }
   video.height = '350';
   video.srcObject = stream;
   video.autoplay = true;
   video.onclick = switchContext;
-  video.addEventListener(
-    'contextmenu',
-    function (e) {
-      e.preventDefault();
-      muteVideo(self, friendtkn);
-    },
-    false
-  );
-
   wrapper.appendChild(video);
-  wrapper.appendChild(nameTag);
+  row.appendChild(nameTag);
+  row.appendChild(audioIcon);
+  wrapper.appendChild(row);
   document.getElementById('videos').appendChild(wrapper);
   if (!context.srcObject) switchContext(document.getElementById(friendtkn));
 }
@@ -390,7 +370,6 @@ export async function endCall(self) {
 
 function deleteAllVideoElements() {
   $('#videos').empty();
-  //$('#context').empty();
   clearContext();
 }
 

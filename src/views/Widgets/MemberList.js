@@ -1,25 +1,11 @@
-import React, { Component, lazy, Suspense } from 'react';
+import React, { Component } from 'react';
 import { store } from 'react-notifications-component';
-import { Bar, Line } from 'react-chartjs-2';
-import socketIOClient from 'socket.io-client';
+// import socketIOClient from 'socket.io-client';
 import axios from 'axios';
 import {
-  Badge,
   Button,
-  ButtonDropdown,
-  ButtonGroup,
-  ButtonToolbar,
-  Card,
-  CardBody,
-  CardFooter,
-  CardHeader,
-  CardTitle,
   Col,
   Container,
-  Dropdown,
-  DropdownItem,
-  DropdownMenu,
-  DropdownToggle,
   Form,
   Input,
   InputGroup,
@@ -31,17 +17,13 @@ import {
   ModalHeader,
   ModalBody,
   ModalFooter,
-  Tooltip,
   UncontrolledTooltip,
   Jumbotron,
-  Progress,
   Row,
-  Spinner,
-  Table,
   Label
 } from 'reactstrap';
 import './MemberList.css';
-const socket = socketIOClient(`${global.config.backendURL}/`);
+// const socket = socketIOClient(`${global.config.backendURL}/`);
 
 class MemberList extends Component {
   constructor(props) {

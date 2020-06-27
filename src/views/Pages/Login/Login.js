@@ -13,10 +13,8 @@ import {
   InputGroup,
   InputGroupAddon,
   InputGroupText,
-  Row,
-  Alert
+  Row
 } from 'reactstrap';
-import axios from 'axios';
 import { connect } from 'react-redux';
 import ReactNotification, { store } from 'react-notifications-component';
 import Notifications from 'react-notification-system-redux';
@@ -122,8 +120,7 @@ export class Login extends Component {
               style={{ margin: '0%', height: '15%' }}>
               <Card
                 className="text-white bg-transparent py-5 d-md-down"
-                style={{ width: '59%' }}
-                style={{ backgroundColor: 'transparent', border: 0 }}>
+                style={{ width: '59%', backgroundColor: 'transparent', border: 0 }}>
                 <CardBody
                   className="text-center"
                   style={{ backgroundColor: 'transparent', border: 0 }}>
@@ -185,6 +182,13 @@ export class Login extends Component {
                               Forgot password?
                             </Button>
                           </Col>
+                        </Row>
+                        <Row>
+                          <br/>
+                          <br/>
+                          <Link to='/join'>Join as a Guest?</Link>
+                          <br/>
+                          <br/>
                         </Row>
                         <Row className="justify-content-center">
                           <h2>OR</h2>

@@ -37,8 +37,6 @@ import {
 import classNames from 'classnames';
 import { AppSwitch } from '@coreui/react';
 import MessageView from '../../views/MessageList/index';
-
-// import Peer from "../../dependencies/peerjs/index.d.ts";
 import Peer from 'peerjs';
 import axios from 'axios';
 import $ from 'jquery';
@@ -154,14 +152,6 @@ class Controls extends Component {
             username: 'veddandekar6@gmail.com'
           }
         ]
-        /*{ urls: "stun.internetcalls.com:3478" },*/
-        /*iceServers: [{
-          urls: 'stun:turn01.brie.fi:5349',
-        }, {
-          urls: 'turn:turn01.brie.fi:5349',
-          username: 'brie',
-          credential: 'fi',
-        }],*/
       } /* Sample servers, please use appropriate ones */
     });
     return peer;
@@ -235,16 +225,6 @@ class Controls extends Component {
           } else {
             console.log('My token: ' + id);
             self.updateSelfPeerInfo(self, peer, id, type);
-            /*
-    var peers = self.state.myPeers;
-    var myIDs = self.state.myIds;
-    peers.add(peer);
-    myIDs.add(id);
-    self.setState({
-      myPeers: peers,
-      myIds: myIDs,
-    });
-    */
             console.log(self.state);
             self.setUpConnections(self, peer, id, type, onlineArray);
             next();
@@ -323,13 +303,6 @@ class Controls extends Component {
     var mediaa = self.state.myMediaStreamObj;
     console.log(mediaa);
     self.sendMediaStream(self, peer, mediaa, friendtkn, false);
-    /*
-var connectedPeers = self.state.connectedPeers;
-connectedPeers.add(friendtkn);
-self.setState({
-connectedPeers: connectedPeers,
-});
-*/
   }
 
   // Function to wait for incoming requests onf 'peer' and handle them.

@@ -5,7 +5,7 @@ import {
 } from './roomActionTypes';
 import { redirectToJoinPage } from '../loginRedux/loginAction';
 import axios from 'axios';
-import Notifications, { success, error } from 'react-notification-system-redux';
+import Notifications from 'react-notification-system-redux';
 
 const notificationOpts = {
   // uid: 'once-please', // you can specify your own uid if required
