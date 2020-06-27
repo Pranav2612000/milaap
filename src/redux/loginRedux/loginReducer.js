@@ -28,7 +28,8 @@ export const loginReducer = (state = initalState, action) => {
         ...state,
         loading: false,
         loggedIn: true,
-        username: action.username
+        username: action.username,
+        guest: action.guest
       };
     case LOGIN_FAILURE:
       console.log('fail');

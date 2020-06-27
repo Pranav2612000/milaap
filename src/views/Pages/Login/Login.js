@@ -111,10 +111,8 @@ export class Login extends Component {
   render() {
     return (
       <>
-        {this.props.loggedIn === true && (
-          <Redirect
-            to={{ pathname: '/dashboard', state: localStorage.getItem('username') }}
-          />
+        {this.props.loggedIn === true && this.props.guest === false && (
+          <Redirect to={{ pathname: '/dashboard', state: this.state.username }} />
         )}
         {/* <ReactNotification /> */}
         {/* {this.state.login && console.log("object")} */}
@@ -201,7 +199,13 @@ export class Login extends Component {
                             </Button>
                           </Col>
                         </Row>
-                        <br />
+                        <Row>
+                          <br />
+                          <br />
+                          <Link to="/join">Join as a Guest?</Link>
+                          <br />
+                          <br />
+                        </Row>
                         <Row className="justify-content-center">
                           <h2>OR</h2>
                         </Row>
@@ -276,7 +280,7 @@ const mapStateToProps = (state) => {
     loggedIn: state.loginReducer.loggedIn,
     error: state.loginReducer.error,
     notifications: state.notifications,
-    loading: state.loading
+    guest: state.loginReducer.guest
   };
 };
 
