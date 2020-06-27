@@ -1,41 +1,22 @@
 import React, { Component } from 'react';
 import { withRouter } from 'react-router-dom';
-import { Redirect, Route, Switch } from 'react-router-dom';
-import ReactNotification, { store } from 'react-notifications-component';
+import { store } from 'react-notifications-component';
 
 import {
   Nav,
   NavItem,
   NavLink,
-  Progress,
   TabContent,
   TabPane,
-  ListGroup,
-  ListGroupItem
+  Container,
+  Row
 } from 'reactstrap';
 import './DefaultLayout.css';
-import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import { AppSwitch } from '@coreui/react';
 import MessageView from '../../views/MessageList/index';
 import Controls from '../../views/Connection/Controls';
 import MemberList from '../../views/Widgets/MemberList';
-import axios from 'axios';
-import {
-  Button,
-  ButtonGroup,
-  Badge,
-  Card,
-  CardBody,
-  CardFooter,
-  CardHeader,
-  Col,
-  Container,
-  Row,
-  Collapse,
-  Fade,
-  Spinner
-} from 'reactstrap';
 
 function getRoomFromLocation(locationString) {
   let room = '';

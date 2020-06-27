@@ -4,31 +4,23 @@ import * as router from 'react-router-dom';
 import { Container } from 'reactstrap';
 import axios from 'axios';
 import socketIOClient from 'socket.io-client';
-import PeerHandler from './peerHandler';
 import { connect } from 'react-redux';
 import ReactNotification, { store } from 'react-notifications-component';
 import * as actions from '../../redux/loginRedux/loginAction';
 import './DefaultLayout.css';
 import {
-  AppAside,
-  AppFooter,
   AppHeader,
   AppSidebar,
   AppSidebarFooter,
   AppSidebarForm,
   AppSidebarHeader,
   AppSidebarMinimizer,
-  AppAsideToggler,
-  AppBreadcrumb2 as AppBreadcrumb,
   AppSidebarNav2 as AppSidebarNav
 } from '@coreui/react';
 import routes from '../../routes';
 
 const socket = socketIOClient(`${global.config.backendURL}/`);
-const DefaultAside = React.lazy(() => import('./DefaultAside'));
-const DefaultFooter = React.lazy(() => import('./DefaultFooter'));
 const DefaultHeader = React.lazy(() => import('./DefaultHeader'));
-const InnerHeader = React.lazy(() => import('./InnerHeader'));
 function getGroupElements(rooms) {
   const groupElements = [];
   if (rooms === undefined) {
@@ -43,22 +35,6 @@ function getGroupElements(rooms) {
     groupElements.push(groupElem);
   });
   return groupElements;
-}
-
-function getFriendList(active) {
-  const activeUsers = [];
-  if (active === undefined) {
-    return {};
-  }
-  active.forEach((item, index) => {
-    const friend = {};
-    friend.name = item;
-    // groupElem.url = '/rooms/' + item;
-    friend.icon = 'icon-user';
-    friend.state = false;
-    activeUsers.push(friend);
-  });
-  return activeUsers;
 }
 
 class DefaultLayout extends Component {
@@ -96,7 +72,6 @@ class DefaultLayout extends Component {
         console.log(res);
         var rooms = res.data.rooms;
         this.setState({ rooms: rooms });
-        const PMList = {};
         const GroupList = getGroupElements(rooms);
         axios
           .post(
@@ -112,17 +87,10 @@ class DefaultLayout extends Component {
             console.log(res);
             var active = res.data.active;
             console.log(active);
-            const FriendList = getFriendList(active);
             console.log({ ...GroupList });
             this.setState({
               navigation: {
                 items: [
-                  {
-                    title: true,
-                    name: 'Friends',
-                    icon: 'icon-puzzle'
-                  },
-                  ...FriendList,
                   {
                     title: true,
                     name: 'Rooms',
@@ -157,20 +125,12 @@ class DefaultLayout extends Component {
   constructor(props) {
     super(props);
     var rooms;
-    var friends;
-    const FriendList = getFriendList(friends);
     const GroupList = getGroupElements(rooms);
     this.state = {
       rooms: [],
       userToken: localStorage.getItem('milaap-auth-token'),
       navigation: {
         items: [
-          {
-            title: true,
-            name: 'Friends',
-            icon: 'icon-puzzle'
-          },
-          FriendList,
           {
             title: true,
             name: 'Rooms',
@@ -199,12 +159,6 @@ class DefaultLayout extends Component {
     this.state = {
       navigation: {
         items: [
-          {
-            title: true,
-            name: 'Friends',
-            icon: 'icon-puzzle'
-          },
-          FriendList,
           {
             title: true,
             name: 'Rooms',

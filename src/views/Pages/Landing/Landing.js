@@ -1,19 +1,5 @@
 import React, { Component } from 'react';
-import { Link, Redirect } from 'react-router-dom';
-import {
-  Button,
-  Card,
-  CardBody,
-  CardGroup,
-  Col,
-  Container,
-  Form,
-  Input,
-  InputGroup,
-  InputGroupAddon,
-  InputGroupText,
-  Row
-} from 'reactstrap';
+import { Button, Card, CardBody, CardGroup, Col, Container, Row } from 'reactstrap';
 import logo from '../../../assets/img/brand/logo.png';
 class Landing extends Component {
   render() {
@@ -76,8 +62,11 @@ class Landing extends Component {
                   </Card>
                   <Card
                     className="text-white bg-transparent py-5 d-md-down"
-                    style={{ width: '59%' }}
-                    style={{ backgroundColor: 'transparent', border: 0 }}>
+                    style={{
+                      width: '59%',
+                      backgroundColor: 'transparent',
+                      border: 0
+                    }}>
                     <CardBody
                       className="text-center"
                       style={{ backgroundColor: 'transparent', border: 0 }}>
