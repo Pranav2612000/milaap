@@ -183,6 +183,13 @@ export class Login extends Component {
                             </Button>
                           </Col>
                         </Row>
+                        <Row>
+                          <br/>
+                          <br/>
+                          <Link to='/join'>Join as a Guest?</Link>
+                          <br/>
+                          <br/>
+                        </Row>
                         <Row className="justify-content-center">
                           <h2>OR</h2>
                         </Row>
