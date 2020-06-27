@@ -138,7 +138,7 @@ class DefaultHeader extends Component {
             </DropdownMenu>
           </UncontrolledDropdown>
           <AppAsideToggler
-            className="d-xs-none bg-dark"
+            className="d-xs-none"
             display="xs"
             style={{ display: showHamburger ? 'block' : 'none' }}
           />
