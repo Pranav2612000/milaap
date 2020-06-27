@@ -243,7 +243,7 @@ class Guest extends Component {
                                   : this.handleSubmit(e)
                                   */
                               }>
-                              Join
+                              {this.state.disabled ? 'Proceed' : 'Join'}
                             </Button>
                           </Col>
                         </Row>
