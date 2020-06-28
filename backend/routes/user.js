@@ -86,7 +86,22 @@ router.post('/adduser', auth, async (req, res) => {
     });
     */
 });
-
+router.post('/verify', async (req, res) => {
+  console.log(req.body.headers['milaap-auth-token']);
+  const token = req.body.headers['milaap-auth-token'];
+  if (!token) {
+    console.log('invalid');
+    return res.status(400).json({ res: false });
+  }
+  try {
+    await jwt.verify(token, config.get('jwtSecret'));
+    console.log('valid');
+    return res.status(200).json({ res: true });
+  } catch (e) {
+    console.log('err');
+    return res.status(400).json({ res: false });
+  }
+});
 /* Takes an input username and returns a JWT string which encrypts
  * this name. */
 router.post('/gettokenfortempuser', async (req, res) => {

@@ -96,7 +96,7 @@ class Room extends Component {
               <div
                 id="contextOptions"
                 style={{
-                  display: 'none',
+                  display: 'block',
                   padding: '5px',
                   backgroundColor: '#555',
                   marginTop: '10px',

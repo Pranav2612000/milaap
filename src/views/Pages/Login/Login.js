@@ -127,17 +127,32 @@ export class Login extends Component {
           <Container>
             <Row
               className="justify-content-center"
-              style={{ margin: '0%', height: '15%' }}>
+              style={{ margin: '0%', height: '15%', padding: '0px !important' }}>
               <Card
                 className="text-white bg-transparent py-5 d-md-down"
-                style={{ width: '59%', backgroundColor: 'transparent', border: 0 }}>
+                style={{
+                  margin: 0,
+                  width: '59%',
+                  backgroundColor: 'transparent',
+                  border: 0,
+                  padding: '0px !important'
+                }}>
                 <CardBody
                   className="text-center"
-                  style={{ backgroundColor: 'transparent', border: 0 }}>
+                  style={{
+                    backgroundColor: 'transparent',
+                    border: 0,
+                    margin: 0,
+                    padding: '0px !important'
+                  }}>
                   <img
                     src={logo}
                     onClick={() => this.props.history.push('landing')}
-                    style={{ cursor: 'pointer' }}
+                    style={{
+                      cursor: 'pointer',
+                      margin: 0,
+                      padding: '0px !important'
+                    }}
                   />
                 </CardBody>
               </Card>
