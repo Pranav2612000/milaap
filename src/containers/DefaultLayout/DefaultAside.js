@@ -115,7 +115,7 @@ class DefaultAside extends Component {
             </NavLink>
           </NavItem>
         </Nav>
-        <TabContent activeTab={this.state.activeTab}>
+        <TabContent className="bg-dark" activeTab={this.state.activeTab}>
           <TabPane tabId="1">
             <Container className="bg-dark">
               <Row>
