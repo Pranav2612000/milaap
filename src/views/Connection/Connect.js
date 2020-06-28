@@ -121,10 +121,10 @@ export async function toggleVideo(self) {
       webCam
         ? {
             video: { width: 1024, height: 576 },
-            audio: true
+            audio: { echoCancellation: true, noiseSuppression: true } //only true here before
           }
         : {
-            audio: true
+            audio: { echoCancellation: true, noiseSuppression: true } //only true here before
           }
     )
     .then((stream) => {
@@ -220,7 +220,7 @@ export async function changeCameraFacing(self, facing) {
   navigator.mediaDevices
     .getUserMedia({
       video: { facingMode: facing },
-      audio: true
+      audio: { echoCancellation: true, noiseSuppression: true } //only true here before
     })
     .then((stream) => {
       self.state.myPeers.map((eachPeer) => {
@@ -241,7 +241,7 @@ export async function getMyMediaStream(self, type) {
     await navigator.mediaDevices
       .getDisplayMedia({
         video: { width: 1024, height: 576 },
-        audio: true
+        audio: { echoCancellation: true, noiseSuppression: true } //only true here before
       })
       .then((media) => {
         self.setState({
@@ -278,8 +278,7 @@ export async function getMyMediaStream(self, type) {
     await navigator.mediaDevices
       .getUserMedia({
         video: { width: 1024, height: 576 },
-        echoCancellation: true,
-        noiseSuppression: true
+        audio: { echoCancellation: true, noiseSuppression: true }
       })
       .then((media) => {
         self.setState({
