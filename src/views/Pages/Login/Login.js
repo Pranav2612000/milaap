@@ -112,7 +112,9 @@ export class Login extends Component {
     return (
       <>
         {this.props.loggedIn === true && (
-          <Redirect to={{ pathname: '/dashboard', state: this.state.username }} />
+          <Redirect
+            to={{ pathname: '/dashboard', state: localStorage.getItem('username') }}
+          />
         )}
         {/* <ReactNotification /> */}
         {/* {this.state.login && console.log("object")} */}
