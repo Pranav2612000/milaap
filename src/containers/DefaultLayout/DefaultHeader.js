@@ -45,24 +45,6 @@ class DefaultHeader extends Component {
     this.addFriend = this.addFriend.bind(this);
   }
 
-  componentDidMount() {
-    /* To be changed: Use Redux to get username. */
-    // axios
-    //   .get('http://localhost:5000/api/user/getUserName', {
-    //     headers: {
-    //       'milaap-auth-token': localStorage.getItem('milaap-auth-token')
-    //     }
-    //   })
-    //   .then((resp) => {
-    //     console.log(resp.data.username);
-    //     this.setState({ username: resp.data.username });
-    //   })
-    //   .catch((err) => {
-    //     console.log(err, 'Error in Verifying JWT');
-    //     this.setState({ username: false });
-    //   });
-  }
-
   addFriend() {
     const reqData = {
       user: this.state.friendid,
@@ -112,7 +94,7 @@ class DefaultHeader extends Component {
     }
     return (
       <React.Fragment>
-        <AppSidebarToggler className="d-lg-none" display="md" mobile />
+        <AppSidebarToggler className="d-lg-none bg-dark" display="md" mobile />
         <NavLink to="/dashboard">
           <AppNavbarBrand
             full={{ src: logo, width: 65, height: 55 }}
@@ -123,16 +105,13 @@ class DefaultHeader extends Component {
             }}
           />
         </NavLink>
-        <AppSidebarToggler className="d-md-down-none" display="lg" />
+        <AppSidebarToggler className="d-md-down-none bg-dark" display="lg" />
         <Nav className="d-block d-md-down" navbar>
-          <NavItem className="px-2">
-            <NavLink to="/dashboard" className="nav-link">
-              Dashboard
-            </NavLink>
-          </NavItem>
-          <NavItem className="px-2">
+          <NavItem className="ml-4 px-2">
             <NavLink to="#" className="nav-link" onClick={this.toggle}>
-              Create Room
+              <button type="button" class="btn btn-pill btn-secondary">
+                Create Room
+              </button>
             </NavLink>
           </NavItem>
         </Nav>
@@ -159,7 +138,7 @@ class DefaultHeader extends Component {
             </DropdownMenu>
           </UncontrolledDropdown>
           <AppAsideToggler
-            className="d-xs-none"
+            className="d-xs-none bg-dark"
             display="xs"
             style={{ display: showHamburger ? 'block' : 'none' }}
           />

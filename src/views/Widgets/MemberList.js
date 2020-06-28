@@ -75,7 +75,7 @@ class MemberList extends Component {
           store.addNotification({
             title: 'Link copied',
             message: 'Link copied to clipboard!',
-            type: 'success',
+            type: 'info',
             container: 'top-right',
             animationIn: ['animated', 'fadeIn'],
             animationOut: ['animated', 'fadeOut'],
@@ -150,15 +150,15 @@ class MemberList extends Component {
             <h3> Members </h3>
           </Col>
           <Col>
-            {/* <button class="btn-danger"> */}
-            <i
-              style={{ cursor: 'pointer' }}
-              class="fa fa-user-plus"
-              onClick={this.toggle}>
-              {' '}
-              Add
-            </i>
-            {/* </button> */}
+            <button type="button" className="btn btn-pill btn-secondary">
+              <i
+                style={{ cursor: 'pointer' }}
+                class="fa fa-user-plus"
+                onClick={this.toggle}>
+                {' '}
+                Add
+              </i>
+            </button>
           </Col>
         </Row>
         <h5> Admins </h5>

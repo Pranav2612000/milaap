@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import './Room.css';
+import { store } from 'react-notifications-component';
 import { connect } from 'react-redux';
 import { Container, Row } from 'reactstrap';
 import * as action from '../../redux/roomRedux/roomAction';
@@ -14,20 +15,14 @@ import {
 class Room extends Component {
   constructor(props) {
     super(props);
-
     const roomName = props.match.params.roomname;
     console.log(roomName);
     this.state = {
-      roomName: roomName,
-      peer: null
+      roomName: roomName
     };
     this.props.enterRoom(roomName);
     //this.startCall = this.startCall.bind(this);
     //this.endCall = this.endCall.bind(this);
-    this.submitVideoHandler = this.submitVideoHandler.bind(this);
-    this.submitScreenHandler = this.submitScreenHandler.bind(this);
-    this.endCallHandler = this.endCallHandler.bind(this);
-    this.inCallShareHandler = this.inCallShareHandler.bind(this);
     //this.getMyMediaStream = this.getMyMediaStream.bind(this);
     //this.createVideoElement = this.createVideoElement.bind(this);
   }
@@ -42,20 +37,6 @@ class Room extends Component {
     });
   }
   */
-  submitVideoHandler() {
-    startCall(this, this.state.roomName, 'video');
-  }
-  submitScreenHandler() {
-    startCall(this, this.state.roomName, 'screen');
-  }
-  inCallShareHandler() {
-    addScreenShareStream(this);
-  }
-
-  endCallHandler() {
-    endCall(this);
-  }
-
   /*
   endCall() {
     console.log(this.state);
@@ -64,20 +45,22 @@ class Room extends Component {
   }
   */
 
+  componentDidMount() {
+    if (window.innerWidth > 985)
+      document.getElementsByTagName('body')[0].classList.add('aside-menu-show');
+  }
+
   componentDidUpdate(prevProps) {
     if (this.props.match.params.roomname !== prevProps.match.params.roomname) {
       this.setState(
         {
           roomName: this.props.match.params.roomname
-        }
-
-        /*
-        () => {
+        },
+        () =>
           store.addNotification({
-            title: 'Room changed',
-            message: `Entered ${this.state.roomName} `,
-            type: 'success',
-            // insert: "top",
+            title: 'Room change',
+            message: 'Entered room ' + this.state.roomName,
+            type: 'info',
             container: 'top-right',
             animationIn: ['animated', 'fadeIn'],
             animationOut: ['animated', 'fadeOut'],
@@ -85,9 +68,7 @@ class Room extends Component {
               duration: 3000,
               pauseOnHover: true
             }
-          });
-        }
-        */
+          })
       );
       this.props.enterRoom(this.props.match.params.roomname);
     }
@@ -96,10 +77,13 @@ class Room extends Component {
   loading = () => <div className="animated fadeIn pt-1 text-center">Loading...</div>;
 
   render() {
-    console.log(this.props);
     return (
       <div class="app-body" id="inner-aside-container">
         <main class="main">
+          <br />
+          <h2 className="text-center" style={{ color: 'white', opacity: '0.5' }}>
+            Welcome to room: {this.props.match.params.roomname}
+          </h2>
           <Container className="room">
             <video id="context" controls autoPlay></video>
             <Row className="m-0 p-0" id="videos"></Row>
@@ -111,10 +95,7 @@ class Room extends Component {
             */}
           </Container>
         </main>
-        <aside
-          className="aside-menu bg-dark"
-          display="md"
-          style={{ position: 'relative' }}>
+        <aside className="aside-menu bg-dark" display="xs">
           <DefaultAside
             roomName={this.props.roomName}
             msgs={this.props.msgs}
@@ -129,7 +110,6 @@ class Room extends Component {
 }
 
 const mapStateToProps = (state) => {
-  console.log(state);
   return {
     roomName: state.roomReducer.currentRoom,
     guests: state.roomReducer.guests,

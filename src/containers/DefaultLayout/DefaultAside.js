@@ -30,7 +30,6 @@ class DefaultAside extends Component {
   constructor(props) {
     super(props);
     console.log(props);
-
     let roomName = getRoomFromLocation(this.props.location.pathname);
     this.toggle = this.toggle.bind(this);
     this.state = {
@@ -41,6 +40,15 @@ class DefaultAside extends Component {
       path: props.location.pathname
     };
     this.getRoomInfo = this.getRoomInfo.bind(this);
+  }
+
+  componentDidUpdate(prevProps) {
+    if (this.props.roomName != prevProps.roomName) {
+      this.setState({
+        roomName: this.props.roomName,
+        path: this.props.location.pathname
+      });
+    }
   }
 
   changeRoomType = () => {
@@ -65,10 +73,6 @@ class DefaultAside extends Component {
   getRoomInfo(roomName) {
     console.log('nothing to say.');
     return;
-  }
-
-  componentDidMount() {
-    console.log('mounting');
   }
 
   toggle(tab) {
@@ -115,7 +119,7 @@ class DefaultAside extends Component {
             </NavLink>
           </NavItem>
         </Nav>
-        <TabContent activeTab={this.state.activeTab}>
+        <TabContent className="bg-dark" activeTab={this.state.activeTab}>
           <TabPane tabId="1">
             <Container className="bg-dark">
               <Row>
@@ -128,7 +132,10 @@ class DefaultAside extends Component {
               </Row>
             </Container>
           </TabPane>
-          <TabPane tabId="2" className="p-3 bg-dark overflow-auto" key={this.state.change}>
+          <TabPane
+            tabId="2"
+            className="p-3 bg-dark overflow-auto"
+            key={this.state.change}>
             <MessageView roomName={this.props.roomName} msgs={this.props.msgs} />
           </TabPane>
 
