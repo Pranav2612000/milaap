@@ -197,7 +197,10 @@ class DefaultLayout extends Component {
   }
 
   componentDidMount() {
-    if (this.props.location.state !== undefined) {
+    if (
+      this.props.location.state !== undefined &&
+      this.props.location.state !== null
+    ) {
       store.addNotification({
         title: `Hi ${this.props.location.state}`,
         message: 'Welcome to Dashboard',
