@@ -41,7 +41,6 @@ import {
 import classNames from 'classnames';
 import { AppSwitch } from '@coreui/react';
 import MessageView from '../../views/MessageList/index';
-import Peer from 'peerjs';
 import axios from 'axios';
 import $ from 'jquery';
 import './Controls.css';
@@ -71,7 +70,7 @@ class Controls extends Component {
 
   componentDidUpdate(prevProps) {
     console.log(prevProps);
-    console.log(this.props.roomName);
+    console.log(this.props);
     if (this.props.roomName !== prevProps.roomName) {
       this.setState({
         roomName: this.props.roomName,
@@ -184,7 +183,7 @@ class Controls extends Component {
               toggleVideo(self);
               next();
             }}>
-            <span>On Webcam</span>
+            <span>Webcam On</span>
           </AwesomeButtonProgress>
           <AwesomeButtonProgress
             type="primary"
@@ -197,7 +196,7 @@ class Controls extends Component {
               next();
             }}>
             <i className="icon-user icons"></i>
-            <span>Off Webcam</span>
+            <span>Webcam Off</span>
           </AwesomeButtonProgress>
         </Row>
         <Row className="justify-content-center text-center">
@@ -207,7 +206,7 @@ class Controls extends Component {
             disabled={!self.state.inCall}
             action={(element, next) => {
               this.inCallShareHandler();
-              next();
+              setTimeout(next, 2000);
             }}>
             <i className="icon-screen-desktop icons"></i>
             <span>Share Screen</span>
