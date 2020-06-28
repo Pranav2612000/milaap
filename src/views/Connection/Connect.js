@@ -94,13 +94,18 @@ export class Peer extends Emitter {
       console.log(data);
       this.sharing = 0;
 
-      // If screen shared is of type screen, don't add handlers 
-      if(this.next_stream_type == 'screen') {
+      // If screen shared is of type screen, don't add handlers
+      if (this.next_stream_type == 'screen') {
         createVideoElement(self, data, self.their_id + '-screen', self.their_name);
         return;
       }
       data.addEventListener('removetrack', (event) => {
-        changeStatusOfVideoElement(self, 'video_off', data, this.their_id + '-video');
+        changeStatusOfVideoElement(
+          self,
+          'video_off',
+          data,
+          this.their_id + '-video'
+        );
         console.log('update ui');
       });
       data.addEventListener('addtrack', (event) => {
@@ -118,12 +123,12 @@ export class Peer extends Emitter {
     });
     this.peer.on('data', (data) => {
       // Check if this is waiting to handle any stream.
-      if(data == 'screen- go ahead') {
+      if (data == 'screen- go ahead') {
         //Handshake complete share screen
         this.peer.addStream(this.stream_to_be_sent);
       }
-      if(this.sharing == 0) {
-        if(data == 'sharing screen') {
+      if (this.sharing == 0) {
+        if (data == 'sharing screen') {
           this.sharing = 1;
           this.next_stream_type = 'screen';
           this.peer.send('screen- go ahead');
@@ -743,15 +748,30 @@ export async function addScreenShareStream(self) {
   getMyMediaStream(self, 'screen').then((media) => {
     self.state.myPeers.forEach((val, index) => {
       console.log(val);
-      // send request to share screen. Reply for this 
+      // send request to share screen. Reply for this
       // handled in peer.on('data') eventHandler.
-      if(val.peer && !val.peer.destroyed && val.connected) {
+      if (val.peer && !val.peer.destroyed && val.connected) {
         val.peer.send('sharing screen');
         val.stream_to_be_sent = self.state.myScreenStreamObj;
       }
       //val.peer.addStream(self.state.myScreenStreamObj);
     });
   });
+}
+
+export async function stopScreenShare(self) {
+  if (self.state.myScreenStreamObj) {
+    self.state.myScreenStreamObj.getTracks().forEach((track) => {
+      console.log(track);
+      track.stop();
+    });
+    self.state.myScreenStreamObj.getTracks().forEach((track) => {
+      self.state.myScreenStreamObj.removeTrack(track);
+    });
+    self.setState({
+      myScreenStreamObj: null
+    });
+  }
 }
 
 function setMediaBitrate(sdp, media, bitrate) {
