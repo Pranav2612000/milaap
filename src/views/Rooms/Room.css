@@ -8,7 +8,7 @@ video::-webkit-media-controls-timeline {
   left: 215px;
   display: none;
   width: 60vw;
-  margin-top: 5vh;
+  margin-top: 1vh;
   max-width: 85vw;
   max-height: 60vh;
 }

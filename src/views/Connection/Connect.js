@@ -431,7 +431,7 @@ export function createVideoElement(self, stream, friendtkn, username) {
   row.appendChild(audioIcon);
   wrapper.appendChild(row);
   document.getElementById('videos').appendChild(wrapper);
-  contextOptions.style.display = 'block';
+  contextOptions.style.display = 'inline-flex';
   if (!context.srcObject) switchContext(document.getElementById(friendtkn));
 }
 

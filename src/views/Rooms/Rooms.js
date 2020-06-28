@@ -91,20 +91,33 @@ class Room extends Component {
             Welcome to room: {this.props.match.params.roomname}
           </h2>
           <Container className="room">
-            {/* <div> */}
-            <video id="context" controls autoPlay></video>
-            <Row className="d-flex justify-content-center align-items-center m-0 p-0">
+            <div className="d-flex justify-content-center align-items-center">
+              <video
+                id="context"
+                controls
+                autoPlay
+                style={{
+                  position: 'relative',
+                  display: 'inline-block',
+                  marginTop: '1vh !important'
+                }}></video>
+              {/* <Row className="d-flex justify-content-center align-items-center m-0 p-0"> */}
+              <br />
               <div
                 id="contextOptions"
                 style={{
+                  position: 'absolute',
+                  bottom: '-15%',
+                  right: '10%',
+                  transform: 'scale(0.7)',
                   display: 'none',
                   padding: '5px',
                   backgroundColor: '#555',
                   marginTop: '10px',
                   borderRadius: '50px',
                   borderWidth: '1px',
-                  width: 'fit-content',
-                  borderColor: 'transparent'
+                  borderColor: 'transparent',
+                  zIndex: 0
                 }}>
                 <button
                   id="end"
@@ -170,8 +183,8 @@ class Room extends Component {
                   <img src={endcall} style={{ height: '2.5em', width: '2.5em' }} />
                 </button>
               </div>
-            </Row>
-            {/* </div> */}
+              {/* </Row> */}
+            </div>
             <Row className="m-0 p-0" id="videos"></Row>
             {/*
             <button onClick={this.submitVideoHandler}>Start Call </button>

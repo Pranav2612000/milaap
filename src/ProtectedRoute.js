@@ -30,7 +30,7 @@ const ProtectedRoute = (props) => {
     verifyToken();
   }, []);
 
-  if (credentialsValid && validated) {
+  if (!credentialsValid && validated) {
     return (
       <Route {...rest} render={(props) => <Component {...rest} {...props} />} />
     );
