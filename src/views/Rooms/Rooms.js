@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import './Room.css';
+import { store } from 'react-notifications-component';
 import { connect } from 'react-redux';
 import { Container, Row } from 'reactstrap';
 import * as action from '../../redux/roomRedux/roomAction';
@@ -74,15 +75,12 @@ class Room extends Component {
       this.setState(
         {
           roomName: this.props.match.params.roomname
-        }
-
-        /*
-        () => {
+        },
+        () =>
           store.addNotification({
-            title: 'Room changed',
-            message: `Entered ${this.state.roomName} `,
-            type: 'success',
-            // insert: "top",
+            title: 'Room change',
+            message: 'Entered room ' + this.state.roomName,
+            type: 'info',
             container: 'top-right',
             animationIn: ['animated', 'fadeIn'],
             animationOut: ['animated', 'fadeOut'],
@@ -90,9 +88,7 @@ class Room extends Component {
               duration: 3000,
               pauseOnHover: true
             }
-          });
-        }
-        */
+          })
       );
       this.props.enterRoom(this.props.match.params.roomname);
     }

@@ -2,6 +2,7 @@ import { Component } from 'react';
 import SimplePeer from 'simple-peer';
 import $ from 'jquery';
 import socketIOClient, { connect } from 'socket.io-client';
+import { store as NotifStore } from 'react-notifications-component';
 import { Emitter } from './emmiter';
 import axios from 'axios';
 import { store } from '../../redux/store';
@@ -87,7 +88,7 @@ export class Peer extends Emitter {
       console.log('stream received');
       console.log(data);
       data.addEventListener('removetrack', (event) => {
-        changeStatusOfVideoElement(self, "video_off", data, this.their_id);
+        changeStatusOfVideoElement(self, 'video_off', data, this.their_id);
         console.log('update ui');
       });
       createVideoElement(self, data, self.their_id, self.their_name);
@@ -96,7 +97,7 @@ export class Peer extends Emitter {
       const self = this;
       console.log(data);
       console.log('track rcvd');
-      changeStatusOfVideoElement(self, "video_on", stream, this.their_id);
+      changeStatusOfVideoElement(self, 'video_on', stream, this.their_id);
     });
     socket.on('signalling', (data, from_id) => {
       if (from_id != this.their_id) {
@@ -117,7 +118,7 @@ export class Peer extends Emitter {
 
   async close() {
     console.log(this.ended);
-    if(this.ended) {
+    if (this.ended) {
       this.emit('close');
       this.active = false;
       this.peer.destroy();
@@ -125,7 +126,7 @@ export class Peer extends Emitter {
     } else {
       //Trying to reconnect.
       this.num_retries = this.num_retries + 1;
-      if(this.num_retries > 3) {
+      if (this.num_retries > 3) {
         console.log('Too many retries.. Device facing connection issue');
         return;
       }
@@ -180,24 +181,42 @@ export async function toggleVideo(self) {
       self.state.myMediaStreamObj.removeTrack(self.state.myMediaStreamObj.getVideoTracks()[0]);
       */
       console.log(self.state.myMediaStreamObj.getVideoTracks());
-      if(self.state.myMediaStreamObj.getVideoTracks().length != 0) {
+      if (self.state.myMediaStreamObj.getVideoTracks().length != 0) {
         self.state.myPeers.map((eachPeer) => {
-          eachPeer.peer.removeTrack(self.state.myMediaStreamObj.getVideoTracks()[0], self.state.myMediaStreamObj);
+          eachPeer.peer.removeTrack(
+            self.state.myMediaStreamObj.getVideoTracks()[0],
+            self.state.myMediaStreamObj
+          );
         });
         //Remove locally
         self.state.myMediaStreamObj.getVideoTracks()[0].stop();
-        self.state.myMediaStreamObj.removeTrack(self.state.myMediaStreamObj.getVideoTracks()[0]);
-        changeStatusOfVideoElement(self, "video_off", self.state.myMediaStreamObj, "me");
+        self.state.myMediaStreamObj.removeTrack(
+          self.state.myMediaStreamObj.getVideoTracks()[0]
+        );
+        changeStatusOfVideoElement(
+          self,
+          'video_off',
+          self.state.myMediaStreamObj,
+          'me'
+        );
       }
-      if(webCam) {
+      if (webCam) {
         if (self.state.myPeers) {
           self.state.myPeers.map((eachPeer) => {
             //TODO: REmove previous video tracks if any
-            eachPeer.peer.addTrack(stream.getVideoTracks()[0], self.state.myMediaStreamObj);
+            eachPeer.peer.addTrack(
+              stream.getVideoTracks()[0],
+              self.state.myMediaStreamObj
+            );
           });
         }
         self.state.myMediaStreamObj.addTrack(stream.getVideoTracks()[0]);
-        changeStatusOfVideoElement(self, "video_on", self.state.myMediaStreamObj, "me");
+        changeStatusOfVideoElement(
+          self,
+          'video_on',
+          self.state.myMediaStreamObj,
+          'me'
+        );
       } /*else {
         if (self.state.myPeers) {
           self.state.myPeers.map((eachPeer) => {
@@ -226,6 +245,18 @@ function muteVideo(self, id) {
 }
 
 export function createVideoElement(self, stream, friendtkn, username) {
+  NotifStore.addNotification({
+    title: 'Member entered call',
+    message: (username ? username : 'You') + ' joined the call!',
+    type: 'success',
+    container: 'top-right',
+    animationIn: ['animated', 'fadeIn'],
+    animationOut: ['animated', 'fadeOut'],
+    dismiss: {
+      duration: 3000,
+      pauseOnHover: true
+    }
+  });
   const wrapper = document.createElement('div');
   const video = document.createElement('video');
   const row = document.createElement('div');
@@ -255,21 +286,27 @@ export function createVideoElement(self, stream, friendtkn, username) {
   if (!context.srcObject) switchContext(document.getElementById(friendtkn));
 }
 
-function changeStatusOfVideoElement(self, status, stream, friendtkn, username = null) {
+function changeStatusOfVideoElement(
+  self,
+  status,
+  stream,
+  friendtkn,
+  username = null
+) {
   //let video = $('#' + friendtkn);
-  if(status == 'video_off') {
+  if (status == 'video_off') {
     const video = document.getElementById(friendtkn);
-    if(!video) {
+    if (!video) {
       return;
     }
     console.log(video);
     video.srcObject = null;
     video.poster =
-        'https://dummyimage.com/1024x576/2f353a/ffffff.jpg&text=' + username;
+      'https://dummyimage.com/1024x576/2f353a/ffffff.jpg&text=' + username;
     video.play();
-  } else if(status == 'video_on') {
+  } else if (status == 'video_on') {
     const video = document.getElementById(friendtkn);
-    if(!video) {
+    if (!video) {
       return;
     }
     console.log(stream);
@@ -303,7 +340,7 @@ export function switchContext(e) {
 export async function changeCameraFacing(self, facing) {
   navigator.mediaDevices
     .getUserMedia({
-      video: { facingMode: facing, width:320, height: 180 },
+      video: { facingMode: facing, width: 320, height: 180 },
       audio: true
     })
     .then((stream) => {
