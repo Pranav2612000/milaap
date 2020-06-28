@@ -3,12 +3,15 @@ import React, { Component } from 'react';
 import { store } from 'react-notifications-component';
 import { AwesomeButtonProgress } from 'react-awesome-button';
 import 'react-awesome-button/dist/styles.css';
+import * as actions from '../../redux/userRedux/userAction';
 import { connect } from 'react-redux';
 import {
+  toggleVideo,
   getMyMediaStream,
   startCall,
   endCall,
-  addScreenShareStream
+  addScreenShareStream,
+  changeCameraFacing
 } from '../Connection/Connect';
 import {
   Nav,
@@ -59,7 +62,8 @@ class Controls extends Component {
       myUsername: '',
       isMuted: false,
       inCall: false,
-      isWebcamOn: true
+      isWebcamOn: true,
+      facing: 'user'
     };
     console.log(this.state.roomName);
     this.joinCall = this.joinCall.bind(this);
@@ -74,6 +78,7 @@ class Controls extends Component {
     this.submitScreenHandler = this.submitScreenHandler.bind(this);
     this.endCallHandler = this.endCallHandler.bind(this);
     this.inCallShareHandler = this.inCallShareHandler.bind(this);
+    this.changeCamera = this.changeCamera.bind(this);
   }
 
   componentWillUnmount() {
@@ -91,6 +96,14 @@ class Controls extends Component {
     }
   }
 
+  changeCamera() {
+    if (!this.state.inCall) return;
+    const facing = this.state.facing === 'user' ? 'environment' : 'user';
+    changeCameraFacing(this, facing);
+    this.setState({
+      facing: facing
+    });
+  }
   submitVideoHandler() {
     startCall(this, this.state.roomName, 'video');
   }
@@ -279,7 +292,6 @@ class Controls extends Component {
         });
     } else if (type === 'video') {
       // TODO: Add try catch to handle case when user denies access
-
       await navigator.mediaDevices
         .getUserMedia({
           video: { width: 1024, height: 576 },
@@ -457,6 +469,7 @@ connectedPeers: connectedPeers,
         calls: [...calls, thiscall]
         // calls: calls,
       });
+      console.log(friendtkn);
       self.createStream(self, stream, friendtkn, username);
     });
   }
@@ -651,6 +664,10 @@ videos.empty();
             action={(element, next) => {
               this.setState({ inCall: true });
               this.submitVideoHandler();
+              setTimeout(() => {
+                console.clear();
+                console.log(document.getElementById('videos').childElementCount);
+              }, 1000);
               next();
               //this.joinCall(next);
             }}>
@@ -684,7 +701,7 @@ videos.empty();
             <i className="icon-user icons"></i>
             <span>UnMute</span>
           </AwesomeButtonProgress>
-        </Row>
+          </Row>*/}
         <Row>
           <AwesomeButtonProgress
             type="primary"
@@ -692,8 +709,8 @@ videos.empty();
             disabled={!(self.state.inCall && !self.state.isWebcamOn)}
             action={(element, next) => {
               this.setState({ isWebcamOn: true });
-              //this.startScreenShare('video', next);
-              alert('switching your camera on');
+              this.props.toggleVideo();
+              toggleVideo(self);
               next();
             }}>
             <span>On Webcam</span>
@@ -704,14 +721,14 @@ videos.empty();
             disabled={!(self.state.isWebcamOn && self.state.inCall)}
             action={(element, next) => {
               this.setState({ isWebcamOn: false });
-              //this.stopScreenShare('screen', next);
-              alert('closing your camera');
+              this.props.toggleVideo();
+              toggleVideo(self);
               next();
             }}>
             <i className="icon-user icons"></i>
             <span>Off Webcam</span>
           </AwesomeButtonProgress>
-        </Row> */}
+        </Row>
         <Row className="justify-content-center text-center">
           <AwesomeButtonProgress
             type="primary"
@@ -757,16 +774,38 @@ videos.empty();
             </AwesomeButtonProgress>
           </Row>
         )}
+        <Row className="justify-content-center text-center">
+          <AwesomeButtonProgress
+            type="primary"
+            size="medium"
+            // visible={!self.state.calls.length} //use this if we want it completely hidden until needed instead
+            disabled={
+              !/iPhone|iPad|iPod|Android/i.test(navigator.userAgent) ||
+              !this.state.inCall
+            }
+            action={(element, next) => {
+              this.changeCamera();
+              next();
+            }}>
+            <i className="icon-call-end icons"></i>
+            <span> Flip Camera</span>
+          </AwesomeButtonProgress>
+        </Row>
         <br />
       </Container>
     );
   }
 }
 const mapStateToProps = (state) => {
-  console.log(state);
   return {
+    video: state.userReducer.video,
     username: state.loginReducer.username
   };
 };
 
-export default connect(mapStateToProps)(Controls);
+const mapDispatchToProps = (dispatch) => {
+  return {
+    toggleVideo: () => dispatch(actions.toggleVideo())
+  };
+};
+export default connect(mapStateToProps, mapDispatchToProps)(Controls);

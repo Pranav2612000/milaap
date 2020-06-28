@@ -1,9 +1,17 @@
+import { Component } from 'react';
 import SimplePeer from 'simple-peer';
 import $ from 'jquery';
-import socketIOClient from 'socket.io-client';
+import socketIOClient, { connect } from 'socket.io-client';
 import { Emitter } from './emmiter';
 import axios from 'axios';
+import { store } from '../../redux/store';
 const socket = socketIOClient.connect(`${global.config.backendURL}`); //will be replaced by an appropriate room.
+store.subscribe(getVideoState);
+function getVideoState() {
+  let state = store.getState();
+  return state.userReducer.video;
+}
+
 socket.connect();
 socket.on('connect', () => {
   console.log(socket.connected); // true
@@ -14,8 +22,10 @@ export class Peer extends Emitter {
   constructor(it, stream, room, initiator, their_id, their_name, my_id) {
     super();
     this.error = null;
+    this.ended = false;
+    this.num_retries = 0;
     this.active = false;
-    this.stream = null;
+    this.stream = stream;
     this.their_id = their_id;
     this.their_name = their_name;
     this.my_id = my_id;
@@ -25,7 +35,7 @@ export class Peer extends Emitter {
       initiator: initiator,
       stream: stream,
       trickle: true,
-      sdpTransform: sdp => {
+      sdpTransform: (sdp) => {
         let newSDP = sdp;
         newSDP = setMediaBitrate(newSDP, 'video', 233);
         newSDP = setMediaBitrate(newSDP, 'audio', 80);
@@ -75,7 +85,18 @@ export class Peer extends Emitter {
     this.peer.on('stream', (data) => {
       const self = this;
       console.log('stream received');
+      console.log(data);
+      data.addEventListener('removetrack', (event) => {
+        changeStatusOfVideoElement(self, "video_off", data, this.their_id);
+        console.log('update ui');
+      });
       createVideoElement(self, data, self.their_id, self.their_name);
+    });
+    this.peer.on('track', (data, stream) => {
+      const self = this;
+      console.log(data);
+      console.log('track rcvd');
+      changeStatusOfVideoElement(self, "video_on", stream, this.their_id);
     });
     socket.on('signalling', (data, from_id) => {
       if (from_id != this.their_id) {
@@ -94,28 +115,111 @@ export class Peer extends Emitter {
     });
   }
 
-  close() {
-    this.emit('close');
-    this.active = false;
-    this.peer.destroy();
-    deleteVideoElement(this.their_id);
+  async close() {
+    console.log(this.ended);
+    if(this.ended) {
+      this.emit('close');
+      this.active = false;
+      this.peer.destroy();
+      deleteVideoElement(this.their_id);
+    } else {
+      //Trying to reconnect.
+      this.num_retries = this.num_retries + 1;
+      if(this.num_retries > 3) {
+        console.log('Too many retries.. Device facing connection issue');
+        return;
+      }
+      var peer = new Peer(
+        false,
+        this.stream,
+        this.room,
+        this.initiator,
+        this.their_id,
+        this.their_name,
+        this.my_id
+      );
+    }
   }
 
   startCall() {
     console.log('starting call');
   }
 }
+export async function toggleVideo(self) {
+  var webCam = getVideoState();
 
+  navigator.mediaDevices
+    .getUserMedia(
+      webCam
+        ? {
+            video: { width: 320, height: 180 },
+            audio: true
+          }
+        : {
+            audio: true
+          }
+    )
+    .then((stream) => {
+      console.log(self);
+      console.log(stream);
+      /*
+      if (self.state.myPeers) {
+        self.state.myPeers.map((eachPeer) => {
+          if (self.state.myMediaStreamObj.getVideoTracks)
+            eachPeer.peer.replaceTrack(
+              self.state.myMediaStreamObj.getVideoTracks()[0],
+              stream.getVideoTracks()[0],
+              self.state.myMediaStreamObj
+            );
+          // eachPeer.peer.removeTrack(
+          //   self.state.myMediaStreamObj.getVideoTracks()[0],
+          //   self.state.myMediaStreamObj
+          // );
+        });
+      }
+      self.state.myMediaStreamObj.removeTrack(self.state.myMediaStreamObj.getVideoTracks()[0]);
+      */
+      console.log(self.state.myMediaStreamObj.getVideoTracks());
+      if(self.state.myMediaStreamObj.getVideoTracks().length != 0) {
+        self.state.myPeers.map((eachPeer) => {
+          eachPeer.peer.removeTrack(self.state.myMediaStreamObj.getVideoTracks()[0], self.state.myMediaStreamObj);
+        });
+        //Remove locally
+        self.state.myMediaStreamObj.getVideoTracks()[0].stop();
+        self.state.myMediaStreamObj.removeTrack(self.state.myMediaStreamObj.getVideoTracks()[0]);
+        changeStatusOfVideoElement(self, "video_off", self.state.myMediaStreamObj, "me");
+      }
+      if(webCam) {
+        if (self.state.myPeers) {
+          self.state.myPeers.map((eachPeer) => {
+            //TODO: REmove previous video tracks if any
+            eachPeer.peer.addTrack(stream.getVideoTracks()[0], self.state.myMediaStreamObj);
+          });
+        }
+        self.state.myMediaStreamObj.addTrack(stream.getVideoTracks()[0]);
+        changeStatusOfVideoElement(self, "video_on", self.state.myMediaStreamObj, "me");
+      } /*else {
+        if (self.state.myPeers) {
+          self.state.myPeers.map((eachPeer) => {
+            eachPeer.peer.remove(stream.getVideoTracks()[0], self.state.myMediaStreamObj);
+          });
+        }
+      }*/
+    });
+}
 function muteVideo(self, id) {
   console.log('TEST');
   const userStream = document.getElementById(id).srcObject;
   const deets = document.getElementById(id).nextElementSibling;
+  console.log(userStream);
   if (userStream.getAudioTracks()[0].enabled) {
     userStream.getAudioTracks()[0].enabled = false;
+    // userStream.getVideoTracks()[0].enabled = false;
     deets.children[1].classList.remove('icon-volume-2');
     deets.children[1].classList.add('icon-volume-off');
   } else {
     userStream.getAudioTracks()[0].enabled = true;
+    // userStream.getVideoTracks()[0].enabled = true;
     deets.children[1].classList.add('icon-volume-2');
     deets.children[1].classList.remove('icon-volume-off');
   }
@@ -151,6 +255,29 @@ export function createVideoElement(self, stream, friendtkn, username) {
   if (!context.srcObject) switchContext(document.getElementById(friendtkn));
 }
 
+function changeStatusOfVideoElement(self, status, stream, friendtkn, username = null) {
+  //let video = $('#' + friendtkn);
+  if(status == 'video_off') {
+    const video = document.getElementById(friendtkn);
+    if(!video) {
+      return;
+    }
+    console.log(video);
+    video.srcObject = null;
+    video.poster =
+        'https://dummyimage.com/1024x576/2f353a/ffffff.jpg&text=' + username;
+    video.play();
+  } else if(status == 'video_on') {
+    const video = document.getElementById(friendtkn);
+    if(!video) {
+      return;
+    }
+    console.log(stream);
+    video.srcObject = stream;
+    video.play();
+  }
+}
+
 export function switchContext(e) {
   if (e.target) e = e.target;
   try {
@@ -161,8 +288,8 @@ export function switchContext(e) {
     context.poster =
       'https://dummyimage.com/1024x576/2f353a/ffffff.jpg&text=' + username;
     context.srcObject = e.srcObject;
-    console.log(e); 
-    if(e.id == "me") {
+    console.log(e);
+    if (e.id == 'me') {
       context.muted = 'true';
     }
     context.play();
@@ -173,13 +300,31 @@ export function switchContext(e) {
   }
 }
 
+export async function changeCameraFacing(self, facing) {
+  navigator.mediaDevices
+    .getUserMedia({
+      video: { facingMode: facing, width:320, height: 180 },
+      audio: true
+    })
+    .then((stream) => {
+      self.state.myPeers.map((eachPeer) => {
+        eachPeer.peer.replaceTrack(
+          self.state.myMediaStreamObj.getVideoTracks()[0],
+          stream.getVideoTracks()[0],
+          self.state.myMediaStreamObj
+        );
+        deleteVideoElement('me');
+        createVideoElement(self, stream, 'me');
+      });
+    });
+}
+
 export async function getMyMediaStream(self, type) {
   if (type === 'screen') {
     // TODO: Add try catch to handle case when user denies access
-
     await navigator.mediaDevices
       .getDisplayMedia({
-        video: { width: 1024, height: 576 },
+        video: { width: 320, height: 180 },
         audio: true
       })
       .then((media) => {
@@ -194,8 +339,8 @@ export async function getMyMediaStream(self, type) {
 
     await navigator.mediaDevices
       .getUserMedia({
-        video: { width: 1024, height: 576 },
-        audio: { echoCancellation: true, noiseSuppression: true} 
+        video: { width: 320, height: 180 },
+        audio: { echoCancellation: true, noiseSuppression: true }
       })
       .then((media) => {
         self.setState({
@@ -204,6 +349,7 @@ export async function getMyMediaStream(self, type) {
         createVideoElement(self, media, 'me');
         return media;
       });
+    // alert(self.state.myMediaStreamObj);
   }
 }
 export function startCall(self, roomName, type) {
@@ -338,6 +484,7 @@ function sendRequestToEndCall(self) {
       self.state.myPeers.forEach((val, index) => {
         if (val) {
           console.log(val);
+          val.ended = true;
           val.peer.destroy('Call Ended');
         }
       });
@@ -415,42 +562,40 @@ export async function addScreenShareStream(self) {
   });
 }
 
-
-
 function setMediaBitrate(sdp, media, bitrate) {
-  let lines = sdp.split('\n')
-  let line = -1
+  let lines = sdp.split('\n');
+  let line = -1;
   for (let i = 0; i < lines.length; i++) {
-        if (lines[i].indexOf('m=' + media) === 0) {
-                line = i
-                break
-              }
-      }
+    if (lines[i].indexOf('m=' + media) === 0) {
+      line = i;
+      break;
+    }
+  }
   if (line === -1) {
-      // log('Could not find the m line for', media)
-    return sdp
+    // log('Could not find the m line for', media)
+    return sdp;
   }
   // log('Found the m line for', media, 'at line', line)
 
   // Pass the m line
-  line++
+  line++;
 
   // Skip i and c lines
   while (lines[line].indexOf('i=') === 0 || lines[line].indexOf('c=') === 0) {
-    line++
+    line++;
   }
 
   // If we're on a b line, replace it
   if (lines[line].indexOf('b') === 0) {
     // log('Replaced b line at line', line)
-    lines[line] = 'b=AS:' + bitrate
-    return lines.join('\n')
+    lines[line] = 'b=AS:' + bitrate;
+    return lines.join('\n');
   }
 
   // Add a new b line
   // log('Adding new b line before line', line)
-  let newLines = lines.slice(0, line)
-  newLines.push('b=AS:' + bitrate)
-  newLines = newLines.concat(lines.slice(line, lines.length))
-  return newLines.join('\n')
+  let newLines = lines.slice(0, line);
+  newLines.push('b=AS:' + bitrate);
+  newLines = newLines.concat(lines.slice(line, lines.length));
+  return newLines.join('\n');
 }
