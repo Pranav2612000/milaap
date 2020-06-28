@@ -18,7 +18,7 @@ class Room extends Component {
     const roomName = props.match.params.roomname;
     console.log(roomName);
     this.state = {
-      roomName: roomName,
+      roomName: roomName
     };
     this.props.enterRoom(roomName);
     //this.startCall = this.startCall.bind(this);
@@ -80,6 +80,10 @@ class Room extends Component {
     return (
       <div class="app-body" id="inner-aside-container">
         <main class="main">
+          <br />
+          <h2 className="text-center" style={{ color: 'white', opacity: '0.5' }}>
+            Welcome to room: {this.props.match.params.roomname}
+          </h2>
           <Container className="room">
             <video id="context" controls autoPlay></video>
             <Row className="m-0 p-0" id="videos"></Row>
