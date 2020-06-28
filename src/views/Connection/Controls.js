@@ -139,9 +139,6 @@ class Controls extends Component {
             action={(element, next) => {
               this.setState({ inCall: true });
               this.submitVideoHandler();
-              setTimeout(() => {
-                console.log(document.getElementById('videos').childElementCount);
-              }, 1000);
               next();
               //this.joinCall(next);
             }}>

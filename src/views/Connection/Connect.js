@@ -153,7 +153,7 @@ export class Peer extends Emitter {
     this.emit('close');
     deleteVideoElement(this.their_id + '-video');
     deleteVideoElement(this.their_id + '-screen');
-    if(this.num_retries == null) {
+    if (this.num_retries == null) {
       return;
     }
     if (this.ended) {
@@ -219,13 +219,18 @@ export class Peer extends Emitter {
         console.log(data);
         this.sharing = 0;
 
-        // If screen shared is of type screen, don't add handlers 
-        if(this.next_stream_type == 'screen') {
+        // If screen shared is of type screen, don't add handlers
+        if (this.next_stream_type == 'screen') {
           createVideoElement(self, data, self.their_id + '-screen', self.their_name);
           return;
         }
         data.addEventListener('removetrack', (event) => {
-          changeStatusOfVideoElement(self, 'video_off', data, this.their_id + '-video');
+          changeStatusOfVideoElement(
+            self,
+            'video_off',
+            data,
+            this.their_id + '-video'
+          );
           console.log('update ui');
         });
         data.addEventListener('addtrack', (event) => {
@@ -243,12 +248,12 @@ export class Peer extends Emitter {
       });
       this.peer.on('data', (data) => {
         // Check if this is waiting to handle any stream.
-        if(data == 'screen- go ahead') {
+        if (data == 'screen- go ahead') {
           //Handshake complete share screen
           this.peer.addStream(this.stream_to_be_sent);
         }
-        if(this.sharing == 0) {
-          if(data == 'sharing screen') {
+        if (this.sharing == 0) {
+          if (data == 'sharing screen') {
             this.sharing = 1;
             this.next_stream_type = 'screen';
             this.peer.send('screen- go ahead');
@@ -720,16 +725,16 @@ export async function endCall(self) {
 
 function deleteAllVideoElements() {
   $('#videos').empty();
+  const contextOptions = document.getElementById('contextOptions');
+  contextOptions.style.display = 'none';
   clearContext();
 }
 
 function clearContext() {
   const context = document.getElementById('context');
-  const contextOptions = document.getElementById('contextOptions');
   if (context != null) {
     context.srcObject = null;
     context.style.display = 'none';
-    contextOptions.style.display = 'none';
   }
 }
 function deleteVideoElement(id) {
