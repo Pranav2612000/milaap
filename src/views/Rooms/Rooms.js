@@ -64,6 +64,11 @@ class Room extends Component {
   }
   */
 
+  componentDidMount() {
+    if (window.innerWidth > 985)
+      document.getElementsByTagName('body')[0].classList.add('aside-menu-show');
+  }
+
   componentDidUpdate(prevProps) {
     if (this.props.match.params.roomname !== prevProps.match.params.roomname) {
       this.setState(
@@ -111,10 +116,7 @@ class Room extends Component {
             */}
           </Container>
         </main>
-        <aside
-          className="aside-menu bg-dark"
-          display="md"
-          style={{ position: 'relative' }}>
+        <aside className="aside-menu bg-dark" display="xs">
           <DefaultAside
             roomName={this.props.roomName}
             msgs={this.props.msgs}
