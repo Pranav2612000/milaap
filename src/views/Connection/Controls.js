@@ -7,6 +7,7 @@ import * as actions from '../../redux/userRedux/userAction';
 import { connect } from 'react-redux';
 import {
   toggleVideo,
+  toggleAudio,
   getMyMediaStream,
   startCall,
   endCall,
@@ -73,7 +74,7 @@ class Controls extends Component {
     if (this.props.roomName !== prevProps.roomName) {
       this.setState({
         roomName: this.props.roomName,
-        inCall: false,
+        inCall: false
       });
       endCall(this);
     }
@@ -87,8 +88,31 @@ class Controls extends Component {
       facing: facing
     });
   }
+  addOptions = () => {
+    const contextOptions = document.getElementById('contextOptions');
+    contextOptions.children[0].addEventListener('click', () => {
+      this.changeCamera();
+    });
+    contextOptions.children[0].disabled =
+      !/iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || !this.state.inCall;
+
+    contextOptions.children[1].addEventListener('click', () => {
+      this.props.toggleAudio();
+      toggleAudio(this);
+    });
+    contextOptions.children[2].addEventListener('click', () => {
+      this.setState({ isWebCamOn: !this.state.isWebCamOn });
+      this.props.toggleVideo();
+      toggleVideo(this);
+    });
+    contextOptions.children[3].addEventListener('click', () => {
+      this.setState({ inCall: false });
+      this.endCallHandler();
+    });
+  };
   submitVideoHandler() {
     startCall(this, this.state.roomName, 'video');
+    this.addOptions();
   }
   submitScreenHandler() {
     startCall(this, this.state.roomName, 'screen');
@@ -162,7 +186,7 @@ class Controls extends Component {
               toggleVideo(self);
               next();
             }}>
-            <span>On Webcam</span>
+            <span>Webcam On</span>
           </AwesomeButtonProgress>
           <AwesomeButtonProgress
             type="primary"
@@ -175,7 +199,7 @@ class Controls extends Component {
               next();
             }}>
             <i className="icon-user icons"></i>
-            <span>Off Webcam</span>
+            <span>Webcam Off</span>
           </AwesomeButtonProgress>
         </Row>
         <Row className="justify-content-center text-center">
@@ -185,7 +209,7 @@ class Controls extends Component {
             disabled={!self.state.inCall}
             action={(element, next) => {
               this.inCallShareHandler();
-              next();
+              setTimeout(next, 2000);
             }}>
             <i className="icon-screen-desktop icons"></i>
             <span>Share Screen</span>
@@ -248,13 +272,15 @@ class Controls extends Component {
 const mapStateToProps = (state) => {
   return {
     video: state.userReducer.video,
+    audio: state.userReducer.audio,
     username: state.loginReducer.username
   };
 };
 
 const mapDispatchToProps = (dispatch) => {
   return {
-    toggleVideo: () => dispatch(actions.toggleVideo())
+    toggleVideo: () => dispatch(actions.toggleVideo()),
+    toggleAudio: () => dispatch(actions.toggleAudio())
   };
 };
 export default connect(mapStateToProps, mapDispatchToProps)(Controls);

@@ -2,7 +2,8 @@ import {
   FETCH_USERS_FAILURE,
   FETCH_USERS_REQUEST,
   FETCH_USERS_SUCCESS,
-  TOGGLE_VIDEO
+  TOGGLE_VIDEO,
+  TOGGLE_AUDIO
 } from './userActionTypes';
 import axios from 'axios';
 import { loginSuccess } from '../loginRedux/loginAction';
@@ -29,6 +30,11 @@ export const fetchUserFailuer = (error) => {
 export const toggleVideo = () => {
   return {
     type: TOGGLE_VIDEO
+  };
+};
+export const toggleAudio = () => {
+  return {
+    type: TOGGLE_AUDIO
   };
 };
 export const fetchUsers = () => {

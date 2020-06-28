@@ -112,7 +112,9 @@ export class Login extends Component {
     return (
       <>
         {this.props.loggedIn === true && (
-          <Redirect to={{ pathname: '/dashboard', state: this.state.username }} />
+          <Redirect
+            to={{ pathname: '/dashboard', state: localStorage.getItem('username') }}
+          />
         )}
         {/* <ReactNotification /> */}
         {/* {this.state.login && console.log("object")} */}
@@ -199,20 +201,14 @@ export class Login extends Component {
                             </Button>
                           </Col>
                         </Row>
-                        <Row>
-                          <br />
-                          <br />
-                          <Link to="/join">Join as a Guest?</Link>
-                          <br />
-                          <br />
-                        </Row>
+                        <br />
                         <Row className="justify-content-center">
                           <h2>OR</h2>
                         </Row>
                         <Row className="justify-content-center">
                           <Col>
                             <div>
-                              <h2>Sign up</h2>
+                              <h1>Sign up</h1>
                               <p>
                                 Don't have an account? It takes just 5 secs to create
                                 a new one.
@@ -220,7 +216,8 @@ export class Login extends Component {
                               <Link to="/register">
                                 <Button
                                   color="primary"
-                                  className="mt-3"
+                                  type="submit"
+                                  className="px-4"
                                   active
                                   tabIndex={-1}>
                                   Register Now!
@@ -228,6 +225,15 @@ export class Login extends Component {
                               </Link>
                             </div>
                           </Col>
+                        </Row>
+                        <br />
+                        <Row className="justify-content-center">
+                          <h2>OR</h2>
+                        </Row>
+                        <Row className="justify-content-center">
+                          <br />
+                          <Link to="/join">Join as a Guest?</Link>
+                          <br />
                         </Row>
                       </Form>
                     </CardBody>

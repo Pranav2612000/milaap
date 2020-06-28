@@ -2,14 +2,16 @@ import {
   FETCH_USERS_FAILURE,
   FETCH_USERS_REQUEST,
   FETCH_USERS_SUCCESS,
-  TOGGLE_VIDEO
+  TOGGLE_VIDEO,
+  TOGGLE_AUDIO
 } from './userActionTypes';
 
 const initalState = {
   loading: false,
   users: [],
   error: '',
-  video: true
+  video: true,
+  audio: true
 };
 
 export const userReducer = (state = initalState, action) => {
@@ -32,9 +34,14 @@ export const userReducer = (state = initalState, action) => {
         error: action.payload
       };
     case TOGGLE_VIDEO:
-      alert(state.video);
       return {
+        ...state,
         video: !state.video
+      };
+    case TOGGLE_AUDIO:
+      return {
+        ...state,
+        audio: !state.audio
       };
     default:
       return state;
