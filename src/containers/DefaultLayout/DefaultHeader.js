@@ -45,24 +45,6 @@ class DefaultHeader extends Component {
     this.addFriend = this.addFriend.bind(this);
   }
 
-  componentDidMount() {
-    /* To be changed: Use Redux to get username. */
-    // axios
-    //   .get('http://localhost:5000/api/user/getUserName', {
-    //     headers: {
-    //       'milaap-auth-token': localStorage.getItem('milaap-auth-token')
-    //     }
-    //   })
-    //   .then((resp) => {
-    //     console.log(resp.data.username);
-    //     this.setState({ username: resp.data.username });
-    //   })
-    //   .catch((err) => {
-    //     console.log(err, 'Error in Verifying JWT');
-    //     this.setState({ username: false });
-    //   });
-  }
-
   addFriend() {
     const reqData = {
       user: this.state.friendid,

@@ -15,20 +15,14 @@ import {
 class Room extends Component {
   constructor(props) {
     super(props);
-
     const roomName = props.match.params.roomname;
     console.log(roomName);
     this.state = {
       roomName: roomName,
-      peer: null
     };
     this.props.enterRoom(roomName);
     //this.startCall = this.startCall.bind(this);
     //this.endCall = this.endCall.bind(this);
-    this.submitVideoHandler = this.submitVideoHandler.bind(this);
-    this.submitScreenHandler = this.submitScreenHandler.bind(this);
-    this.endCallHandler = this.endCallHandler.bind(this);
-    this.inCallShareHandler = this.inCallShareHandler.bind(this);
     //this.getMyMediaStream = this.getMyMediaStream.bind(this);
     //this.createVideoElement = this.createVideoElement.bind(this);
   }
@@ -43,20 +37,6 @@ class Room extends Component {
     });
   }
   */
-  submitVideoHandler() {
-    startCall(this, this.state.roomName, 'video');
-  }
-  submitScreenHandler() {
-    startCall(this, this.state.roomName, 'screen');
-  }
-  inCallShareHandler() {
-    addScreenShareStream(this);
-  }
-
-  endCallHandler() {
-    endCall(this);
-  }
-
   /*
   endCall() {
     console.log(this.state);
@@ -97,7 +77,6 @@ class Room extends Component {
   loading = () => <div className="animated fadeIn pt-1 text-center">Loading...</div>;
 
   render() {
-    console.log(this.props);
     return (
       <div class="app-body" id="inner-aside-container">
         <main class="main">
@@ -127,7 +106,6 @@ class Room extends Component {
 }
 
 const mapStateToProps = (state) => {
-  console.log(state);
   return {
     roomName: state.roomReducer.currentRoom,
     guests: state.roomReducer.guests,

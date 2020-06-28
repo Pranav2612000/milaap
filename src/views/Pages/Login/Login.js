@@ -110,7 +110,6 @@ export class Login extends Component {
 
   render() {
     return (
-      /* Add Milaap Logo somewhere on this page. */
       <>
         {this.props.loggedIn === true && (
           <Redirect to={{ pathname: '/dashboard', state: this.state.username }} />

@@ -30,7 +30,6 @@ class DefaultAside extends Component {
   constructor(props) {
     super(props);
     console.log(props);
-
     let roomName = getRoomFromLocation(this.props.location.pathname);
     this.toggle = this.toggle.bind(this);
     this.state = {
@@ -41,6 +40,15 @@ class DefaultAside extends Component {
       path: props.location.pathname
     };
     this.getRoomInfo = this.getRoomInfo.bind(this);
+  }
+
+  componentDidUpdate(prevProps) {
+    if(this.props.roomName != prevProps.roomName) {
+      this.setState({
+        roomName: this.props.roomName,
+        path: this.props.location.pathname
+      });
+    }
   }
 
   changeRoomType = () => {
@@ -65,10 +73,6 @@ class DefaultAside extends Component {
   getRoomInfo(roomName) {
     console.log('nothing to say.');
     return;
-  }
-
-  componentDidMount() {
-    console.log('mounting');
   }
 
   toggle(tab) {

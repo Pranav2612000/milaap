@@ -10,7 +10,7 @@ import Notifications from 'react-notification-system-redux';
 const notificationOpts = {
   // uid: 'once-please', // you can specify your own uid if required
   title: 'Error',
-  message: 'Could not enter room! Please try again.',
+  message: 'Please try again with a different username',
   position: 'tr',
   autoDismiss: 2
 };

@@ -19,7 +19,6 @@ import {
 } from '@coreui/react';
 import routes from '../../routes';
 
-const socket = socketIOClient(`${global.config.backendURL}/`);
 const DefaultHeader = React.lazy(() => import('./DefaultHeader'));
 function getGroupElements(rooms) {
   const groupElements = [];
@@ -125,7 +124,7 @@ class DefaultLayout extends Component {
   constructor(props) {
     super(props);
     var rooms;
-    const GroupList = getGroupElements(rooms);
+    const GroupList = [];//getGroupElements(rooms);
     this.state = {
       rooms: [],
       userToken: localStorage.getItem('milaap-auth-token'),
@@ -156,35 +155,6 @@ class DefaultLayout extends Component {
       return;
     }
     this.getRooms();
-    this.state = {
-      navigation: {
-        items: [
-          {
-            title: true,
-            name: 'Rooms',
-            icon: 'icon-puzzle',
-            children: [
-              {
-                // title: true,
-                name: 'No Messages Yet.',
-                icon: 'icon-puzzle',
-                badge: {
-                  variant: 'info',
-                  text: 'Add'
-                },
-                class: ''
-              }
-            ]
-          },
-          GroupList
-        ]
-      }
-    };
-    socket.on('newRoom', (data) => {
-      console.log('ROOM ADDED');
-      console.log(data);
-      this.getRooms();
-    });
   }
 
   loading = () => <div className="animated fadeIn pt-1 text-center">Loading...</div>;
@@ -215,7 +185,7 @@ class DefaultLayout extends Component {
   }
 
   render() {
-    console.log('here');
+    //TODO: Also check if the token is valid.
     if (localStorage.getItem('milaap-auth-token') === null) {
       if (this.props.location.pathname.match('/rooms/')) {
         var room = this.props.location.pathname.split('/')[2];
@@ -223,7 +193,6 @@ class DefaultLayout extends Component {
       }
       return <Redirect to={{ pathname: '/landing' }} />;
     }
-    console.log(this.props);
     return (
       <React.Fragment>
         <div className="app">
