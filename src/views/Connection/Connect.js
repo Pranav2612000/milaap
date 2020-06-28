@@ -344,6 +344,7 @@ export async function changeCameraFacing(self, facing) {
 }
 
 export async function getMyMediaStream(self, type) {
+  var webCam = getVideoState();
   if (type === 'screen') {
     // TODO: Add try catch to handle case when user denies access
     await navigator.mediaDevices
@@ -366,7 +367,6 @@ export async function getMyMediaStream(self, type) {
       });
   } else if (type === 'video') {
     // TODO: Add try catch to handle case when user denies access
-    var webCam = getVideoState();
 
     await navigator.mediaDevices
       .getUserMedia(
