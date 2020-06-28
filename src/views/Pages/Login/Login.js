@@ -53,6 +53,7 @@ export class Login extends Component {
         }
       });
     }
+    localStorage.removeItem('milaap-auth-token');
   }
 
   componentDidUpdate(prevProps) {
