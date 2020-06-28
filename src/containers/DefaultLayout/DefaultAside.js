@@ -109,7 +109,7 @@ class DefaultAside extends Component {
               <i className="icon-speech"></i>
             </NavLink>
           </NavItem>
-          <NavItem>
+          {/* <NavItem>
             <NavLink
               className={classNames({ active: this.state.activeTab === '3' })}
               onClick={() => {
@@ -117,7 +117,7 @@ class DefaultAside extends Component {
               }}>
               <i className="icon-settings"></i>
             </NavLink>
-          </NavItem>
+          </NavItem> */}
         </Nav>
         <TabContent className="bg-dark" activeTab={this.state.activeTab}>
           <TabPane tabId="1">
@@ -139,7 +139,7 @@ class DefaultAside extends Component {
             <MessageView roomName={this.props.roomName} msgs={this.props.msgs} />
           </TabPane>
 
-          <TabPane tabId="3" className="p-3 bg-dark">
+          {/* <TabPane tabId="3" className="p-3 bg-dark">
             <h6>Settings</h6>
 
             <div className="aside-options">
@@ -183,7 +183,7 @@ class DefaultAside extends Component {
                 />
               </div>
             </div>
-          </TabPane>
+          </TabPane> */}
         </TabContent>
       </React.Fragment>
     );
