@@ -146,6 +146,9 @@ export class Peer extends Emitter {
     this.emit('close');
     deleteVideoElement(this.their_id + '-video');
     deleteVideoElement(this.their_id + '-screen');
+    if(!this.num_retries) {
+      return;
+    }
     if (this.ended) {
       this.active = false;
     } else {
