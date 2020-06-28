@@ -1,12 +1,40 @@
 import React, { Component } from 'react';
 import { Button, Card, CardBody, CardGroup, Col, Container, Row } from 'reactstrap';
+import { Link } from 'react-router-dom';
 import logo from '../../../assets/img/brand/logo.png';
 class Landing extends Component {
   render() {
     return (
-      /* Add Distrideo Logo somewhere on this page. */
-      <>
-        <div className="app flex-row align-items-center">
+      <div style={{ overflow: 'hidden', overflowX: 'hidden', overflowY: 'hidden' }}>
+        <div style={{ overflowX: 'hidden', overflowY: 'hidden' }}>
+          <br />
+          <br />
+          <Row>
+            <Col>
+              <Link to="/privacy">
+                <h5 style={{ color: 'white', textAlign: 'left', marginLeft: '2%' }}>
+                  Privacy Policy
+                </h5>
+              </Link>
+            </Col>
+            <Col>
+              <Link to="/about-us">
+                <h5 style={{ color: 'white', textAlign: 'center' }}> About Us </h5>
+              </Link>
+            </Col>
+            <Col>
+              <a href="https://forms.gle/WPCZh2JDyNfBTCJ47" target="_blank">
+                <h5
+                  style={{ color: 'white', textAlign: 'right', marginRight: '2%' }}>
+                  Report a Bug
+                </h5>
+              </a>
+            </Col>
+          </Row>
+        </div>
+        <div
+          className="app flex-row align-items-center"
+          style={{ overflow: 'hidden' }}>
           <Container>
             <Row className="justify-content-center">
               <Col sm="8">
@@ -19,7 +47,7 @@ class Landing extends Component {
                         style={{
                           textAlign: 'center',
                           width: '100%',
-                          margin: '11px',
+                          margin: '14px',
                           color: 'white'
                         }}>
                         Distrideo Chat
@@ -28,7 +56,7 @@ class Landing extends Component {
                         style={{
                           textAlign: 'center',
                           width: '100%',
-                          margin: '10px',
+                          margin: '12px',
                           color: 'white'
                         }}>
                         An attempt to make a self-sustaining conferencing application
@@ -42,7 +70,7 @@ class Landing extends Component {
                             color="warning"
                             style={{
                               width: '100%',
-                              margin: '10px'
+                              margin: '14px'
                             }}
                             onClick={() => this.props.history.push('join')}>
                             Join a Meeting
@@ -52,16 +80,16 @@ class Landing extends Component {
                         <Col xs="12">
                           <Button
                             color="secondary"
-                            style={{ width: '100%', margin: '10px' }}
+                            style={{ width: '100%', margin: '14px' }}
                             onClick={() => this.props.history.push('login')}>
-                            Sign In
+                            Sign In / Register
                           </Button>
                         </Col>
                       </Row>
                     </CardBody>
                   </Card>
                   <Card
-                    className="text-white bg-transparent py-5 d-md-down"
+                    className="text-white bg-transparent py-5 d-md-down justify-content-center align-items-center"
                     style={{
                       width: '59%',
                       backgroundColor: 'transparent',
@@ -82,7 +110,7 @@ class Landing extends Component {
             </Row>
           </Container>
         </div>
-      </>
+      </div>
     );
   }
 }

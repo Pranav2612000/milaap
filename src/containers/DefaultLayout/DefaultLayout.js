@@ -124,7 +124,7 @@ class DefaultLayout extends Component {
   constructor(props) {
     super(props);
     var rooms;
-    const GroupList = [];//getGroupElements(rooms);
+    const GroupList = []; //getGroupElements(rooms);
     this.state = {
       rooms: [],
       userToken: localStorage.getItem('milaap-auth-token'),

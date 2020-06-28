@@ -43,7 +43,7 @@ class DefaultAside extends Component {
   }
 
   componentDidUpdate(prevProps) {
-    if(this.props.roomName != prevProps.roomName) {
+    if (this.props.roomName != prevProps.roomName) {
       this.setState({
         roomName: this.props.roomName,
         path: this.props.location.pathname
@@ -132,7 +132,10 @@ class DefaultAside extends Component {
               </Row>
             </Container>
           </TabPane>
-          <TabPane tabId="2" className="p-3 bg-dark overflow-auto" key={this.state.change}>
+          <TabPane
+            tabId="2"
+            className="p-3 bg-dark overflow-auto"
+            key={this.state.change}>
             <MessageView roomName={this.props.roomName} msgs={this.props.msgs} />
           </TabPane>
 

@@ -74,7 +74,7 @@ class Controls extends Component {
     if (this.props.roomName !== prevProps.roomName) {
       this.setState({
         roomName: this.props.roomName,
-        inCall: false,
+        inCall: false
       });
       endCall(this);
     }
