@@ -12,9 +12,11 @@ class AboutUs extends Component {
           <br />
           <Row>
             <Col>
-              <h5 style={{ color: 'white', textAlign: 'left', marginLeft: '2%' }}>
-                About Us
-              </h5>
+              <Link to="/privacy">
+                <h5 style={{ color: 'white', textAlign: 'left', marginLeft: '2%' }}>
+                  Privacy Policy
+                </h5>
+              </Link>
             </Col>
             <Col>
               <Link to="/landing">
