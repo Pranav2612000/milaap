@@ -32,6 +32,8 @@ export class Peer extends Emitter {
     this.stream = stream;
     this.their_id = their_id;
     this.connected = false;
+    this.ended = false;
+    this.num_retries = 0;
     console.log(this.my_id);
     console.log(this.their_id);
     this.their_name = their_name;
@@ -146,7 +148,7 @@ export class Peer extends Emitter {
     this.emit('close');
     deleteVideoElement(this.their_id + '-video');
     deleteVideoElement(this.their_id + '-screen');
-    if(!this.num_retries) {
+    if(this.num_retries == null) {
       return;
     }
     if (this.ended) {
@@ -667,6 +669,7 @@ function sendRequestToEndCall(self) {
         if (val) {
           console.log(val);
           val.peer.destroy('Call Ended');
+          val.ended = true;
         }
       });
       // Clear all state variables associated with calls.
