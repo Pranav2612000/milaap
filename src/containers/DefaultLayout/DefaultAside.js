@@ -128,7 +128,7 @@ class DefaultAside extends Component {
               </Row>
             </Container>
           </TabPane>
-          <TabPane tabId="2" className="p-3 bg-dark" key={this.state.change}>
+          <TabPane tabId="2" className="p-3 bg-dark overflow-auto" key={this.state.change}>
             <MessageView roomName={this.props.roomName} msgs={this.props.msgs} />
           </TabPane>
 
