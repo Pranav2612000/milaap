@@ -4,7 +4,7 @@ import logo from '../../../assets/img/brand/logo.png';
 class Landing extends Component {
   render() {
     return (
-      /* Add Milaap Logo somewhere on this page. */
+      /* Add Distrideo Logo somewhere on this page. */
       <>
         <div className="app flex-row align-items-center">
           <Container>
