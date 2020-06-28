@@ -12,7 +12,8 @@ import {
   startCall,
   endCall,
   addScreenShareStream,
-  changeCameraFacing
+  changeCameraFacing,
+  stopScreenShare
 } from '../Connection/Connect';
 import {
   Nav,
@@ -213,6 +214,19 @@ class Controls extends Component {
             }}>
             <i className="icon-screen-desktop icons"></i>
             <span>Share Screen</span>
+          </AwesomeButtonProgress>
+        </Row>
+        <Row className="justify-content-center text-center">
+          <AwesomeButtonProgress
+            type="primary"
+            size="medium"
+            disabled={!self.state.inCall}
+            action={(element, next) => {
+              stopScreenShare(self);
+              setTimeout(next, 2000);
+            }}>
+            <i className="icon-screen-desktop icons"></i>
+            <span>Stop Share Screen</span>
           </AwesomeButtonProgress>
         </Row>
         <Row className="justify-content-center text-center">
