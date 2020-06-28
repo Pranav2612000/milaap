@@ -117,7 +117,7 @@ export class Peer extends Emitter {
 
   async close() {
     console.log(this.ended);
-    if(this.ended) {
+    if (this.ended) {
       this.emit('close');
       this.active = false;
       this.peer.destroy();
@@ -125,7 +125,7 @@ export class Peer extends Emitter {
     } else {
       //Trying to reconnect.
       this.num_retries = this.num_retries + 1;
-      if(this.num_retries > 3) {
+      if (this.num_retries > 3) {
         console.log('Too many retries.. Device facing connection issue');
         return;
       }
@@ -347,10 +347,16 @@ export async function getMyMediaStream(self, type) {
   if (type === 'screen') {
     // TODO: Add try catch to handle case when user denies access
     await navigator.mediaDevices
-      .getDisplayMedia({
-        video: { width: 320, height: 180 },
-        audio: true
-      })
+      .getDisplayMedia(
+        webCam
+          ? {
+              video: { width: 320, height: 180 },
+              audio: true
+            }
+          : {
+              audio: true
+            }
+      )
       .then((media) => {
         self.setState({
           myScreenStreamObj: media
@@ -360,12 +366,19 @@ export async function getMyMediaStream(self, type) {
       });
   } else if (type === 'video') {
     // TODO: Add try catch to handle case when user denies access
+    var webCam = getVideoState();
 
     await navigator.mediaDevices
-      .getUserMedia({
-        video: { width: 320, height: 180 },
-        audio: { echoCancellation: true, noiseSuppression: true }
-      })
+      .getUserMedia(
+        webCam
+          ? {
+              video: { width: 320, height: 180 },
+              audio: { echoCancellation: true, noiseSuppression: true }
+            }
+          : {
+              audio: { echoCancellation: true, noiseSuppression: true }
+            }
+      )
       .then((media) => {
         self.setState({
           myMediaStreamObj: media
