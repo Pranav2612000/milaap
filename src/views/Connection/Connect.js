@@ -15,7 +15,6 @@ function getVideoState() {
 
 socket.connect();
 socket.on('connect', () => {
-  console.log(socket.connected); // true
   console.log(socket.id);
 });
 
@@ -28,6 +27,9 @@ export class Peer extends Emitter {
     this.active = false;
     this.stream = stream;
     this.their_id = their_id;
+    this.connected = false;
+    console.log(this.my_id);
+    console.log(this.their_id);
     this.their_name = their_name;
     this.my_id = my_id;
     this.room = room;
@@ -35,7 +37,6 @@ export class Peer extends Emitter {
     this.peer = new SimplePeer({
       initiator: initiator,
       stream: stream,
-      trickle: true,
       sdpTransform: (sdp) => {
         let newSDP = sdp;
         newSDP = setMediaBitrate(newSDP, 'video', 233);
@@ -58,57 +59,75 @@ export class Peer extends Emitter {
       this.error = err;
       this.emit('error', err);
       this.close();
+      console.log('errorerd');
       console.log('Error Occured while connecting!', err);
     });
 
     this.peer.on('close', (_) => {
+      console.log('closing...');
       this.close();
-      console.log('closed');
     });
-    console.log('in constructor');
     this.peer.on('signal', (data) => {
-      console.log(data);
-      console.log(this.my_id);
-      console.log(this.their_id);
       var room = this.room;
       socket.emit('signalling', room, data, this.their_id, this.my_id, (resp) => {
-        console.log('reply rcvd');
-        console.log(data);
+        return;
       });
-      console.log('received signal to be seint');
     });
+    /*
     this.peer.on('data', (data) => {
       console.log('recvd data from remote peer');
     });
+    */
     this.peer.on('connect', (data) => {
+      this.connected = true;
       console.log('connected');
     });
     this.peer.on('stream', (data) => {
       const self = this;
       console.log('stream received');
       console.log(data);
+      this.sharing = 0;
+
+      // If screen shared is of type screen, don't add handlers 
+      if(this.next_stream_type == 'screen') {
+        createVideoElement(self, data, self.their_id + '-screen', self.their_name);
+        return;
+      }
       data.addEventListener('removetrack', (event) => {
-        changeStatusOfVideoElement(self, 'video_off', data, this.their_id);
+        changeStatusOfVideoElement(self, 'video_off', data, this.their_id + '-video');
         console.log('update ui');
       });
-      createVideoElement(self, data, self.their_id, self.their_name);
+      data.addEventListener('addtrack', (event) => {
+        console.log('update ui');
+      });
+      createVideoElement(self, data, self.their_id + '-video', self.their_name);
     });
     this.peer.on('track', (data, stream) => {
       const self = this;
       console.log(data);
+      console.log(data.label);
       console.log('track rcvd');
-      changeStatusOfVideoElement(self, 'video_on', stream, this.their_id);
+      //TODO: Add appropriate condition
+      //changeStatusOfVideoElement(self, 'video_on', stream, this.their_id);
+    });
+    this.peer.on('data', (data) => {
+      // Check if this is waiting to handle any stream.
+      if(data == 'screen- go ahead') {
+        //Handshake complete share screen
+        this.peer.addStream(this.stream_to_be_sent);
+      }
+      if(this.sharing == 0) {
+        if(data == 'sharing screen') {
+          this.sharing = 1;
+          this.next_stream_type = 'screen';
+          this.peer.send('screen- go ahead');
+        }
+      }
     });
     socket.on('signalling', (data, from_id) => {
       if (from_id != this.their_id) {
         return;
       }
-      console.log(data);
-      console.log(from_id);
-      console.log(this.my_id);
-      console.log(this.their_id);
-      console.log(this.peer);
-      console.log(this.peer.initiator);
       if (this.peer && !this.peer.destroyed) {
         console.log('replying');
         this.peer.signal(data);
@@ -118,11 +137,13 @@ export class Peer extends Emitter {
 
   async close() {
     console.log(this.ended);
+    console.log(this.num_retries);
+    this.peer.destroy();
+    this.emit('close');
+    deleteVideoElement(this.their_id + '-video');
+    deleteVideoElement(this.their_id + '-screen');
     if (this.ended) {
-      this.emit('close');
       this.active = false;
-      this.peer.destroy();
-      deleteVideoElement(this.their_id);
     } else {
       //Trying to reconnect.
       this.num_retries = this.num_retries + 1;
@@ -130,15 +151,6 @@ export class Peer extends Emitter {
         console.log('Too many retries.. Device facing connection issue');
         return;
       }
-      var peer = new Peer(
-        false,
-        this.stream,
-        this.room,
-        this.initiator,
-        this.their_id,
-        this.their_name,
-        this.my_id
-      );
     }
   }
 
@@ -197,7 +209,7 @@ export async function toggleVideo(self) {
           self,
           'video_off',
           self.state.myMediaStreamObj,
-          'me'
+          'me' + '-video'
         );
       }
       if (webCam) {
@@ -215,7 +227,7 @@ export async function toggleVideo(self) {
           self,
           'video_on',
           self.state.myMediaStreamObj,
-          'me'
+          'me' + '-video'
         );
       } /*else {
         if (self.state.myPeers) {
@@ -300,7 +312,7 @@ function changeStatusOfVideoElement(
       return;
     }
     console.log(video);
-    video.srcObject = null;
+    video.srcObject = stream;
     video.poster =
       'https://dummyimage.com/1024x576/2f353a/ffffff.jpg&text=' + username;
     video.play();
@@ -350,8 +362,8 @@ export async function changeCameraFacing(self, facing) {
           stream.getVideoTracks()[0],
           self.state.myMediaStreamObj
         );
-        deleteVideoElement('me');
-        createVideoElement(self, stream, 'me');
+        deleteVideoElement('me' + '-video');
+        createVideoElement(self, stream, 'me' + '-video');
       });
     });
 }
@@ -368,7 +380,7 @@ export async function getMyMediaStream(self, type) {
         self.setState({
           myScreenStreamObj: media
         });
-        createVideoElement(self, media, 'me');
+        createVideoElement(self, media, 'me' + '-screen');
         return media;
       });
   } else if (type === 'video') {
@@ -383,7 +395,7 @@ export async function getMyMediaStream(self, type) {
         self.setState({
           myMediaStreamObj: media
         });
-        createVideoElement(self, media, 'me');
+        createVideoElement(self, media, 'me' + '-video');
         return media;
       });
     // alert(self.state.myMediaStreamObj);
@@ -594,7 +606,13 @@ export async function addScreenShareStream(self) {
   getMyMediaStream(self, 'screen').then((media) => {
     self.state.myPeers.forEach((val, index) => {
       console.log(val);
-      val.peer.addStream(self.state.myScreenStreamObj);
+      // send request to share screen. Reply for this 
+      // handled in peer.on('data') eventHandler.
+      if(val.peer && !val.peer.destroyed && val.connected) {
+        val.peer.send('sharing screen');
+        val.stream_to_be_sent = self.state.myScreenStreamObj;
+      }
+      //val.peer.addStream(self.state.myScreenStreamObj);
     });
   });
 }

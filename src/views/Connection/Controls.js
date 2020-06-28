@@ -40,7 +40,6 @@ import {
 import classNames from 'classnames';
 import { AppSwitch } from '@coreui/react';
 import MessageView from '../../views/MessageList/index';
-import Peer from 'peerjs';
 import axios from 'axios';
 import $ from 'jquery';
 import './Controls.css';
@@ -70,7 +69,7 @@ class Controls extends Component {
 
   componentDidUpdate(prevProps) {
     console.log(prevProps);
-    console.log(this.props.roomName);
+    console.log(this.props);
     if (this.props.roomName !== prevProps.roomName) {
       this.setState({
         roomName: this.props.roomName,
@@ -116,7 +115,6 @@ class Controls extends Component {
               this.setState({ inCall: true });
               this.submitVideoHandler();
               setTimeout(() => {
-                console.clear();
                 console.log(document.getElementById('videos').childElementCount);
               }, 1000);
               next();
