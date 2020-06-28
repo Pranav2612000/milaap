@@ -23,7 +23,7 @@ export class Peer extends Emitter {
     super();
     this.error = null;
     this.active = false;
-    this.stream = null;
+    this.stream = stream;
     this.their_id = their_id;
     this.their_name = their_name;
     this.my_id = my_id;
@@ -83,7 +83,18 @@ export class Peer extends Emitter {
     this.peer.on('stream', (data) => {
       const self = this;
       console.log('stream received');
+      console.log(data);
+      data.addEventListener('removetrack', (event) => {
+        changeStatusOfVideoElement(self, "video_off", data, this.their_id);
+        console.log('update ui');
+      });
       createVideoElement(self, data, self.their_id, self.their_name);
+    });
+    this.peer.on('track', (data, stream) => {
+      const self = this;
+      console.log(data);
+      console.log('track rcvd');
+      changeStatusOfVideoElement(self, "video_on", stream, this.their_id);
     });
     socket.on('signalling', (data, from_id) => {
       if (from_id != this.their_id) {
@@ -120,7 +131,7 @@ export async function toggleVideo(self) {
     .getUserMedia(
       webCam
         ? {
-            video: { width: 1024, height: 576 },
+            video: { width: 320, height: 180 },
             audio: true
           }
         : {
@@ -129,9 +140,9 @@ export async function toggleVideo(self) {
     )
     .then((stream) => {
       console.log(self);
-      console.clear();
       console.log(stream);
-      if (self.state.myPeers)
+      /*
+      if (self.state.myPeers) {
         self.state.myPeers.map((eachPeer) => {
           if (self.state.myMediaStreamObj.getVideoTracks)
             eachPeer.peer.replaceTrack(
@@ -144,6 +155,35 @@ export async function toggleVideo(self) {
           //   self.state.myMediaStreamObj
           // );
         });
+      }
+      self.state.myMediaStreamObj.removeTrack(self.state.myMediaStreamObj.getVideoTracks()[0]);
+      */
+      console.log(self.state.myMediaStreamObj.getVideoTracks());
+      if(self.state.myMediaStreamObj.getVideoTracks().length != 0) {
+        self.state.myPeers.map((eachPeer) => {
+          eachPeer.peer.removeTrack(self.state.myMediaStreamObj.getVideoTracks()[0], self.state.myMediaStreamObj);
+        });
+        //Remove locally
+        self.state.myMediaStreamObj.getVideoTracks()[0].stop();
+        self.state.myMediaStreamObj.removeTrack(self.state.myMediaStreamObj.getVideoTracks()[0]);
+        changeStatusOfVideoElement(self, "video_off", self.state.myMediaStreamObj, "me");
+      }
+      if(webCam) {
+        if (self.state.myPeers) {
+          self.state.myPeers.map((eachPeer) => {
+            //TODO: REmove previous video tracks if any
+            eachPeer.peer.addTrack(stream.getVideoTracks()[0], self.state.myMediaStreamObj);
+          });
+        }
+        self.state.myMediaStreamObj.addTrack(stream.getVideoTracks()[0]);
+        changeStatusOfVideoElement(self, "video_on", self.state.myMediaStreamObj, "me");
+      } /*else {
+        if (self.state.myPeers) {
+          self.state.myPeers.map((eachPeer) => {
+            eachPeer.peer.remove(stream.getVideoTracks()[0], self.state.myMediaStreamObj);
+          });
+        }
+      }*/
     });
 }
 function muteVideo(self, id) {
@@ -194,6 +234,29 @@ export function createVideoElement(self, stream, friendtkn, username) {
   if (!context.srcObject) switchContext(document.getElementById(friendtkn));
 }
 
+function changeStatusOfVideoElement(self, status, stream, friendtkn, username = null) {
+  //let video = $('#' + friendtkn);
+  if(status == 'video_off') {
+    const video = document.getElementById(friendtkn);
+    if(!video) {
+      return;
+    }
+    console.log(video);
+    video.srcObject = null;
+    video.poster =
+        'https://dummyimage.com/1024x576/2f353a/ffffff.jpg&text=' + username;
+    video.play();
+  } else if(status == 'video_on') {
+    const video = document.getElementById(friendtkn);
+    if(!video) {
+      return;
+    }
+    console.log(stream);
+    video.srcObject = stream;
+    video.play();
+  }
+}
+
 export function switchContext(e) {
   if (e.target) e = e.target;
   try {
@@ -219,7 +282,7 @@ export function switchContext(e) {
 export async function changeCameraFacing(self, facing) {
   navigator.mediaDevices
     .getUserMedia({
-      video: { facingMode: facing },
+      video: { facingMode: facing, width:320, height: 180 },
       audio: true
     })
     .then((stream) => {
@@ -240,7 +303,7 @@ export async function getMyMediaStream(self, type) {
     // TODO: Add try catch to handle case when user denies access
     await navigator.mediaDevices
       .getDisplayMedia({
-        video: { width: 1024, height: 576 },
+        video: { width: 320, height: 180 },
         audio: true
       })
       .then((media) => {
@@ -255,7 +318,7 @@ export async function getMyMediaStream(self, type) {
 
     await navigator.mediaDevices
       .getUserMedia({
-        video: { width: 1024, height: 576 },
+        video: { width: 320, height: 180 },
         audio: { echoCancellation: true, noiseSuppression: true }
       })
       .then((media) => {
