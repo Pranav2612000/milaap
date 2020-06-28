@@ -756,13 +756,27 @@ export async function addScreenShareStream(self) {
       // send request to share screen. Reply for this
       // handled in peer.on('data') eventHandler.
       if (val.peer && !val.peer.destroyed && val.connected) {
-        // alert('hi');
         val.peer.send('sharing screen');
         val.stream_to_be_sent = self.state.myScreenStreamObj;
       }
       //val.peer.addStream(self.state.myScreenStreamObj);
     });
   });
+}
+
+export async function stopScreenShare(self) {
+  if (self.state.myScreenStreamObj) {
+    self.state.myScreenStreamObj.getTracks().forEach((track) => {
+      console.log(track);
+      track.stop();
+    });
+    self.state.myScreenStreamObj.getTracks().forEach((track) => {
+      self.state.myScreenStreamObj.removeTrack(track);
+    });
+    self.setState({
+      myScreenStreamObj: null
+    });
+  }
 }
 
 function setMediaBitrate(sdp, media, bitrate) {
