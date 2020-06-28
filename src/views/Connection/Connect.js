@@ -675,6 +675,7 @@ export async function stopScreenShare(self) {
     self.setState({
       myScreenStreamObj: null
     });
+    deleteVideoElement('me-screen');
   }
 }
 
