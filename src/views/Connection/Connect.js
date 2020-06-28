@@ -2,6 +2,7 @@ import { Component } from 'react';
 import SimplePeer from 'simple-peer';
 import $ from 'jquery';
 import socketIOClient, { connect } from 'socket.io-client';
+import { store as NotifStore } from 'react-notifications-component';
 import { Emitter } from './emmiter';
 import axios from 'axios';
 import { store } from '../../redux/store';
@@ -119,11 +120,30 @@ export class Peer extends Emitter {
     });
   }
 
-  close() {
-    this.emit('close');
-    this.active = false;
-    this.peer.destroy();
-    deleteVideoElement(this.their_id);
+  async close() {
+    console.log(this.ended);
+    if (this.ended) {
+      this.emit('close');
+      this.active = false;
+      this.peer.destroy();
+      deleteVideoElement(this.their_id);
+    } else {
+      //Trying to reconnect.
+      this.num_retries = this.num_retries + 1;
+      if (this.num_retries > 3) {
+        console.log('Too many retries.. Device facing connection issue');
+        return;
+      }
+      var peer = new Peer(
+        false,
+        this.stream,
+        this.room,
+        this.initiator,
+        this.their_id,
+        this.their_name,
+        this.my_id
+      );
+    }
   }
 
   startCall() {
@@ -188,7 +208,6 @@ export async function toggleVideo(self) {
         if (self.state.myPeers) {
           self.state.myPeers.map((eachPeer) => {
             //TODO: REmove previous video tracks if any
-            console.log(eachPeer);
             eachPeer.peer.addTrack(
               stream.getVideoTracks()[0],
               self.state.myMediaStreamObj
@@ -256,6 +275,18 @@ function muteVideo(self, id) {
 }
 
 export function createVideoElement(self, stream, friendtkn, username) {
+  NotifStore.addNotification({
+    title: 'Member entered call',
+    message: (username ? username : 'You') + ' joined the call!',
+    type: 'success',
+    container: 'top-right',
+    animationIn: ['animated', 'fadeIn'],
+    animationOut: ['animated', 'fadeOut'],
+    dismiss: {
+      duration: 3000,
+      pauseOnHover: true
+    }
+  });
   const wrapper = document.createElement('div');
   const video = document.createElement('video');
   const row = document.createElement('div');

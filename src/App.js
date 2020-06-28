@@ -21,6 +21,9 @@ const Page404 = React.lazy(() => import('./views/Pages/Page404'));
 const Page500 = React.lazy(() => import('./views/Pages/Page500'));
 const Guest = React.lazy(() => import('./views/Pages/Guest/Guest'));
 const Landing = React.lazy(() => import('./views/Pages/Landing/Landing'));
+const Privacy = React.lazy(() => import('./views/Pages/Privacy/Privacy'));
+const AboutUs = React.lazy(() => import('./views/Pages/AboutUs/AboutUs'));
+
 class App extends Component {
   render() {
     return (
@@ -41,9 +44,20 @@ class App extends Component {
                 render={(props) => <Login {...props} />}
               />
               <Route
+                exact
+                path="/privacy"
+                name="Privacy Page"
+                render={(props) => <Privacy {...props} />}
+              />
+              <Route
                 path="/join"
                 name="Guest Login"
                 render={(props) => <Guest {...props} />}
+              />
+              <Route
+                path="/about-us"
+                name="About Us"
+                render={(props) => <AboutUs {...props} />}
               />
               <Route
                 exact

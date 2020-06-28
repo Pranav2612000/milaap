@@ -2,10 +2,18 @@ audio::-webkit-media-controls-timeline,
 video::-webkit-media-controls-timeline {
   display: none;
 }
+audio::-webkit-media-controls,
+video::-webkit-media-controls {
+  transform: rotateY(180deg);
+  -webkit-transform: rotateY(180deg); /* Safari and Chrome */
+  -moz-transform: rotateY(180deg); /* Firefox */
+}
 
 #context {
+  position: fixed;
+  left: 215px;
   display: none;
-  margin-left: 130px;
+  width: 60vw;
   margin-top: 5vh;
   max-width: 85vw;
   max-height: 60vh;
@@ -29,7 +37,9 @@ video::-webkit-media-controls-timeline {
     width: 95vw;
   }
   #context {
-    margin-left: 15px;
+    left: 10px;
+    width: 95vw;
+    max-width: 100vw;
   }
 }
 
@@ -75,4 +85,10 @@ video::-webkit-media-controls-timeline {
 #inner-aside-container {
   margin-top: 0px;
   height: 100%;
+}
+
+video {
+  transform: rotateY(180deg);
+  -webkit-transform: rotateY(180deg); /* Safari and Chrome */
+  -moz-transform: rotateY(180deg); /* Firefox */
 }

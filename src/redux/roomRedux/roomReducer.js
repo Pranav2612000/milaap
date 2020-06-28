@@ -11,7 +11,6 @@ const initalState = {
 export const roomReducer = (state = initalState, action) => {
   switch (action.type) {
     case ENTER_ROOM_REQUEST:
-      console.log('Entering Room...');
       return {
         ...state,
         loading: true,
@@ -21,7 +20,6 @@ export const roomReducer = (state = initalState, action) => {
         guests: undefined
       };
     case ENTER_ROOM_SUCCESS:
-      console.log('entered room');
       return {
         ...state,
         // loading: false,
@@ -31,7 +29,6 @@ export const roomReducer = (state = initalState, action) => {
         guests: action.guests
       };
     case ENTER_ROOM_FAILURE:
-      console.log('failed to enter room.');
       return {
         ...state,
         loading: false,
