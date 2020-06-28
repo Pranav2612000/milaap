@@ -32,7 +32,6 @@ export const userReducer = (state = initalState, action) => {
         error: action.payload
       };
     case TOGGLE_VIDEO:
-      alert(state.video);
       return {
         video: !state.video
       };
