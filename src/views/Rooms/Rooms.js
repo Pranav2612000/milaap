@@ -91,13 +91,9 @@ class Room extends Component {
             Welcome to room: {this.props.match.params.roomname}
           </h2>
           <Container className="room">
-            <div>
-              <video
-                id="context"
-                controls
-                autoPlay
-                style={{ position: 'absolute' }}></video>
-              {/* <Row className="d-flex justify-content-center align-items-center m-0 p-0"> */}
+            {/* <div> */}
+            <video id="context" controls autoPlay></video>
+            <Row className="d-flex justify-content-center align-items-center m-0 p-0">
               <div
                 id="contextOptions"
                 style={{
@@ -174,8 +170,8 @@ class Room extends Component {
                   <img src={endcall} style={{ height: '2.5em', width: '2.5em' }} />
                 </button>
               </div>
-            </div>
-            {/* </Row> */}
+            </Row>
+            {/* </div> */}
             <Row className="m-0 p-0" id="videos"></Row>
             {/*
             <button onClick={this.submitVideoHandler}>Start Call </button>
