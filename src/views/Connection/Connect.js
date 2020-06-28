@@ -318,7 +318,7 @@ export function createVideoElement(self, stream, friendtkn, username) {
   video.srcObject = stream;
   video.autoplay = true;
   video.onclick = switchContext;
-  if (video.id == 'me') {
+  if (video.id == 'me-video') {
     video.muted = 'true';
   }
   wrapper.appendChild(video);
@@ -370,7 +370,7 @@ export function switchContext(e) {
       'https://dummyimage.com/1024x576/2f353a/ffffff.jpg&text=' + username;
     context.srcObject = e.srcObject;
     console.log(e);
-    if (e.id == 'me') {
+    if (e.id == 'me-video') {
       context.muted = 'true';
     }
     context.play();

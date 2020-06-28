@@ -86,12 +86,10 @@ class Room extends Component {
     return (
       <div class="app-body" id="inner-aside-container">
         <main class="main">
-          <br />
-          <h2 className="text-center" style={{ color: 'white', opacity: '0.5' }}>
+          <h4 className="text-center" style={{ color: 'white', opacity: '0.5' }}>
             Welcome to room: {this.props.match.params.roomname}
-          </h2>
+          </h4>
           <Container className="room">
-            <video id="context" controls autoPlay></video>
             <Row className="d-flex justify-content-center align-items-center m-0 p-0">
               <div
                 id="contextOptions"
@@ -169,6 +167,7 @@ class Room extends Component {
                 </button>
               </div>
             </Row>
+            <video id="context" controls autoPlay></video>
             <Row className="m-0 p-0" id="videos"></Row>
             {/*
             <button onClick={this.submitVideoHandler}>Start Call </button>
