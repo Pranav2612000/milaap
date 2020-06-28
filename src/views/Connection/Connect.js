@@ -32,6 +32,8 @@ export class Peer extends Emitter {
     this.stream = stream;
     this.their_id = their_id;
     this.connected = false;
+    this.ended = false;
+    this.num_retries = 0;
     console.log(this.my_id);
     console.log(this.their_id);
     this.their_name = their_name;
@@ -151,6 +153,9 @@ export class Peer extends Emitter {
     this.emit('close');
     deleteVideoElement(this.their_id + '-video');
     deleteVideoElement(this.their_id + '-screen');
+    if(this.num_retries == null) {
+      return;
+    }
     if (this.ended) {
       this.active = false;
     } else {
@@ -160,6 +165,96 @@ export class Peer extends Emitter {
         console.log('Too many retries.. Device facing connection issue');
         return;
       }
+      this.peer = new SimplePeer({
+        initiator: this.initiator,
+        stream: this.stream,
+        sdpTransform: (sdp) => {
+          let newSDP = sdp;
+          newSDP = setMediaBitrate(newSDP, 'video', 233);
+          newSDP = setMediaBitrate(newSDP, 'audio', 80);
+          return newSDP;
+        },
+        config: {
+          iceServers: [
+            { urls: 'stun:stun.l.google.com:19302' },
+            {
+              urls: 'turn:numb.viagenie.ca',
+              credential: 'HWeF3pu@u2RfeYD',
+              username: 'veddandekar6@gmail.com'
+            }
+          ]
+        }
+      });
+
+      this.peer.on('error', (err) => {
+        this.error = err;
+        this.emit('error', err);
+        this.close();
+        console.log('errorerd');
+        console.log('Error Occured while connecting!', err);
+      });
+
+      this.peer.on('close', (_) => {
+        console.log('closing...');
+        this.close();
+      });
+      this.peer.on('signal', (data) => {
+        var room = this.room;
+        socket.emit('signalling', room, data, this.their_id, this.my_id, (resp) => {
+          return;
+        });
+      });
+      /*
+      this.peer.on('data', (data) => {
+        console.log('recvd data from remote peer');
+      });
+      */
+      this.peer.on('connect', (data) => {
+        this.connected = true;
+        console.log('connected');
+      });
+      this.peer.on('stream', (data) => {
+        const self = this;
+        console.log('stream received');
+        console.log(data);
+        this.sharing = 0;
+
+        // If screen shared is of type screen, don't add handlers 
+        if(this.next_stream_type == 'screen') {
+          createVideoElement(self, data, self.their_id + '-screen', self.their_name);
+          return;
+        }
+        data.addEventListener('removetrack', (event) => {
+          changeStatusOfVideoElement(self, 'video_off', data, this.their_id + '-video');
+          console.log('update ui');
+        });
+        data.addEventListener('addtrack', (event) => {
+          console.log('update ui');
+        });
+        createVideoElement(self, data, self.their_id + '-video', self.their_name);
+      });
+      this.peer.on('track', (data, stream) => {
+        const self = this;
+        console.log(data);
+        console.log(data.label);
+        console.log('track rcvd');
+        //TODO: Add appropriate condition
+        //changeStatusOfVideoElement(self, 'video_on', stream, this.their_id);
+      });
+      this.peer.on('data', (data) => {
+        // Check if this is waiting to handle any stream.
+        if(data == 'screen- go ahead') {
+          //Handshake complete share screen
+          this.peer.addStream(this.stream_to_be_sent);
+        }
+        if(this.sharing == 0) {
+          if(data == 'sharing screen') {
+            this.sharing = 1;
+            this.next_stream_type = 'screen';
+            this.peer.send('screen- go ahead');
+          }
+        }
+      });
     }
   }
 
@@ -579,6 +674,7 @@ function sendRequestToEndCall(self) {
         if (val) {
           console.log(val);
           val.peer.destroy('Call Ended');
+          val.ended = true;
         }
       });
       // Clear all state variables associated with calls.
