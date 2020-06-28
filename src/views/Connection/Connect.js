@@ -5,13 +5,19 @@ import socketIOClient, { connect } from 'socket.io-client';
 import { Emitter } from './emmiter';
 import axios from 'axios';
 import { store } from '../../redux/store';
+import * as action from '../../redux/userRedux/userAction';
 const socket = socketIOClient.connect(`${global.config.backendURL}`); //will be replaced by an appropriate room.
 store.subscribe(getVideoState);
+store.subscribe(getAudioState);
+
 function getVideoState() {
   let state = store.getState();
   return state.userReducer.video;
 }
-
+function getAudioState() {
+  let state = store.getState();
+  return state.userReducer.audio;
+}
 socket.connect();
 socket.on('connect', () => {
   console.log(socket.connected); // true
@@ -22,8 +28,6 @@ export class Peer extends Emitter {
   constructor(it, stream, room, initiator, their_id, their_name, my_id) {
     super();
     this.error = null;
-    this.ended = false;
-    this.num_retries = 0;
     this.active = false;
     this.stream = stream;
     this.their_id = their_id;
@@ -115,30 +119,11 @@ export class Peer extends Emitter {
     });
   }
 
-  async close() {
-    console.log(this.ended);
-    if (this.ended) {
-      this.emit('close');
-      this.active = false;
-      this.peer.destroy();
-      deleteVideoElement(this.their_id);
-    } else {
-      //Trying to reconnect.
-      this.num_retries = this.num_retries + 1;
-      if (this.num_retries > 3) {
-        console.log('Too many retries.. Device facing connection issue');
-        return;
-      }
-      var peer = new Peer(
-        false,
-        this.stream,
-        this.room,
-        this.initiator,
-        this.their_id,
-        this.their_name,
-        this.my_id
-      );
-    }
+  close() {
+    this.emit('close');
+    this.active = false;
+    this.peer.destroy();
+    deleteVideoElement(this.their_id);
   }
 
   startCall() {
@@ -203,6 +188,7 @@ export async function toggleVideo(self) {
         if (self.state.myPeers) {
           self.state.myPeers.map((eachPeer) => {
             //TODO: REmove previous video tracks if any
+            console.log(eachPeer);
             eachPeer.peer.addTrack(
               stream.getVideoTracks()[0],
               self.state.myMediaStreamObj
@@ -224,6 +210,32 @@ export async function toggleVideo(self) {
         }
       }*/
     });
+}
+export async function toggleAudio(self) {
+  var mic = getAudioState();
+
+  navigator.mediaDevices
+    .getUserMedia({
+      video: { width: 320, height: 180 },
+      audio: mic ? { echoCancellation: true, noiseSuppression: true } : false
+    })
+    .then((stream) => {
+      console.log(self);
+      // alert(stream);
+      console.clear();
+      console.log(stream);
+      if (self.state.myPeers) {
+        self.state.myPeers.map((eachPeer) => {
+          if (self.state.myMediaStreamObj.getAudioTracks)
+            eachPeer.peer.replaceTrack(
+              self.state.myMediaStreamObj.getAudioTracks()[0],
+              stream.getAudioTracks()[0],
+              self.state.myMediaStreamObj
+            );
+        });
+      }
+    })
+    .catch((err) => console.log(err));
 }
 function muteVideo(self, id) {
   console.log('TEST');
@@ -251,6 +263,7 @@ export function createVideoElement(self, stream, friendtkn, username) {
   const nameTag = document.createElement('div');
   const audioIcon = document.createElement('i');
   const context = document.getElementById('context');
+  const contextOptions = document.getElementById('contextOptions');
   audioIcon.classList.add('icon-volume-2', 'audio-icon');
   audioIcon.addEventListener('click', () => muteVideo(self, friendtkn));
   if (friendtkn == 'me') audioIcon.style.display = 'none';
@@ -270,6 +283,7 @@ export function createVideoElement(self, stream, friendtkn, username) {
   row.appendChild(audioIcon);
   wrapper.appendChild(row);
   document.getElementById('videos').appendChild(wrapper);
+  contextOptions.style.display = 'block';
   if (!context.srcObject) switchContext(document.getElementById(friendtkn));
 }
 
@@ -348,16 +362,10 @@ export async function getMyMediaStream(self, type) {
   if (type === 'screen') {
     // TODO: Add try catch to handle case when user denies access
     await navigator.mediaDevices
-      .getDisplayMedia(
-        webCam
-          ? {
-              video: { width: 320, height: 180 },
-              audio: true
-            }
-          : {
-              audio: true
-            }
-      )
+      .getDisplayMedia({
+        video: { width: 320, height: 180 },
+        audio: true
+      })
       .then((media) => {
         self.setState({
           myScreenStreamObj: media
@@ -370,14 +378,15 @@ export async function getMyMediaStream(self, type) {
 
     await navigator.mediaDevices
       .getUserMedia(
-        webCam
-          ? {
-              video: { width: 320, height: 180 },
-              audio: { echoCancellation: true, noiseSuppression: true }
-            }
-          : {
-              audio: { echoCancellation: true, noiseSuppression: true }
-            }
+        // webCam
+        //   ?
+        {
+          video: { width: 320, height: 180 },
+          audio: { echoCancellation: true, noiseSuppression: true }
+        }
+        // : {
+        //     audio: { echoCancellation: true, noiseSuppression: true }
+        //   }
       )
       .then((media) => {
         self.setState({
@@ -521,7 +530,6 @@ function sendRequestToEndCall(self) {
       self.state.myPeers.forEach((val, index) => {
         if (val) {
           console.log(val);
-          val.ended = true;
           val.peer.destroy('Call Ended');
         }
       });
@@ -573,9 +581,11 @@ function deleteAllVideoElements() {
 
 function clearContext() {
   const context = document.getElementById('context');
+  const contextOptions = document.getElementById('contextOptions');
   if (context != null) {
     context.srcObject = null;
     context.style.display = 'none';
+    contextOptions.style.display = 'none';
   }
 }
 function deleteVideoElement(id) {

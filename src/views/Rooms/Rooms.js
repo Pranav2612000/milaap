@@ -3,14 +3,20 @@ import './Room.css';
 import { connect } from 'react-redux';
 import { Container, Row } from 'reactstrap';
 import * as action from '../../redux/roomRedux/roomAction';
+import * as userAction from '../../redux/userRedux/userAction';
 import DefaultAside from '../../containers/DefaultLayout/DefaultAside';
 import {
   getMyMediaStream,
   startCall,
   endCall,
-  addScreenShareStream
+  addScreenShareStream,
+  toggleVideo
 } from '../Connection/Connect';
-
+import video_slash from '../../assets/video_slash.png';
+import video from '../../assets/video.webp';
+import endcall from '../../assets/endcall.png';
+import flip from '../../assets/flip.png';
+import mic from '../../assets/mic.png';
 class Room extends Component {
   constructor(props) {
     super(props);
@@ -102,6 +108,83 @@ class Room extends Component {
         <main class="main">
           <Container className="room">
             <video id="context" controls autoPlay></video>
+            <Row className="d-flex justify-content-center align-items-center m-0 p-0">
+              <div
+                id="contextOptions"
+                style={{
+                  display: 'none',
+                  padding: '5px',
+                  backgroundColor: '#555',
+                  marginTop: '10px',
+                  borderRadius: '50px',
+                  borderWidth: '1px',
+                  borderColor: 'transparent'
+                }}>
+                <button
+                  id="end"
+                  style={{
+                    backgroundColor: 'white',
+                    margin: '15px',
+                    borderWidth: '1px',
+                    borderColor: 'transparent',
+                    borderRadius: '50px',
+                    padding: '10px'
+                  }}>
+                  <img src={flip} style={{ height: '2.5em', width: '2.5em' }} />
+                </button>
+                <button
+                  id="end"
+                  style={{
+                    backgroundColor: this.props.audio ? 'green' : 'red',
+                    margin: '15px',
+                    borderWidth: '1px',
+                    borderColor: 'transparent',
+                    borderRadius: '50px',
+                    padding: '15px'
+                  }}>
+                  {/* <img src={mic} style={{ height: '2.5em', width: '2em' }} /> */}
+                  {this.props.audio ? (
+                    <icon
+                      className=" icon-volume-off"
+                      style={{ fontSize: '1.4em' }}
+                    />
+                  ) : (
+                    <icon className=" icon-volume-2" style={{ fontSize: '1.4em' }} />
+                  )}
+                </button>
+                <button
+                  id="webCam"
+                  style={{
+                    backgroundColor: this.props.webCam ? 'green' : 'red',
+                    margin: '14px',
+                    borderWidth: '1px',
+                    borderColor: 'transparent',
+                    borderRadius: '50px',
+                    padding: '10px'
+                  }}>
+                  {this.props.webCam ? (
+                    <img
+                      src={video_slash}
+                      style={{ height: '2.5em', width: '2.5em' }}
+                    />
+                  ) : (
+                    <img src={video} style={{ height: '2.5em', width: '2.5em' }} />
+                  )}
+                </button>
+                <button
+                  id="end"
+                  style={{
+                    backgroundColor: 'red',
+                    margin: '15px',
+                    borderWidth: '1px',
+                    borderColor: 'transparent',
+                    borderRadius: '50px',
+                    padding: '10px'
+                  }}>
+                  <img src={endcall} style={{ height: '2.5em', width: '2.5em' }} />
+                </button>
+              </div>
+            </Row>
             <Row className="m-0 p-0" id="videos"></Row>
             {/*
             <button onClick={this.submitVideoHandler}>Start Call </button>
@@ -135,7 +218,9 @@ const mapStateToProps = (state) => {
     guests: state.roomReducer.guests,
     users: state.roomReducer.users,
     msgs: state.roomReducer.msgs,
-    loading: state.roomReducer.loading
+    loading: state.roomReducer.loading,
+    webCam: state.userReducer.video,
+    audio: state.userReducer.audio
   };
 };
 

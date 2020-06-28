@@ -7,6 +7,7 @@ import * as actions from '../../redux/userRedux/userAction';
 import { connect } from 'react-redux';
 import {
   toggleVideo,
+  toggleAudio,
   getMyMediaStream,
   startCall,
   endCall,
@@ -104,8 +105,31 @@ class Controls extends Component {
       facing: facing
     });
   }
+  addOptions = () => {
+    const contextOptions = document.getElementById('contextOptions');
+    contextOptions.children[0].addEventListener('click', () => {
+      this.changeCamera();
+    });
+    contextOptions.children[0].disabled =
+      !/iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || !this.state.inCall;
+
+    contextOptions.children[1].addEventListener('click', () => {
+      this.props.toggleAudio();
+      toggleAudio(this);
+    });
+    contextOptions.children[2].addEventListener('click', () => {
+      this.setState({ isWebCamOn: !this.state.isWebCamOn });
+      this.props.toggleVideo();
+      toggleVideo(this);
+    });
+    contextOptions.children[3].addEventListener('click', () => {
+      this.setState({ inCall: false });
+      this.endCallHandler();
+    });
+  };
   submitVideoHandler() {
     startCall(this, this.state.roomName, 'video');
+    this.addOptions();
   }
   submitScreenHandler() {
     startCall(this, this.state.roomName, 'screen');
@@ -536,14 +560,17 @@ connectedPeers: connectedPeers,
     wrapper.appendChild(video);
     wrapper.appendChild(nameTag);
     document.getElementById('videos').appendChild(wrapper);
+
     if (!context.srcObject) self.switchContext(document.getElementById(friendtkn));
   }
 
   clearContext() {
     const context = document.getElementById('context');
+    const contextOptions = document.getElementById('context');
     if (context != null) {
       context.srcObject = null;
       context.style.display = 'none';
+      contextOptions.style.display = 'none';
     }
   }
 
@@ -664,10 +691,6 @@ videos.empty();
             action={(element, next) => {
               this.setState({ inCall: true });
               this.submitVideoHandler();
-              setTimeout(() => {
-                console.clear();
-                console.log(document.getElementById('videos').childElementCount);
-              }, 1000);
               next();
               //this.joinCall(next);
             }}>
@@ -799,13 +822,15 @@ videos.empty();
 const mapStateToProps = (state) => {
   return {
     video: state.userReducer.video,
+    audio: state.userReducer.audio,
     username: state.loginReducer.username
   };
 };
 
 const mapDispatchToProps = (dispatch) => {
   return {
-    toggleVideo: () => dispatch(actions.toggleVideo())
+    toggleVideo: () => dispatch(actions.toggleVideo()),
+    toggleAudio: () => dispatch(actions.toggleAudio())
   };
 };
 export default connect(mapStateToProps, mapDispatchToProps)(Controls);
