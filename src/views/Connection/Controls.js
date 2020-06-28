@@ -164,7 +164,7 @@ class Controls extends Component {
               toggleVideo(self);
               next();
             }}>
-            <span>On Webcam</span>
+            <span>Webcam On</span>
           </AwesomeButtonProgress>
           <AwesomeButtonProgress
             type="primary"
@@ -177,7 +177,7 @@ class Controls extends Component {
               next();
             }}>
             <i className="icon-user icons"></i>
-            <span>Off Webcam</span>
+            <span>Webcam Off</span>
           </AwesomeButtonProgress>
         </Row>
         <Row className="justify-content-center text-center">
@@ -187,7 +187,7 @@ class Controls extends Component {
             disabled={!self.state.inCall}
             action={(element, next) => {
               this.inCallShareHandler();
-              next();
+              setTimeout(next, 2000);
             }}>
             <i className="icon-screen-desktop icons"></i>
             <span>Share Screen</span>
