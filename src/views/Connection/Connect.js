@@ -166,10 +166,12 @@ export class Peer extends Emitter {
     if (this.num_retries == null) {
       return;
     }
+    const self = this;
     if (this.ended) {
       this.active = false;
     } else {
       if (this.num_retries > 3) {
+        
         if(self.stream) {
           self.stream.getTracks().forEach((track) => {
             track.stop();
@@ -191,7 +193,6 @@ export class Peer extends Emitter {
           });
         }
       }
-      const self = this;
       //Trying to reconnect.
       if(this.type == 'video') {
         await navigator.mediaDevices
