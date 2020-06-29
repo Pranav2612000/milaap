@@ -23,12 +23,6 @@ io.sockets.on('connection', (client) => {
   console.log(client.id);
   client.on('signalling', (room, data, to_id, from_id) => {
     // Add id of client to online array of room.
-    console.log(room);
-    console.log('*****************************received signal');
-    console.log(data);
-    console.log('*************************************toandfrom');
-    console.log(to_id);
-    console.log(from_id);
     //client.to(room).emit('signalling', data);
     io.to(to_id).emit('signalling', data, from_id);
   });
