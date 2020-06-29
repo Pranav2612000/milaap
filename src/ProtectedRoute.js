@@ -10,7 +10,6 @@ const ProtectedRoute = (props) => {
   const [validated, setValidated] = useState(false);
   var token = localStorage.getItem('milaap-auth-token');
   useEffect(() => {
-    console.log('checking');
     const verifyToken = async () => {
       token = localStorage.getItem('milaap-auth-token');
       await axios

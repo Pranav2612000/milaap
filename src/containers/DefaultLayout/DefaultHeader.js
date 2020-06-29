@@ -57,7 +57,6 @@ class DefaultHeader extends Component {
         }
       })
       .then((res) => {
-        console.log(res);
         this.toggle();
       })
       .catch((err) => {
@@ -187,7 +186,6 @@ DefaultHeader.propTypes = propTypes;
 DefaultHeader.defaultProps = defaultProps;
 
 const mapStateToProps = (state) => {
-  console.log(state);
   return {
     username: state.loginReducer.username
   };

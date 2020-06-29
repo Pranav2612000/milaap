@@ -39,7 +39,6 @@ export const enterRoomFailure = (error) => {
 };
 
 export const enterRoom = (room) => {
-  console.log('Entering Room...');
   var reqData = {
     roomName: room
   };
@@ -52,11 +51,7 @@ export const enterRoom = (room) => {
         }
       })
       .then((res) => {
-        console.log(res.data);
         if (res.data.err == 'UEXISTS') {
-          console.log(
-            'Someone with the same username already exists. Change your username and try again.'
-          );
           localStorage.removeItem('milaap-auth-token');
           dispatch(redirectToJoinPage());
           dispatch(enterRoomFailure('UEXISTS'));

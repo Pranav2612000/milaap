@@ -64,7 +64,6 @@ class DefaultHeader extends Component {
         }
       })
       .then((res) => {
-        console.log(res);
         this.toggle();
         window.location.reload();
       })

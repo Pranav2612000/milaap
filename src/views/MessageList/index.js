@@ -26,8 +26,6 @@ class MessageList extends Component {
       messages: this.props.msgs
     });
     socket.on('newMessage', (data) => {
-      console.log('New Message Arrived', data, this.state.MY_USER_ID);
-
       if (
         this.props.roomName !== 'dashboard' &&
         this.props.roomName == data['room'] &&
@@ -44,7 +42,6 @@ class MessageList extends Component {
       this.setState({
         messages: this.props.msgs
       });
-      this.init();
     }
   }
 
@@ -61,23 +58,6 @@ class MessageList extends Component {
     });
     return formattedMsgs;
   }
-
-  init = () => {
-    // axios
-    //   .get('http://localhost:5000/api/user/getUserName', {
-    //     headers: {
-    //       'milaap-auth-token': localStorage.getItem('milaap-auth-token')
-    //     }
-    //   })
-    //   .then((resp) => {
-    //     this.setState({
-    //       MY_USER_ID: resp.data.username
-    //     });
-    //   })
-    //   .catch((err) => {
-    //     console.log(err, 'Error in Verifying JWT');
-    //   });
-  };
 
   getReqData = () => {
     // console.clear()
@@ -98,26 +78,18 @@ class MessageList extends Component {
       data !== undefined &&
       data !== null
     ) {
-      console.log('Inside');
       var msg = messages;
       msg.push(data);
       this.setState({
         messages: msg
       });
     }
-    console.log('Inside fetch Message', this.state.messages, data);
     return;
   };
 
   renderMessages = () => {
-    // console.clear()
     let messages = this.state.messages;
-    if (!messages) {
-      console.log('no messages');
-      return;
-    }
-    console.log(messages);
-    console.log(messages.length);
+    if (!messages) return;
     let i = 0;
     const messageCount = messages.length;
     const tempMessages = [];
@@ -170,10 +142,7 @@ class MessageList extends Component {
 
       // Proceed to the next message.
       i += 1;
-
-      // console.log(current);
     }
-    console.log(tempMessages);
     return tempMessages;
   };
 
@@ -222,7 +191,6 @@ class MessageList extends Component {
 }
 
 const mapStateToProps = (state) => {
-  console.log(state);
   return {
     username: state.loginReducer.username
   };

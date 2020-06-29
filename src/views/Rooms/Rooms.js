@@ -22,7 +22,6 @@ class Room extends Component {
   constructor(props) {
     super(props);
     const roomName = props.match.params.roomname;
-    console.log(roomName);
     this.state = {
       roomName: roomName
     };

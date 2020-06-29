@@ -68,25 +68,9 @@ class DefaultLayout extends Component {
           });
           return;
         }
-        console.log(res);
         var rooms = res.data.rooms;
         this.setState({ rooms: rooms });
         const GroupList = getGroupElements(rooms);
-        // axios
-        //   .post(
-        //     `${global.config.backendURL}/api/room/getActive`,
-        //     {},
-        //     {
-        //       headers: {
-        //         'milaap-auth-token': localStorage.getItem('milaap-auth-token')
-        //       }
-        //     }
-        //   )
-        //   .then((res) => {
-        //     console.log(res);
-        //     var active = res.data.active;
-        //     console.log(active);
-        //     console.log({ ...GroupList });
         this.setState({
           navigation: {
             items: [
@@ -96,7 +80,6 @@ class DefaultLayout extends Component {
                 icon: 'icon-puzzle',
                 children: [
                   {
-                    // title: true,
                     name: 'No Messages Yet.',
                     icon: 'icon-puzzle',
                     badge: {
@@ -112,10 +95,6 @@ class DefaultLayout extends Component {
           }
         });
       })
-      //     .catch((err) => {
-      //       console.log(err);
-      //     });
-      // })
       .catch((err) => {
         console.log(err);
       });
@@ -124,7 +103,7 @@ class DefaultLayout extends Component {
   constructor(props) {
     super(props);
     var rooms;
-    const GroupList = []; //getGroupElements(rooms);
+    const GroupList = [];
     this.state = {
       rooms: [],
       userToken: localStorage.getItem('milaap-auth-token'),

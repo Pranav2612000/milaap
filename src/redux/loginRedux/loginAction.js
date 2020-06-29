@@ -65,7 +65,6 @@ export const logout = () => {
 };
 
 export const login = (username, password) => {
-  console.log('loggin in...');
   var reqData = {
     username: username,
     password: password
@@ -75,7 +74,6 @@ export const login = (username, password) => {
     axios
       .post(`${global.config.backendURL}/api/login`, reqData)
       .then((res) => {
-        console.log(res.data);
         localStorage.setItem('milaap-auth-token', res.data.token);
         localStorage.setItem('username', username);
         dispatch(loginSuccess(username));

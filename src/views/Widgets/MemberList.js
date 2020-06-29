@@ -59,33 +59,25 @@ class MemberList extends Component {
       ? document.querySelector('link[rel=canonical]').href
       : document.location.href;
     if (navigator.share) {
-      navigator
-        .share({
-          title: 'Join via Link',
-          url: link
-        })
-        .then(() => {
-          console.log('Link Shared!');
-        })
-        .catch(console.error);
+      navigator.share({
+        title: 'Join via Link',
+        url: link
+      });
     } else {
-      navigator.clipboard
-        .writeText(link)
-        .then(() => {
-          store.addNotification({
-            title: 'Link copied',
-            message: 'Link copied to clipboard!',
-            type: 'info',
-            container: 'top-right',
-            animationIn: ['animated', 'fadeIn'],
-            animationOut: ['animated', 'fadeOut'],
-            dismiss: {
-              duration: 3000,
-              pauseOnHover: true
-            }
-          });
-        })
-        .catch(console.log('Sorry try again'));
+      navigator.clipboard.writeText(link).then(() => {
+        store.addNotification({
+          title: 'Link copied',
+          message: 'Link copied to clipboard!',
+          type: 'info',
+          container: 'top-right',
+          animationIn: ['animated', 'fadeIn'],
+          animationOut: ['animated', 'fadeOut'],
+          dismiss: {
+            duration: 3000,
+            pauseOnHover: true
+          }
+        });
+      });
     }
   }
 
@@ -100,7 +92,6 @@ class MemberList extends Component {
       username: this.state.newmember,
       roomName: this.props.roomName
     };
-    console.log(reqData);
     axios
       .post(`${global.config.backendURL}/api/room/addusertoroom`, reqData, {
         headers: {
@@ -108,7 +99,6 @@ class MemberList extends Component {
         }
       })
       .then((res) => {
-        console.log(res);
         if (res.status == 200) {
           this.toggle();
           this.setState({

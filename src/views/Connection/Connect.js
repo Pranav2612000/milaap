@@ -8,11 +8,11 @@ import axios from 'axios';
 import { store } from '../../redux/store';
 import * as action from '../../redux/userRedux/userAction';
 const videoQuality = [
- { width: 1280, height: 720 },//720p
- { width: 640, height: 360 },//360p
- { width: 426, height: 240 },//240p
- { width: 320, height: 180 },//144p
-]
+  { width: 1280, height: 720 }, //720p
+  { width: 640, height: 360 }, //360p
+  { width: 426, height: 240 }, //240p
+  { width: 320, height: 180 } //144p
+];
 const socket = socketIOClient.connect(`${global.config.backendURL}`); //will be replaced by an appropriate room.
 store.subscribe(getVideoState);
 store.subscribe(getAudioState);
@@ -26,13 +26,10 @@ function getAudioState() {
   return state.userReducer.audio;
 }
 socket.connect();
-socket.on('connect', () => {
-  console.log(socket.id);
-});
 
 export class Peer extends Emitter {
   constructor(it, stream, room, initiator, their_id, their_name, my_id, type) {
-    if(type == null) {
+    if (type == null) {
       type = 'video';
     }
     super();
@@ -44,8 +41,6 @@ export class Peer extends Emitter {
     this.ended = false;
     this.num_retries = 0;
     this.type = type;
-    console.log(this.my_id);
-    console.log(this.their_id);
     this.their_name = their_name;
     this.my_id = my_id;
     this.room = room;
@@ -74,34 +69,22 @@ export class Peer extends Emitter {
     this.peer.on('error', (err) => {
       this.error = err;
       this.emit('error', err);
-      console.log('errorerd');
-      console.log('Error Occured while connecting!', err);
     });
 
     this.peer.on('close', (_) => {
-      console.log('closing...');
       this.close();
     });
     this.peer.on('signal', (data) => {
       var room = this.room;
       socket.emit('signalling', room, data, this.their_id, this.my_id, (resp) => {
-        console.log('emmiting signal');
         return;
       });
     });
-    /*
-    this.peer.on('data', (data) => {
-      console.log('recvd data from remote peer');
-    });
-    */
     this.peer.on('connect', (data) => {
       this.connected = true;
-      console.log('connected');
     });
     this.peer.on('stream', (data) => {
       const self = this;
-      console.log('stream received');
-      console.log(data);
       this.sharing = 0;
 
       // If screen shared is of type screen, don't add handlers
@@ -116,17 +99,8 @@ export class Peer extends Emitter {
           data,
           this.their_id + '-video'
         );
-        console.log('update ui');
       });
       createVideoElement(self, data, self.their_id + '-video', self.their_name);
-    });
-    this.peer.on('track', (data, stream) => {
-      const self = this;
-      console.log(data);
-      console.log(data.label);
-      console.log('track rcvd');
-      //TODO: Add appropriate condition
-      //changeStatusOfVideoElement(self, 'video_on', stream, this.their_id);
     });
     this.peer.on('data', (data) => {
       // Check if this is waiting to handle any stream.
@@ -150,15 +124,12 @@ export class Peer extends Emitter {
         return;
       }
       if (this.peer && !this.peer.destroyed) {
-        console.log('replying');
         this.peer.signal(data);
       }
     });
   }
 
   async close() {
-    console.log(this.ended);
-    console.log(this.num_retries);
     this.peer.destroy();
     this.emit('close');
     deleteVideoElement(this.their_id + '-video');
@@ -171,8 +142,7 @@ export class Peer extends Emitter {
       this.active = false;
     } else {
       if (this.num_retries > 3) {
-        
-        if(self.stream) {
+        if (self.stream) {
           self.stream.getTracks().forEach((track) => {
             track.stop();
           });
@@ -180,11 +150,10 @@ export class Peer extends Emitter {
             self.stream.removeTrack(track);
           });
         }
-        console.log('Too many retries.. Device facing connection issue');
         return;
       }
-      if(this.num_retries >= 1) {
-        if(self.stream) {
+      if (this.num_retries >= 1) {
+        if (self.stream) {
           self.stream.getTracks().forEach((track) => {
             track.stop();
           });
@@ -194,17 +163,16 @@ export class Peer extends Emitter {
         }
       }
       //Trying to reconnect.
-      if(this.type == 'video') {
+      if (this.type == 'video') {
         await navigator.mediaDevices
           .getUserMedia({
             video: videoQuality[this.num_retries],
-            audio: { echoCancellation: true, noiseSuppression: true} 
+            audio: { echoCancellation: true, noiseSuppression: true }
           })
           .then((media) => {
             self.num_retries = self.num_retries + 1;
             self.stream = media;
-            var retrytime = Math.floor(Math.random() * 5000) + 1  
-            console.log(retrytime);
+            var retrytime = Math.floor(Math.random() * 5000) + 1;
             self.peer = new SimplePeer({
               initiator: self.initiator,
               stream: self.stream,
@@ -230,68 +198,66 @@ export class Peer extends Emitter {
               self.error = err;
               self.emit('error', err);
               self.close();
-              console.log('errorerd');
-              console.log('Error Occured while connecting!', err);
             });
 
             self.peer.on('close', (_) => {
-              console.log('closing...');
               self.close();
             });
             self.peer.on('signal', (data) => {
-              setTimeout(function() {
+              setTimeout(function () {
                 retrytime = 0;
                 var room = self.room;
-                console.log('signalling');
-                socket.emit('signalling', room, data, self.their_id, self.my_id, (resp) => {
-                  return;
-                });
-                console.log('trying to reconnect');
+                socket.emit(
+                  'signalling',
+                  room,
+                  data,
+                  self.their_id,
+                  self.my_id,
+                  (resp) => {
+                    return;
+                  }
+                );
               }, retrytime);
             });
-            /*
-            self.peer.on('data', (data) => {
-              console.log('recvd data from remote peer');
-            });
-            */
             self.peer.on('connect', (data) => {
               self.connected = true;
-              console.log('connected');
             });
             self.peer.on('stream', (data) => {
-              console.log('stream received');
-              console.log(data);
               self.sharing = 0;
 
-              // If screen shared is of type screen, don't add handlers 
-              if(self.next_stream_type == 'screen') {
-                createVideoElement(self, data, self.their_id + '-screen', self.their_name);
+              // If screen shared is of type screen, don't add handlers
+              if (self.next_stream_type == 'screen') {
+                createVideoElement(
+                  self,
+                  data,
+                  self.their_id + '-screen',
+                  self.their_name
+                );
                 return;
               }
               data.addEventListener('removetrack', (event) => {
-                changeStatusOfVideoElement(self, 'video_off', data, self.their_id + '-video');
-                console.log('update ui');
+                changeStatusOfVideoElement(
+                  self,
+                  'video_off',
+                  data,
+                  self.their_id + '-video'
+                );
               });
-              data.addEventListener('addtrack', (event) => {
-                console.log('update ui');
-              });
-              createVideoElement(self, data, self.their_id + '-video', self.their_name);
-            });
-            self.peer.on('track', (data, stream) => {
-              console.log(data);
-              console.log(data.label);
-              console.log('track rcvd');
-              //TODO: Add appropriate condition
-              //changeStatusOfVideoElement(self, 'video_on', stream, self.their_id);
+              createVideoElement(
+                self,
+                data,
+                self.their_id + '-video',
+                self.their_name
+              );
             });
             self.peer.on('data', (data) => {
               // Check if this is waiting to handle any stream.
-              if(data == 'screen- go ahead') {
+              if (data == 'screen- go ahead') {
                 //Handshake complete share screen
                 self.peer.addStream(self.stream_to_be_sent);
               }
-              if(self.sharing == 0) {
-                if(data == 'sharing screen') {
+              if (self.sharing == 0) {
+                if (data == 'sharing screen') {
                   self.sharing = 1;
                   self.next_stream_type = 'screen';
                   self.peer.send('screen- go ahead');
@@ -299,108 +265,96 @@ export class Peer extends Emitter {
               }
             });
           });
-        } else if(this.type == 'screen') {
-            var retrytime = Math.floor(Math.random() * 5000) + 1  
-            console.log(retrytime);
-            self.peer = new SimplePeer({
-              initiator: self.initiator,
-              stream: self.stream,
-              sdpTransform: (sdp) => {
-                let newSDP = sdp;
-                newSDP = setMediaBitrate(newSDP, 'video', 233);
-                newSDP = setMediaBitrate(newSDP, 'audio', 80);
-                return newSDP;
-              },
-              config: {
-                iceServers: [
-                  { urls: 'stun:stun.l.google.com:19302' },
-                  {
-                    urls: 'turn:numb.viagenie.ca',
-                    credential: 'HWeF3pu@u2RfeYD',
-                    username: 'veddandekar6@gmail.com'
-                  }
-                ]
+      } else if (this.type == 'screen') {
+        var retrytime = Math.floor(Math.random() * 5000) + 1;
+        self.peer = new SimplePeer({
+          initiator: self.initiator,
+          stream: self.stream,
+          sdpTransform: (sdp) => {
+            let newSDP = sdp;
+            newSDP = setMediaBitrate(newSDP, 'video', 233);
+            newSDP = setMediaBitrate(newSDP, 'audio', 80);
+            return newSDP;
+          },
+          config: {
+            iceServers: [
+              { urls: 'stun:stun.l.google.com:19302' },
+              {
+                urls: 'turn:numb.viagenie.ca',
+                credential: 'HWeF3pu@u2RfeYD',
+                username: 'veddandekar6@gmail.com'
               }
-            });
+            ]
+          }
+        });
 
-            self.peer.on('error', (err) => {
-              self.error = err;
-              self.emit('error', err);
-              self.close();
-              console.log('errorerd');
-              console.log('Error Occured while connecting!', err);
-            });
+        self.peer.on('error', (err) => {
+          self.error = err;
+          self.emit('error', err);
+          self.close();
+        });
 
-            self.peer.on('close', (_) => {
-              console.log('closing...');
-              self.close();
-            });
-            self.peer.on('signal', (data) => {
-              setTimeout(function() {
-                retrytime = 0;
-                var room = self.room;
-                console.log('signalling');
-                socket.emit('signalling', room, data, self.their_id, self.my_id, (resp) => {
-                  return;
-                });
-                console.log('trying to reconnect');
-              }, retrytime);
-            });
-            /*
-            self.peer.on('data', (data) => {
-              console.log('recvd data from remote peer');
-            });
-            */
-            self.peer.on('connect', (data) => {
-              self.connected = true;
-              console.log('connected');
-            });
-            self.peer.on('stream', (data) => {
-              console.log('stream received');
-              console.log(data);
-              self.sharing = 0;
-
-              // If screen shared is of type screen, don't add handlers 
-              if(self.next_stream_type == 'screen') {
-                createVideoElement(self, data, self.their_id + '-screen', self.their_name);
+        self.peer.on('close', (_) => {
+          self.close();
+        });
+        self.peer.on('signal', (data) => {
+          setTimeout(function () {
+            retrytime = 0;
+            var room = self.room;
+            socket.emit(
+              'signalling',
+              room,
+              data,
+              self.their_id,
+              self.my_id,
+              (resp) => {
                 return;
               }
-              data.addEventListener('removetrack', (event) => {
-                changeStatusOfVideoElement(self, 'video_off', data, self.their_id + '-video');
-                console.log('update ui');
-              });
-              data.addEventListener('addtrack', (event) => {
-                console.log('update ui');
-              });
-              createVideoElement(self, data, self.their_id + '-video', self.their_name);
-            });
-            self.peer.on('track', (data, stream) => {
-              console.log(data);
-              console.log(data.label);
-              console.log('track rcvd');
-              //TODO: Add appropriate condition
-              //changeStatusOfVideoElement(self, 'video_on', stream, self.their_id);
-            });
-            self.peer.on('data', (data) => {
-              // Check if this is waiting to handle any stream.
-              if(data == 'screen- go ahead') {
-                //Handshake complete share screen
-                self.peer.addStream(self.stream_to_be_sent);
-              }
-              if(self.sharing == 0) {
-                if(data == 'sharing screen') {
-                  self.sharing = 1;
-                  self.next_stream_type = 'screen';
-                  self.peer.send('screen- go ahead');
-                }
-              }
-            });
-        }
-      }
-  }
+            );
+          }, retrytime);
+        });
+        self.peer.on('connect', (data) => {
+          self.connected = true;
+        });
+        self.peer.on('stream', (data) => {
+          self.sharing = 0;
 
-  startCall() {
-    console.log('starting call');
+          // If screen shared is of type screen, don't add handlers
+          if (self.next_stream_type == 'screen') {
+            createVideoElement(
+              self,
+              data,
+              self.their_id + '-screen',
+              self.their_name
+            );
+            return;
+          }
+          data.addEventListener('removetrack', (event) => {
+            changeStatusOfVideoElement(
+              self,
+              'video_off',
+              data,
+              self.their_id + '-video'
+            );
+          });
+          createVideoElement(self, data, self.their_id + '-video', self.their_name);
+        });
+        self.peer.on('data', (data) => {
+          // Check if this is waiting to handle any stream.
+          if (data == 'screen- go ahead') {
+            //Handshake complete share screen
+            self.peer.addStream(self.stream_to_be_sent);
+          }
+          if (self.sharing == 0) {
+            if (data == 'sharing screen') {
+              self.sharing = 1;
+              self.next_stream_type = 'screen';
+              self.peer.send('screen- go ahead');
+            }
+          }
+        });
+      }
+    }
   }
 }
 export async function toggleVideo(self) {
@@ -417,9 +371,6 @@ export async function toggleVideo(self) {
           }
     )
     .then((stream) => {
-      console.log(self);
-      console.log(stream);
-      console.log(self.state.myMediaStreamObj.getVideoTracks());
       if (self.state.myMediaStreamObj.getVideoTracks().length != 0) {
         self.state.myPeers.map((eachPeer) => {
           try {
@@ -427,11 +378,9 @@ export async function toggleVideo(self) {
               self.state.myMediaStreamObj.getVideoTracks()[0],
               self.state.myMediaStreamObj
             );
-          } catch(err) {
-          console.log(err);
-          alert('could not share screen to this peer');
-          console.log(eachPeer.their_id);
-          console.log(eachPeer.their_name);
+          } catch (err) {
+            console.log(err);
+            alert('could not share screen to this peer');
           }
         });
         //Remove locally
@@ -455,11 +404,9 @@ export async function toggleVideo(self) {
                 stream.getVideoTracks()[0],
                 self.state.myMediaStreamObj
               );
-            } catch(err) {
+            } catch (err) {
               console.log(err);
               alert('could not share screen to this peer');
-              console.log(eachPeer.their_id);
-              console.log(eachPeer.their_name);
             }
           });
         }
@@ -488,10 +435,6 @@ export async function toggleAudio(self) {
       audio: mic ? { echoCancellation: true, noiseSuppression: true } : false
     })
     .then((stream) => {
-      console.log(self);
-      // alert(stream);
-      console.clear();
-      console.log(stream);
       if (self.state.myPeers) {
         self.state.myPeers.map((eachPeer) => {
           if (self.state.myMediaStreamObj.getAudioTracks)
@@ -509,10 +452,8 @@ export async function toggleAudio(self) {
     .catch((err) => console.log(err));
 }
 function muteVideo(self, id) {
-  console.log('TEST');
   const userStream = document.getElementById(id).srcObject;
   const deets = document.getElementById(id).nextElementSibling;
-  console.log(userStream);
   if (userStream.getAudioTracks()[0].enabled) {
     userStream.getAudioTracks()[0].enabled = false;
     // userStream.getVideoTracks()[0].enabled = false;
@@ -583,7 +524,6 @@ function changeStatusOfVideoElement(
     if (!video) {
       return;
     }
-    console.log(video);
     video.srcObject = stream;
     video.poster =
       'https://dummyimage.com/1024x576/2f353a/ffffff.jpg&text=' + username;
@@ -593,7 +533,6 @@ function changeStatusOfVideoElement(
     if (!video) {
       return;
     }
-    console.log(stream);
     video.srcObject = stream;
     video.play();
   }
@@ -609,14 +548,12 @@ export function switchContext(e) {
     context.poster =
       'https://dummyimage.com/1024x576/2f353a/ffffff.jpg&text=' + username;
     context.srcObject = e.srcObject;
-    console.log(e);
     if (e.id == 'me-video') {
       context.muted = 'true';
     }
     context.play();
     $('#context').removeClass().addClass(e.id);
   } catch (err) {
-    console.log('The selected stream is old');
     console.log(err);
   }
 }
@@ -642,7 +579,7 @@ export async function changeCameraFacing(self, facing) {
 }
 
 export async function getMyMediaStream(self, type, quality_index) {
-  if(quality_index == null) {
+  if (quality_index == null) {
     quality_index = 0;
   }
   if (type === 'screen') {
@@ -686,7 +623,6 @@ export async function getMyMediaStream(self, type, quality_index) {
 }
 export function startCall(self, roomName, type) {
   var my_id = socket.id;
-  console.log(my_id);
   // Go online and get online array from express server.
   var reqData = {
     id: my_id,
@@ -700,11 +636,9 @@ export function startCall(self, roomName, type) {
       }
     })
     .then((res) => {
-      console.log(res);
       var onlineArray = res.data.online;
       // Get myMyMediaStream
       getMyMediaStream(self, type).then((media) => {
-        console.log('media object found');
         // Add eventhandler for "createConnection" signal, On receiving the signal:
         self.setState({
           myPeers: []
@@ -714,17 +648,11 @@ export function startCall(self, roomName, type) {
           //FACT: Comment this part to test reconnection.
           self.state.myPeers.forEach((val, index) => {
             if (val && val.their_id == their_id) {
-              console.log(val);
               val.ended = true;
               val.peer.destroy('Call Ended');
             }
           });
-          console.log('connection received from server');
-          console.log(their_id);
-          console.log(my_id);
-          console.log(socket.id);
           var my_id = socket.id;
-          console.log(my_id);
           var mediaStream;
           if (type == 'video') {
             mediaStream = self.state.myMediaStreamObj;
@@ -747,7 +675,6 @@ export function startCall(self, roomName, type) {
           self.setState({
             myPeers: [...self.state.myPeers, peer]
           });
-          console.log(self.state.myPeers);
         });
 
         axios
@@ -759,26 +686,19 @@ export function startCall(self, roomName, type) {
           .then((resp) => {
             // Loop through online Array and make connections to online Peers
             onlineArray.forEach((val, index) => {
-              console.log(resp.data);
               // Ignore self;
               if (val.username === resp.data.username /*&& val.type === type*/) {
                 return;
               }
-              console.log('Connecting to ' + onlineArray[index]);
               var their_id = onlineArray[index].id;
               var their_name = onlineArray[index].username;
               var my_name = resp.data.username;
               //    create a new Peer with initiator = true
               var my_id = socket.id;
               socket.emit('startconn', their_id, my_id, my_name, (resp) => {
-                console.log('start conn emited');
-                console.log(their_name);
                 var my_id = socket.id;
                 //var peer = new Peer(true, self.state.myMediaStreamObj, self.state.roomName, true, their_id, my_id);
               });
-              console.log('start conn emited');
-              console.log(socket.id);
-              console.log(my_id);
               var mediaStream;
               if (type == 'video') {
                 mediaStream = self.state.myMediaStreamObj;
@@ -801,7 +721,6 @@ export function startCall(self, roomName, type) {
               self.setState({
                 myPeers: [...self.state.myPeers, peer]
               });
-              console.log(self.state.myPeers);
             });
           });
       });
@@ -821,22 +740,17 @@ function sendRequestToEndCall(self) {
       }
     })
     .then((res) => {
-      console.log(res.data);
       var idToBeDestroyed = res.data.idToBeDestroyed;
-      console.log(self.state.myPeers);
       self.state.myPeers.forEach((val, index) => {
         if (val) {
-          console.log(val);
           val.ended = true;
           val.peer.destroy('Call Ended');
         }
       });
       // Clear all state variables associated with calls.
-      console.log('hrere');
       self.setState({
         myPeers: []
       });
-      console.log('here too');
       return;
     })
     .catch((err) => {
@@ -848,7 +762,6 @@ export async function endCall(self) {
   await sendRequestToEndCall(self);
   if (self.state.myMediaStreamObj) {
     self.state.myMediaStreamObj.getTracks().forEach((track) => {
-      console.log(track);
       track.stop();
     });
     self.state.myMediaStreamObj.getTracks().forEach((track) => {
@@ -860,7 +773,6 @@ export async function endCall(self) {
   }
   if (self.state.myScreenStreamObj) {
     self.state.myScreenStreamObj.getTracks().forEach((track) => {
-      console.log(track);
       track.stop();
     });
     self.state.myScreenStreamObj.getTracks().forEach((track) => {
@@ -877,7 +789,7 @@ export async function endCall(self) {
 function deleteAllVideoElements() {
   $('#videos').empty();
   const contextOptions = document.getElementById('contextOptions');
-  contextOptions.style.display = 'none';
+  if (contextOptions) contextOptions.style.display = 'none';
   clearContext();
 }
 
@@ -909,11 +821,9 @@ export async function addScreenShareStream(self) {
         try {
           val.peer.send('sharing screen');
           val.stream_to_be_sent = self.state.myScreenStreamObj;
-        } catch(err) {
+        } catch (err) {
           console.log(err);
           alert('could not share screen to this peer');
-          console.log(val.their_id);
-          console.log(val.their_name);
         }
       }
       //val.peer.addStream(self.state.myScreenStreamObj);
@@ -929,17 +839,14 @@ export async function stopScreenShare(self) {
       try {
         val.peer.removeStream(self.state.myScreenStreamObj);
         val.peer.send('stop screen sharing');
-      } catch(err) {
+      } catch (err) {
         console.log(err);
         alert('could not share screen to this peer');
-        console.log(val.their_id);
-        console.log(val.their_name);
       }
     }
   });
   if (self.state.myScreenStreamObj) {
     self.state.myScreenStreamObj.getTracks().forEach((track) => {
-      console.log(track);
       track.stop();
     });
     self.state.myScreenStreamObj.getTracks().forEach((track) => {

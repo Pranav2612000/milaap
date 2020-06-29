@@ -22,14 +22,12 @@ function getRoomFromLocation(locationString) {
   let room = '';
   const lastslash = locationString.lastIndexOf('/');
   room = locationString.slice(lastslash + 1);
-  console.log(room);
   return room;
 }
 
 class DefaultAside extends Component {
   constructor(props) {
     super(props);
-    console.log(props);
     let roomName = getRoomFromLocation(this.props.location.pathname);
     this.toggle = this.toggle.bind(this);
     this.state = {
@@ -85,7 +83,6 @@ class DefaultAside extends Component {
 
   render() {
     // eslint-disable-next-line
-    console.log(this.props);
     const { children, ...attributes } = this.props;
 
     return (

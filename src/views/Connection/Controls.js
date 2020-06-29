@@ -57,7 +57,6 @@ class Controls extends Component {
       isWebcamOn: true,
       facing: 'user'
     };
-    console.log(this.state.roomName);
     this.submitVideoHandler = this.submitVideoHandler.bind(this);
     this.submitScreenHandler = this.submitScreenHandler.bind(this);
     this.endCallHandler = this.endCallHandler.bind(this);
@@ -70,8 +69,6 @@ class Controls extends Component {
   }
 
   componentDidUpdate(prevProps) {
-    console.log(prevProps);
-    console.log(this.props);
     if (this.props.roomName !== prevProps.roomName) {
       this.setState({
         roomName: this.props.roomName,

@@ -35,7 +35,6 @@ export const roomReducer = (state = initalState, action) => {
         error: action.error
       };
     default:
-      console.log('def');
       return state;
   }
 };

@@ -15,7 +15,6 @@ router.post('/', async (req, res) => {
     if (!user) {
       return res.status(400).json({ err: 'Invalid Credentials' });
     }
-    console.log(user);
     if (password === user.password) {
       //       return res.status(200).json({ msg: "Correct Credentials" });
       const payload = {
