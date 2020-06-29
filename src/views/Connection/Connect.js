@@ -82,6 +82,18 @@ export class Peer extends Emitter {
     });
     this.peer.on('connect', (data) => {
       this.connected = true;
+      NotifStore.addNotification({
+        title: 'Member entered call',
+        message: 'New member joined the call!',
+        type: 'success',
+        container: 'top-right',
+        animationIn: ['animated', 'fadeIn'],
+        animationOut: ['animated', 'fadeOut'],
+        dismiss: {
+          duration: 3000,
+          pauseOnHover: true
+        }
+      });
     });
     this.peer.on('stream', (data) => {
       const self = this;
@@ -468,18 +480,6 @@ function muteVideo(self, id) {
 }
 
 export function createVideoElement(self, stream, friendtkn, username) {
-  NotifStore.addNotification({
-    title: 'Member entered call',
-    message: (username ? username : 'You') + ' joined the call!',
-    type: 'success',
-    container: 'top-right',
-    animationIn: ['animated', 'fadeIn'],
-    animationOut: ['animated', 'fadeOut'],
-    dismiss: {
-      duration: 3000,
-      pauseOnHover: true
-    }
-  });
   const wrapper = document.createElement('div');
   const video = document.createElement('video');
   const row = document.createElement('div');
