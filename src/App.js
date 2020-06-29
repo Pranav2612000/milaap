@@ -6,6 +6,7 @@ import './App.scss';
 //Redux related imports
 import { store } from './redux/store';
 import { Provider } from 'react-redux';
+import ProtectedRoute from './ProtectedRoute';
 
 const loading = () => (
   <div className="animated fadeIn pt-3 text-center">Loading...</div>
@@ -77,10 +78,11 @@ class App extends Component {
                 name="Page 500"
                 render={(props) => <Page500 {...props} />}
               />
+
               <Route
                 path="/"
                 name="Home"
-                render={(props) => <DefaultLayout {...props} />}
+                render={() => <ProtectedRoute path="/" component={DefaultLayout} />}
               />
             </Switch>
           </React.Suspense>

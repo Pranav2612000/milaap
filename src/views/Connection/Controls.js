@@ -12,7 +12,8 @@ import {
   startCall,
   endCall,
   addScreenShareStream,
-  changeCameraFacing
+  changeCameraFacing,
+  stopScreenShare
 } from '../Connection/Connect';
 import {
   Nav,
@@ -138,9 +139,6 @@ class Controls extends Component {
             action={(element, next) => {
               this.setState({ inCall: true });
               this.submitVideoHandler();
-              setTimeout(() => {
-                console.log(document.getElementById('videos').childElementCount);
-              }, 1000);
               next();
               //this.joinCall(next);
             }}>
@@ -175,7 +173,7 @@ class Controls extends Component {
             <span>UnMute</span>
           </AwesomeButtonProgress>
           </Row>*/}
-        <Row className="justify-content-center text-center">
+        {/* <Row className="justify-content-center text-center">
           <AwesomeButtonProgress
             type="primary"
             size="medium"
@@ -201,7 +199,7 @@ class Controls extends Component {
             <i className="icon-user icons"></i>
             <span>Webcam Off</span>
           </AwesomeButtonProgress>
-        </Row>
+        </Row> */}
         <Row className="justify-content-center text-center">
           <AwesomeButtonProgress
             type="primary"
@@ -213,6 +211,19 @@ class Controls extends Component {
             }}>
             <i className="icon-screen-desktop icons"></i>
             <span>Share Screen</span>
+          </AwesomeButtonProgress>
+        </Row>
+        <Row className="justify-content-center text-center">
+          <AwesomeButtonProgress
+            type="primary"
+            size="medium"
+            disabled={!self.state.inCall}
+            action={(element, next) => {
+              stopScreenShare(self);
+              setTimeout(next, 2000);
+            }}>
+            <i className="icon-screen-desktop icons"></i>
+            <span>Stop Screen</span>
           </AwesomeButtonProgress>
         </Row>
         <Row className="justify-content-center text-center">
@@ -247,23 +258,6 @@ class Controls extends Component {
             </AwesomeButtonProgress>
           </Row>
         )}
-        <Row className="justify-content-center text-center">
-          <AwesomeButtonProgress
-            type="primary"
-            size="medium"
-            // visible={!self.state.calls.length} //use this if we want it completely hidden until needed instead
-            disabled={
-              !/iPhone|iPad|iPod|Android/i.test(navigator.userAgent) ||
-              !this.state.inCall
-            }
-            action={(element, next) => {
-              this.changeCamera();
-              next();
-            }}>
-            <i className="icon-call-end icons"></i>
-            <span> Flip Camera</span>
-          </AwesomeButtonProgress>
-        </Row>
         <br />
       </Container>
     );
