@@ -100,17 +100,12 @@ export class Peer extends Emitter {
         return;
       }
       data.addEventListener('removetrack', (event) => {
-        /*
         changeStatusOfVideoElement(
           self,
           'video_off',
           data,
           this.their_id + '-video'
         );
-        */
-        console.log('update ui');
-      });
-      data.addEventListener('addtrack', (event) => {
         console.log('update ui');
       });
       createVideoElement(self, data, self.their_id + '-video', self.their_name);
@@ -128,6 +123,9 @@ export class Peer extends Emitter {
       if (data == 'screen- go ahead') {
         //Handshake complete share screen
         this.peer.addStream(this.stream_to_be_sent);
+      }
+      if (data == 'stop screen sharing') {
+        deleteVideoElement(this.their_id + '-screen');
       }
       if (this.sharing == 0) {
         if (data == 'sharing screen') {
@@ -764,7 +762,6 @@ function deleteVideoElement(id) {
 export async function addScreenShareStream(self) {
   getMyMediaStream(self, 'screen').then((media) => {
     self.state.myPeers.forEach((val, index) => {
-      console.log(val);
       // send request to share screen. Reply for this
       // handled in peer.on('data') eventHandler.
       if (val.peer && !val.peer.destroyed && val.connected) {
@@ -784,6 +781,21 @@ export async function addScreenShareStream(self) {
 }
 
 export async function stopScreenShare(self) {
+  self.state.myPeers.forEach((val, index) => {
+    // send request to share screen. Reply for this
+    // handled in peer.on('data') eventHandler.
+    if (val.peer && !val.peer.destroyed && val.connected) {
+      try {
+        val.peer.removeStream(self.state.myScreenStreamObj);
+        val.peer.send('stop screen sharing');
+      } catch(err) {
+        console.log(err);
+        alert('could not share screen to this peer');
+        console.log(val.their_id);
+        console.log(val.their_name);
+      }
+    }
+  });
   if (self.state.myScreenStreamObj) {
     self.state.myScreenStreamObj.getTracks().forEach((track) => {
       console.log(track);
