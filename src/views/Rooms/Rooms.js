@@ -27,29 +27,7 @@ class Room extends Component {
       roomName: roomName
     };
     this.props.enterRoom(roomName);
-    //this.startCall = this.startCall.bind(this);
-    //this.endCall = this.endCall.bind(this);
-    //this.getMyMediaStream = this.getMyMediaStream.bind(this);
-    //this.createVideoElement = this.createVideoElement.bind(this);
   }
-
-  /*
-  startCall() {
-    getMyMediaStream(this, 'video').then((media) => {
-      console.log('here');
-      var peer = new Peer(true, this.state.myMediaStreamObj, this.state.roomName);
-      this.setState({ peer: peer });
-      return;
-    });
-  }
-  */
-  /*
-  endCall() {
-    console.log(this.state);
-    this.state.myMediaStreamObj.getTracks().forEach((track) => track.stop());
-    this.state.peer.peer.destroy();
-  }
-  */
 
   componentDidMount() {
     if (window.innerWidth > 985)
@@ -87,38 +65,11 @@ class Room extends Component {
       <div class="app-body" id="inner-aside-container">
         <main class="main">
           <br />
-          <h2 className="text-center" style={{ color: 'white', opacity: '0.5' }}>
-            Welcome to room: {this.props.match.params.roomname}
-          </h2>
           <Container className="room">
             <div className="d-flex justify-content-center align-items-center">
-              <video
-                id="context"
-                controls
-                autoPlay
-                style={{
-                  position: 'relative',
-                  display: 'inline-block',
-                  marginTop: '1vh !important'
-                }}></video>
-              {/* <Row className="d-flex justify-content-center align-items-center m-0 p-0"> */}
+              <video id="context" controls autoPlay></video>
               <br />
-              <div
-                id="contextOptions"
-                style={{
-                  position: 'absolute',
-                  bottom: '-15%',
-                  right: '10%',
-                  transform: 'scale(0.7)',
-                  display: 'none',
-                  padding: '5px',
-                  backgroundColor: '#555',
-                  marginTop: '10px',
-                  borderRadius: '50px',
-                  borderWidth: '1px',
-                  borderColor: 'transparent',
-                  zIndex: 0
-                }}>
+              <div id="contextOptions">
                 <button
                   id="end"
                   style={{
@@ -141,7 +92,6 @@ class Room extends Component {
                     borderRadius: '50px',
                     padding: '15px'
                   }}>
-                  {/* <img src={mic} style={{ height: '2.5em', width: '2em' }} /> */}
                   {this.props.audio ? (
                     <icon
                       className=" icon-volume-off"
@@ -186,12 +136,6 @@ class Room extends Component {
               {/* </Row> */}
             </div>
             <Row className="m-0 p-0" id="videos"></Row>
-            {/*
-            <button onClick={this.submitVideoHandler}>Start Call </button>
-            <button onClick={this.submitScreenHandler}>Screen Call </button>
-            <button onClick={this.endCallHandler}>End Call </button>
-            <button onClick={this.inCallShareHandler}>CallScreenShare </button>
-            */}
           </Container>
         </main>
         <aside className="aside-menu bg-dark" display="xs">

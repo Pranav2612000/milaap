@@ -173,7 +173,7 @@ class Controls extends Component {
             <span>UnMute</span>
           </AwesomeButtonProgress>
           </Row>*/}
-        <Row className="justify-content-center text-center">
+        {/* <Row className="justify-content-center text-center">
           <AwesomeButtonProgress
             type="primary"
             size="medium"
@@ -199,7 +199,7 @@ class Controls extends Component {
             <i className="icon-user icons"></i>
             <span>Webcam Off</span>
           </AwesomeButtonProgress>
-        </Row>
+        </Row> */}
         <Row className="justify-content-center text-center">
           <AwesomeButtonProgress
             type="primary"
@@ -223,7 +223,7 @@ class Controls extends Component {
               setTimeout(next, 2000);
             }}>
             <i className="icon-screen-desktop icons"></i>
-            <span>Stop Share Screen</span>
+            <span>Stop Screen</span>
           </AwesomeButtonProgress>
         </Row>
         <Row className="justify-content-center text-center">
@@ -258,23 +258,6 @@ class Controls extends Component {
             </AwesomeButtonProgress>
           </Row>
         )}
-        <Row className="justify-content-center text-center">
-          <AwesomeButtonProgress
-            type="primary"
-            size="medium"
-            // visible={!self.state.calls.length} //use this if we want it completely hidden until needed instead
-            disabled={
-              !/iPhone|iPad|iPod|Android/i.test(navigator.userAgent) ||
-              !this.state.inCall
-            }
-            action={(element, next) => {
-              this.changeCamera();
-              next();
-            }}>
-            <i className="icon-call-end icons"></i>
-            <span> Flip Camera</span>
-          </AwesomeButtonProgress>
-        </Row>
         <br />
       </Container>
     );
