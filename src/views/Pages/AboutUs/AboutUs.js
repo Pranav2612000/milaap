@@ -35,7 +35,7 @@ class AboutUs extends Component {
         </div>
         <div
           className="app flex-row align-items-center"
-          style={{ overflow: 'hidden' }}>
+          style={{ overflow: 'hidden', padding: '0px', margin: '0px' }}>
           <Container>
             <Row
               className="justify-content-center"
@@ -56,11 +56,56 @@ class AboutUs extends Component {
                   style={{
                     textAlign: 'center',
                     width: '100%',
-                    margin: '14px',
                     color: 'white'
                   }}>
                   About Us
                 </h1>
+                <br />
+                <h4
+                  style={{
+                    textAlign: 'justify',
+                    width: '100%',
+                    color: 'white'
+                  }}>
+                  Distrideochat a DISTRIbuted viDEO/audio CHAT/conferencing
+                  application, which is designed to work on the edge, with very less
+                  interference of the server(i.e. peer to peer connection).
+                </h4>
+                <br />
+                <h5
+                  style={{
+                    textAlign: 'justify',
+                    width: '100%',
+                    color: 'white'
+                  }}>
+                  There are many video calling applications around the globe, but
+                  they are mostly server based applications providing maximum load on
+                  the server, wherein the audio and video quality decreases with
+                  increase in the number of participants. Many don't even support
+                  end-to-end encryption. So we decided to develop a one-stop solution
+                  for not only addressing all these solution, but to give a seamless
+                  experience to the user. It is designed to work efficiently on all
+                  platforms.
+                </h5>
+                <br />
+                <h4
+                  style={{
+                    textAlign: 'center',
+                    width: '100%',
+                    color: 'white'
+                  }}>
+                  We are still in out Development Phase. Feel free to contribute{' '}
+                  <a
+                    href="https://github.com/pranav2612000/distrideochat"
+                    style={{
+                      textAlign: 'center',
+                      width: '100%',
+                      color: ' light grey'
+                    }}
+                    target="_blank">
+                    here
+                  </a>
+                </h4>
               </Card>
             </Row>
           </Container>
