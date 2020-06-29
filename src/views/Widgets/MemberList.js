@@ -156,7 +156,7 @@ class MemberList extends Component {
                 class="fa fa-user-plus"
                 onClick={this.toggle}>
                 {' '}
-                Add
+                Invite
               </i>
             </button>
           </Col>
