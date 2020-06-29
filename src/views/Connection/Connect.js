@@ -141,6 +141,7 @@ export class Peer extends Emitter {
     if (this.ended) {
       this.active = false;
     } else {
+      console.log(this.num_retries);
       if (this.num_retries > 3) {
         if (self.stream) {
           self.stream.getTracks().forEach((track) => {
@@ -205,6 +206,7 @@ export class Peer extends Emitter {
             });
             self.peer.on('signal', (data) => {
               setTimeout(function () {
+                console.log(retrytime);
                 retrytime = 0;
                 var room = self.room;
                 socket.emit(
@@ -299,6 +301,7 @@ export class Peer extends Emitter {
         });
         self.peer.on('signal', (data) => {
           setTimeout(function () {
+            console.log(retrytime);
             retrytime = 0;
             var room = self.room;
             socket.emit(
@@ -364,10 +367,10 @@ export async function toggleVideo(self) {
       webCam
         ? {
             video: { width: 320, height: 180 },
-            audio: true
+            audio: { echoCancellation: true, noiseSuppression: true }
           }
         : {
-            audio: true
+            audio: { echoCancellation: true, noiseSuppression: true }
           }
     )
     .then((stream) => {
@@ -380,7 +383,7 @@ export async function toggleVideo(self) {
             );
           } catch (err) {
             console.log(err);
-            alert('could not share screen to this peer');
+            //alert('could not share screen to this peer');
           }
         });
         //Remove locally
@@ -406,7 +409,7 @@ export async function toggleVideo(self) {
               );
             } catch (err) {
               console.log(err);
-              alert('could not share screen to this peer');
+              //alert('could not share screen to this peer');
             }
           });
         }
@@ -490,7 +493,7 @@ export function createVideoElement(self, stream, friendtkn, username) {
   const contextOptions = document.getElementById('contextOptions');
   audioIcon.classList.add('icon-volume-2', 'audio-icon');
   audioIcon.addEventListener('click', () => muteVideo(self, friendtkn));
-  if (friendtkn == 'me') audioIcon.style.display = 'none';
+  if (friendtkn == 'me-video') audioIcon.style.display = 'none';
   nameTag.classList.add('name-label');
   nameTag.innerText = username || 'me';
   video.width = '200';
@@ -562,7 +565,7 @@ export async function changeCameraFacing(self, facing) {
   navigator.mediaDevices
     .getUserMedia({
       video: { facingMode: facing, width: 320, height: 180 },
-      audio: true
+      audio: { echoCancellation: true, noiseSuppression: true }
     })
     .then((stream) => {
       self.state.myPeers.map((eachPeer) => {
@@ -740,22 +743,22 @@ function sendRequestToEndCall(self) {
       }
     })
     .then((res) => {
-      var idToBeDestroyed = res.data.idToBeDestroyed;
-      self.state.myPeers.forEach((val, index) => {
-        if (val) {
-          val.ended = true;
-          val.peer.destroy('Call Ended');
-        }
-      });
-      // Clear all state variables associated with calls.
-      self.setState({
-        myPeers: []
-      });
+      console.log('exited');
       return;
     })
     .catch((err) => {
       console.log(err);
       return;
+    });
+    self.state.myPeers.forEach((val, index) => {
+      if (val) {
+        val.ended = true;
+        val.peer.destroy('Call Ended');
+      }
+    });
+    // Clear all state variables associated with calls.
+    self.setState({
+      myPeers: []
     });
 }
 export async function endCall(self) {
@@ -823,7 +826,7 @@ export async function addScreenShareStream(self) {
           val.stream_to_be_sent = self.state.myScreenStreamObj;
         } catch (err) {
           console.log(err);
-          alert('could not share screen to this peer');
+          //alert('could not share screen to this peer');
         }
       }
       //val.peer.addStream(self.state.myScreenStreamObj);
@@ -841,7 +844,7 @@ export async function stopScreenShare(self) {
         val.peer.send('stop screen sharing');
       } catch (err) {
         console.log(err);
-        alert('could not share screen to this peer');
+        //alert('could not share screen to this peer');
       }
     }
   });
