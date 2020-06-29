@@ -7,6 +7,12 @@ import { Emitter } from './emmiter';
 import axios from 'axios';
 import { store } from '../../redux/store';
 import * as action from '../../redux/userRedux/userAction';
+const videoQuality = [
+ { width: 1280, height: 720 },//720p
+ { width: 640, height: 360 },//360p
+ { width: 426, height: 240 },//240p
+ { width: 320, height: 180 },//144p
+]
 const socket = socketIOClient.connect(`${global.config.backendURL}`); //will be replaced by an appropriate room.
 store.subscribe(getVideoState);
 store.subscribe(getAudioState);
@@ -25,7 +31,10 @@ socket.on('connect', () => {
 });
 
 export class Peer extends Emitter {
-  constructor(it, stream, room, initiator, their_id, their_name, my_id) {
+  constructor(it, stream, room, initiator, their_id, their_name, my_id, type) {
+    if(type == null) {
+      type = 'video';
+    }
     super();
     this.error = null;
     this.active = false;
@@ -34,6 +43,7 @@ export class Peer extends Emitter {
     this.connected = false;
     this.ended = false;
     this.num_retries = 0;
+    this.type = type;
     console.log(this.my_id);
     console.log(this.their_id);
     this.their_name = their_name;
@@ -156,112 +166,237 @@ export class Peer extends Emitter {
     if (this.num_retries == null) {
       return;
     }
+    const self = this;
     if (this.ended) {
       this.active = false;
     } else {
-      //Trying to reconnect.
-      this.num_retries = this.num_retries + 1;
       if (this.num_retries > 3) {
+        
+        if(self.stream) {
+          self.stream.getTracks().forEach((track) => {
+            track.stop();
+          });
+          self.stream.getTracks().forEach((track) => {
+            self.stream.removeTrack(track);
+          });
+        }
         console.log('Too many retries.. Device facing connection issue');
         return;
       }
-      var retrytime = Math.floor(Math.random() * 5000) + 1  
-      console.log(retrytime);
-      const self = this;
-      self.peer = new SimplePeer({
-        initiator: self.initiator,
-        stream: self.stream,
-        sdpTransform: (sdp) => {
-          let newSDP = sdp;
-          newSDP = setMediaBitrate(newSDP, 'video', 233);
-          newSDP = setMediaBitrate(newSDP, 'audio', 80);
-          return newSDP;
-        },
-        config: {
-          iceServers: [
-            { urls: 'stun:stun.l.google.com:19302' },
-            {
-              urls: 'turn:numb.viagenie.ca',
-              credential: 'HWeF3pu@u2RfeYD',
-              username: 'veddandekar6@gmail.com'
-            }
-          ]
-        }
-      });
-
-      self.peer.on('error', (err) => {
-        self.error = err;
-        self.emit('error', err);
-        self.close();
-        console.log('errorerd');
-        console.log('Error Occured while connecting!', err);
-      });
-
-      self.peer.on('close', (_) => {
-        console.log('closing...');
-        self.close();
-      });
-      self.peer.on('signal', (data) => {
-        setTimeout(function() {
-          retrytime = 0;
-          var room = self.room;
-          console.log('signalling');
-          socket.emit('signalling', room, data, self.their_id, self.my_id, (resp) => {
-            return;
+      if(this.num_retries >= 1) {
+        if(self.stream) {
+          self.stream.getTracks().forEach((track) => {
+            track.stop();
           });
-          console.log('trying to reconnect');
-        }, retrytime);
-      });
-      /*
-      self.peer.on('data', (data) => {
-        console.log('recvd data from remote peer');
-      });
-      */
-      self.peer.on('connect', (data) => {
-        self.connected = true;
-        console.log('connected');
-      });
-      self.peer.on('stream', (data) => {
-        console.log('stream received');
-        console.log(data);
-        self.sharing = 0;
+          self.stream.getTracks().forEach((track) => {
+            self.stream.removeTrack(track);
+          });
+        }
+      }
+      //Trying to reconnect.
+      if(this.type == 'video') {
+        await navigator.mediaDevices
+          .getUserMedia({
+            video: videoQuality[this.num_retries],
+            audio: { echoCancellation: true, noiseSuppression: true} 
+          })
+          .then((media) => {
+            self.num_retries = self.num_retries + 1;
+            self.stream = media;
+            var retrytime = Math.floor(Math.random() * 5000) + 1  
+            console.log(retrytime);
+            self.peer = new SimplePeer({
+              initiator: self.initiator,
+              stream: self.stream,
+              sdpTransform: (sdp) => {
+                let newSDP = sdp;
+                newSDP = setMediaBitrate(newSDP, 'video', 233);
+                newSDP = setMediaBitrate(newSDP, 'audio', 80);
+                return newSDP;
+              },
+              config: {
+                iceServers: [
+                  { urls: 'stun:stun.l.google.com:19302' },
+                  {
+                    urls: 'turn:numb.viagenie.ca',
+                    credential: 'HWeF3pu@u2RfeYD',
+                    username: 'veddandekar6@gmail.com'
+                  }
+                ]
+              }
+            });
 
-        // If screen shared is of type screen, don't add handlers 
-        if(self.next_stream_type == 'screen') {
-          createVideoElement(self, data, self.their_id + '-screen', self.their_name);
-          return;
+            self.peer.on('error', (err) => {
+              self.error = err;
+              self.emit('error', err);
+              self.close();
+              console.log('errorerd');
+              console.log('Error Occured while connecting!', err);
+            });
+
+            self.peer.on('close', (_) => {
+              console.log('closing...');
+              self.close();
+            });
+            self.peer.on('signal', (data) => {
+              setTimeout(function() {
+                retrytime = 0;
+                var room = self.room;
+                console.log('signalling');
+                socket.emit('signalling', room, data, self.their_id, self.my_id, (resp) => {
+                  return;
+                });
+                console.log('trying to reconnect');
+              }, retrytime);
+            });
+            /*
+            self.peer.on('data', (data) => {
+              console.log('recvd data from remote peer');
+            });
+            */
+            self.peer.on('connect', (data) => {
+              self.connected = true;
+              console.log('connected');
+            });
+            self.peer.on('stream', (data) => {
+              console.log('stream received');
+              console.log(data);
+              self.sharing = 0;
+
+              // If screen shared is of type screen, don't add handlers 
+              if(self.next_stream_type == 'screen') {
+                createVideoElement(self, data, self.their_id + '-screen', self.their_name);
+                return;
+              }
+              data.addEventListener('removetrack', (event) => {
+                changeStatusOfVideoElement(self, 'video_off', data, self.their_id + '-video');
+                console.log('update ui');
+              });
+              data.addEventListener('addtrack', (event) => {
+                console.log('update ui');
+              });
+              createVideoElement(self, data, self.their_id + '-video', self.their_name);
+            });
+            self.peer.on('track', (data, stream) => {
+              console.log(data);
+              console.log(data.label);
+              console.log('track rcvd');
+              //TODO: Add appropriate condition
+              //changeStatusOfVideoElement(self, 'video_on', stream, self.their_id);
+            });
+            self.peer.on('data', (data) => {
+              // Check if this is waiting to handle any stream.
+              if(data == 'screen- go ahead') {
+                //Handshake complete share screen
+                self.peer.addStream(self.stream_to_be_sent);
+              }
+              if(self.sharing == 0) {
+                if(data == 'sharing screen') {
+                  self.sharing = 1;
+                  self.next_stream_type = 'screen';
+                  self.peer.send('screen- go ahead');
+                }
+              }
+            });
+          });
+        } else if(this.type == 'screen') {
+            var retrytime = Math.floor(Math.random() * 5000) + 1  
+            console.log(retrytime);
+            self.peer = new SimplePeer({
+              initiator: self.initiator,
+              stream: self.stream,
+              sdpTransform: (sdp) => {
+                let newSDP = sdp;
+                newSDP = setMediaBitrate(newSDP, 'video', 233);
+                newSDP = setMediaBitrate(newSDP, 'audio', 80);
+                return newSDP;
+              },
+              config: {
+                iceServers: [
+                  { urls: 'stun:stun.l.google.com:19302' },
+                  {
+                    urls: 'turn:numb.viagenie.ca',
+                    credential: 'HWeF3pu@u2RfeYD',
+                    username: 'veddandekar6@gmail.com'
+                  }
+                ]
+              }
+            });
+
+            self.peer.on('error', (err) => {
+              self.error = err;
+              self.emit('error', err);
+              self.close();
+              console.log('errorerd');
+              console.log('Error Occured while connecting!', err);
+            });
+
+            self.peer.on('close', (_) => {
+              console.log('closing...');
+              self.close();
+            });
+            self.peer.on('signal', (data) => {
+              setTimeout(function() {
+                retrytime = 0;
+                var room = self.room;
+                console.log('signalling');
+                socket.emit('signalling', room, data, self.their_id, self.my_id, (resp) => {
+                  return;
+                });
+                console.log('trying to reconnect');
+              }, retrytime);
+            });
+            /*
+            self.peer.on('data', (data) => {
+              console.log('recvd data from remote peer');
+            });
+            */
+            self.peer.on('connect', (data) => {
+              self.connected = true;
+              console.log('connected');
+            });
+            self.peer.on('stream', (data) => {
+              console.log('stream received');
+              console.log(data);
+              self.sharing = 0;
+
+              // If screen shared is of type screen, don't add handlers 
+              if(self.next_stream_type == 'screen') {
+                createVideoElement(self, data, self.their_id + '-screen', self.their_name);
+                return;
+              }
+              data.addEventListener('removetrack', (event) => {
+                changeStatusOfVideoElement(self, 'video_off', data, self.their_id + '-video');
+                console.log('update ui');
+              });
+              data.addEventListener('addtrack', (event) => {
+                console.log('update ui');
+              });
+              createVideoElement(self, data, self.their_id + '-video', self.their_name);
+            });
+            self.peer.on('track', (data, stream) => {
+              console.log(data);
+              console.log(data.label);
+              console.log('track rcvd');
+              //TODO: Add appropriate condition
+              //changeStatusOfVideoElement(self, 'video_on', stream, self.their_id);
+            });
+            self.peer.on('data', (data) => {
+              // Check if this is waiting to handle any stream.
+              if(data == 'screen- go ahead') {
+                //Handshake complete share screen
+                self.peer.addStream(self.stream_to_be_sent);
+              }
+              if(self.sharing == 0) {
+                if(data == 'sharing screen') {
+                  self.sharing = 1;
+                  self.next_stream_type = 'screen';
+                  self.peer.send('screen- go ahead');
+                }
+              }
+            });
         }
-        data.addEventListener('removetrack', (event) => {
-          changeStatusOfVideoElement(self, 'video_off', data, self.their_id + '-video');
-          console.log('update ui');
-        });
-        data.addEventListener('addtrack', (event) => {
-          console.log('update ui');
-        });
-        createVideoElement(self, data, self.their_id + '-video', self.their_name);
-      });
-      self.peer.on('track', (data, stream) => {
-        console.log(data);
-        console.log(data.label);
-        console.log('track rcvd');
-        //TODO: Add appropriate condition
-        //changeStatusOfVideoElement(self, 'video_on', stream, self.their_id);
-      });
-      self.peer.on('data', (data) => {
-        // Check if this is waiting to handle any stream.
-        if(data == 'screen- go ahead') {
-          //Handshake complete share screen
-          self.peer.addStream(self.stream_to_be_sent);
-        }
-        if(self.sharing == 0) {
-          if(data == 'sharing screen') {
-            self.sharing = 1;
-            self.next_stream_type = 'screen';
-            self.peer.send('screen- go ahead');
-          }
-        }
-      });
-    }
+      }
   }
 
   startCall() {
@@ -506,12 +641,15 @@ export async function changeCameraFacing(self, facing) {
     });
 }
 
-export async function getMyMediaStream(self, type) {
+export async function getMyMediaStream(self, type, quality_index) {
+  if(quality_index == null) {
+    quality_index = 0;
+  }
   if (type === 'screen') {
     // TODO: Add try catch to handle case when user denies access
     await navigator.mediaDevices
       .getDisplayMedia({
-        video: { width: 320, height: 180 },
+        video: { width: 1280, height: 720 },
         audio: true
       })
       .then((media) => {
@@ -529,7 +667,7 @@ export async function getMyMediaStream(self, type) {
         // webCam
         //   ?
         {
-          video: { width: 320, height: 180 },
+          video: videoQuality[quality_index],
           audio: { echoCancellation: true, noiseSuppression: true }
         }
         // : {
@@ -573,6 +711,7 @@ export function startCall(self, roomName, type) {
         });
         socket.on('startconn', (their_id, their_name) => {
           //Remove previous connections with their_id
+          //FACT: Comment this part to test reconnection.
           self.state.myPeers.forEach((val, index) => {
             if (val && val.their_id == their_id) {
               console.log(val);
@@ -602,7 +741,8 @@ export function startCall(self, roomName, type) {
             false,
             their_id,
             their_name,
-            my_id
+            my_id,
+            type
           );
           self.setState({
             myPeers: [...self.state.myPeers, peer]
@@ -655,7 +795,8 @@ export function startCall(self, roomName, type) {
                 true,
                 their_id,
                 their_name,
-                my_id
+                my_id,
+                type
               );
               self.setState({
                 myPeers: [...self.state.myPeers, peer]
