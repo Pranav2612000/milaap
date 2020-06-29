@@ -107,7 +107,7 @@ class DefaultHeader extends Component {
         </NavLink>
         <AppSidebarToggler className="d-md-down-none bg-dark" display="lg" />
         <Nav className="d-block d-md-down" navbar>
-          <NavItem className="ml-4 px-2">
+          <NavItem className="ml-0 px-2">
             <NavLink to="#" className="nav-link" onClick={this.toggle}>
               <button type="button" class="btn btn-pill btn-secondary">
                 Create Room
