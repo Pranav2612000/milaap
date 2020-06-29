@@ -129,14 +129,8 @@ class Privacy extends Component {
               channels online or offline. However, we shall try to ensure none of
               these can be used to trace you directly. If you have any issues with
               any media content owned by us, please raise a concern at
-              milaap.techteam@gmail.com.   APP-SPECIFIC INFORMATION COLLECTED This
-              section adheres to the information collected through our Attendance
-              MIT-WPU Android application. Firebase Data collected: The application
-              includes Firebase, with the following configured services: • Firebase
-              Cloud Messaging - collects Instance IDs from your device, which is
-              retained till we specifically delete it • Google Analytics (Firebase) -
-              Google uses Google Analytics data to provide us with the Google
-              Analytics measurement service. Identifiers such as cookies and app
+              milaap.techteam@gmail.com.   APP-SPECIFIC INFORMATION COLLECTED. Uses audio and video with permission.
+              This Identifiers such as cookies and app
               instance IDs are used to measure user interactions with a customer’s
               sites and/or apps, while IP addresses are used to provide and protect
               the security of the service, and to give us a sense of where in the
