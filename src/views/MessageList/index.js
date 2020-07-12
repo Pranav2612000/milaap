@@ -149,7 +149,10 @@ class MessageList extends Component {
   updateMsg = (msgObject) => {
     let newMsgs = [msgObject];
     let newFormattedMsg = this.formatMsgs(newMsgs, true);
-    newMsgs = this.state.messages.concat(newFormattedMsg);
+    newMsgs =
+      this.state.messages !== undefined && this.state.messages !== null
+        ? this.state.messages.concat(newFormattedMsg)
+        : newFormattedMsg;
     this.setState({
       messages: newMsgs
     });
