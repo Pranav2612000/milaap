@@ -6,15 +6,16 @@ import { store as NotifStore } from 'react-notifications-component';
 import axios from 'axios';
 import { store } from '../../redux/store';
 import * as action from '../../redux/userRedux/userAction';
+const socket = socketIOClient.connect(`${global.config.backendURL}`); //will be replaced by an appropriate room.
 var connectedPeers = []; 
+var myMediaStreamObj = new MediaStream();
+var myScreenStreamObj = new MediaStream();
 const videoQuality = [
   { width: 1280, height: 720 }, //720p
   { width: 640, height: 360 }, //360p
   { width: 426, height: 240 }, //240p
   { width: 320, height: 180 } //144p
 ];
-const socket = socketIOClient.connect(`${global.config.backendURL}`); //will be replaced by an appropriate room.
-socket.connect();
 store.subscribe(getVideoState);
 store.subscribe(getAudioState);
 
@@ -73,15 +74,6 @@ export class Peer {
     /* add event listeners to handle simplepeer communication. */
     this.addEventListenersToPeer(this.peer);
 
-    socket.on('signalling', (data, from_id) => {
-      console.log('signal received');
-      if (from_id != this.their_id) {
-        return;
-      }
-      if (this.peer && !this.peer.destroyed) {
-        this.peer.signal(data);
-      }
-    });
   }
 
   addEventListenersToPeer(peer) {
@@ -395,12 +387,12 @@ export async function toggleVideo(self) {
           }
     )
     .then((stream) => {
-      if (self.state.myMediaStreamObj.getVideoTracks().length != 0) {
+      if (myMediaStreamObj.getVideoTracks().length != 0) {
         connectedPeers.map((eachPeer) => {
           try {
             eachPeer.peer.removeTrack(
-              self.state.myMediaStreamObj.getVideoTracks()[0],
-              self.state.myMediaStreamObj
+              myMediaStreamObj.getVideoTracks()[0],
+              myMediaStreamObj
             );
           } catch (err) {
             console.log(err);
@@ -408,14 +400,12 @@ export async function toggleVideo(self) {
           }
         });
         //Remove locally
-        self.state.myMediaStreamObj.getVideoTracks()[0].stop();
-        self.state.myMediaStreamObj.removeTrack(
-          self.state.myMediaStreamObj.getVideoTracks()[0]
-        );
+        myMediaStreamObj.getVideoTracks()[0].stop();
+        myMediaStreamObj.removeTrack(myMediaStreamObj.getVideoTracks()[0]);
         changeStatusOfVideoElement(
           self,
           'video_off',
-          self.state.myMediaStreamObj,
+          myMediaStreamObj,
           'me' + '-video'
         );
       }
@@ -426,7 +416,7 @@ export async function toggleVideo(self) {
             try {
               eachPeer.peer.addTrack(
                 stream.getVideoTracks()[0],
-                self.state.myMediaStreamObj
+                myMediaStreamObj
               );
             } catch (err) {
               console.log(err);
@@ -434,11 +424,11 @@ export async function toggleVideo(self) {
             }
           });
         }
-        self.state.myMediaStreamObj.addTrack(stream.getVideoTracks()[0]);
+        myMediaStreamObj.addTrack(stream.getVideoTracks()[0]);
         changeStatusOfVideoElement(
           self,
           'video_on',
-          self.state.myMediaStreamObj,
+          myMediaStreamObj,
           'me' + '-video'
         );
       } /*else {
@@ -461,15 +451,15 @@ export async function toggleAudio(self) {
     .then((stream) => {
       if (connectedPeers) {
         connectedPeers.map((eachPeer) => {
-          if (self.state.myMediaStreamObj.getAudioTracks)
+          if (myMediaStreamObj.getAudioTracks)
             eachPeer.peer.replaceTrack(
-              self.state.myMediaStreamObj.getAudioTracks()[0],
+              myMediaStreamObj.getAudioTracks()[0],
               stream.getAudioTracks()[0],
-              self.state.myMediaStreamObj
+              myMediaStreamObj
             );
         });
-        if (self.state.myMediaStreamObj.getAudioTracks) {
-          self.state.myMediaStreamObj.getAudioTracks()[0].stop();
+        if (myMediaStreamObj.getAudioTracks) {
+          myMediaStreamObj.getAudioTracks()[0].stop();
         }
       }
     })
@@ -579,14 +569,14 @@ export async function changeCameraFacing(self, facing) {
     .then((stream) => {
       connectedPeers.map((eachPeer) => {
         eachPeer.peer.replaceTrack(
-          self.state.myMediaStreamObj.getVideoTracks()[0],
+          myMediaStreamObj.getVideoTracks()[0],
           stream.getVideoTracks()[0],
-          self.state.myMediaStreamObj
+          myMediaStreamObj
         );
         deleteVideoElement('me' + '-video');
         createVideoElement(self, stream, 'me' + '-video');
       });
-      self.state.myMediaStreamObj.getVideoTracks()[0].stop();
+      myMediaStreamObj.getVideoTracks()[0].stop();
     });
 }
 
@@ -602,9 +592,7 @@ export async function getMyMediaStream(self, type, quality_index) {
         audio: true
       })
       .then((media) => {
-        self.setState({
-          myScreenStreamObj: media
-        });
+        myScreenStreamObj = media;
         createVideoElement(self, media, 'me' + '-screen');
         return media;
       });
@@ -624,9 +612,7 @@ export async function getMyMediaStream(self, type, quality_index) {
         //   }
       )
       .then((media) => {
-        self.setState({
-          myMediaStreamObj: media
-        });
+        myMediaStreamObj = media
         createVideoElement(self, media, 'me' + '-video');
         return media;
       });
@@ -634,8 +620,35 @@ export async function getMyMediaStream(self, type, quality_index) {
   }
 }
 export function startCall(self, roomName, type) {
+  /* Initialize connectedPeers to empty array */ 
   connectedPeers = [];
+
+  /* create a socket to handle configuration messages. */
+  socket.connect();
+  console.log(socket.id);
+  socket.on('connect', () => {
+    createConnections(self, roomName, type);
+  });
+  socket.on('signalling', (data, from_id) => {
+    /*
+    if (from_id != this.their_id) {
+      return;
+    }
+    if (this.peer && !this.peer.destroyed) {
+      this.peer.signal(data);
+    }
+    */
+    connectedPeers.forEach((val) => {
+      if(val.their_id == from_id) {
+        val.peer.signal(data);
+      }
+    });
+  });
+}
+
+function createConnections(self, roomName, type) {
   var my_id = socket.id;
+  console.log(socket.id);
   // Go online and get online array from express server.
   var reqData = {
     id: my_id,
@@ -666,9 +679,9 @@ export function startCall(self, roomName, type) {
           var my_id = socket.id;
           var mediaStream;
           if (type == 'video') {
-            mediaStream = self.state.myMediaStreamObj;
+            mediaStream = myMediaStreamObj;
           } else if (type == 'screen') {
-            mediaStream = self.state.myScreenStreamObj;
+            mediaStream = myScreenStreamObj;
           } else {
             mediaStream = null;
           }
@@ -693,6 +706,7 @@ export function startCall(self, roomName, type) {
           })
           .then((resp) => {
             // Loop through online Array and make connections to online Peers
+            console.log(onlineArray);
             onlineArray.forEach((val, index) => {
               // Ignore self;
               if (val.username === resp.data.username /*&& val.type === type*/) {
@@ -702,15 +716,16 @@ export function startCall(self, roomName, type) {
               var their_name = onlineArray[index].username;
               var my_name = resp.data.username;
               var my_id = socket.id;
+              console.log(their_id, my_id, my_name);
               socket.emit('startconn', their_id, my_id, my_name, (resp) => {
                 var my_id = socket.id;
                 //var peer = new Peer(true, self.state.myMediaStreamObj, self.state.roomName, true, their_id, my_id);
               });
               var mediaStream;
               if (type == 'video') {
-                mediaStream = self.state.myMediaStreamObj;
+                mediaStream = myMediaStreamObj;
               } else if (type == 'screen') {
-                mediaStream = self.state.myScreenStreamObj;
+                mediaStream = myScreenStreamObj;
               } else {
                 mediaStream = null;
               }
@@ -763,30 +778,29 @@ function sendRequestToEndCall(self) {
 }
 export async function endCall(self) {
   await sendRequestToEndCall(self);
-  if (self.state.myMediaStreamObj) {
-    self.state.myMediaStreamObj.getTracks().forEach((track) => {
+  if (myMediaStreamObj) {
+    myMediaStreamObj.getTracks().forEach((track) => {
       track.stop();
     });
-    self.state.myMediaStreamObj.getTracks().forEach((track) => {
-      self.state.myMediaStreamObj.removeTrack(track);
+    myMediaStreamObj.getTracks().forEach((track) => {
+      myMediaStreamObj.removeTrack(track);
     });
-    self.setState({
-      myMediaStreamObj: null
-    });
+    myMediaStreamObj = new MediaStream();
   }
-  if (self.state.myScreenStreamObj) {
-    self.state.myScreenStreamObj.getTracks().forEach((track) => {
+  if (myScreenStreamObj) {
+    myScreenStreamObj.getTracks().forEach((track) => {
       track.stop();
     });
-    self.state.myScreenStreamObj.getTracks().forEach((track) => {
-      self.state.myScreenStreamObj.removeTrack(track);
+    myScreenStreamObj.getTracks().forEach((track) => {
+      myScreenStreamObj.removeTrack(track);
     });
-    self.setState({
-      myScreenStreamObj: null
-    });
+    myScreenStreamObj = new MediaStream();
   }
   // Add by appropriate UI changes which clears the screen.
   deleteAllVideoElements();
+
+  /* Delete the current socket connection. */
+  socket.close();
 }
 
 function deleteAllVideoElements() {
@@ -823,7 +837,7 @@ export async function addScreenShareStream(self) {
       if (val.peer && !val.peer.destroyed && val.connected) {
         try {
           val.peer.send('sharing screen');
-          val.stream_to_be_sent = self.state.myScreenStreamObj;
+          val.stream_to_be_sent = myScreenStreamObj;
         } catch (err) {
           console.log(err);
           //alert('could not share screen to this peer');
@@ -840,7 +854,7 @@ export async function stopScreenShare(self) {
     // handled in peer.on('data') eventHandler.
     if (val.peer && !val.peer.destroyed && val.connected) {
       try {
-        val.peer.removeStream(self.state.myScreenStreamObj);
+        val.peer.removeStream(myScreenStreamObj);
         val.peer.send('stop screen sharing');
       } catch (err) {
         console.log(err);
@@ -848,16 +862,14 @@ export async function stopScreenShare(self) {
       }
     }
   });
-  if (self.state.myScreenStreamObj) {
-    self.state.myScreenStreamObj.getTracks().forEach((track) => {
+  if (myScreenStreamObj) {
+    myScreenStreamObj.getTracks().forEach((track) => {
       track.stop();
     });
-    self.state.myScreenStreamObj.getTracks().forEach((track) => {
-      self.state.myScreenStreamObj.removeTrack(track);
+    myScreenStreamObj.getTracks().forEach((track) => {
+      myScreenStreamObj.removeTrack(track);
     });
-    self.setState({
-      myScreenStreamObj: null
-    });
+    myScreenStreamObj = MediaStream();
     deleteVideoElement('me-screen');
   }
 }
