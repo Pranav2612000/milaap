@@ -305,29 +305,57 @@ export async function toggleVideo(self) {
 }
 export async function toggleAudio(self) {
   var mic = getAudioState();
-
-  navigator.mediaDevices
-    .getUserMedia({
-      video: { width: 320, height: 180 },
-      audio: mic ? { echoCancellation: true, noiseSuppression: true } : false
-    })
-    .then((stream) => {
-      if (connectedPeers) {
-        connectedPeers.map((eachPeer) => {
-          if (myMediaStreamObj.getAudioTracks)
-            eachPeer.peer.replaceTrack(
-              myMediaStreamObj.getAudioTracks()[0],
-              stream.getAudioTracks()[0],
-              myMediaStreamObj
-            );
-        });
-        if (myMediaStreamObj.getAudioTracks) {
-          myMediaStreamObj.getAudioTracks()[0].stop();
+  if (myMediaStreamObj.getAudioTracks().length != 0) {
+    if (connectedPeers) {
+      connectedPeers.map((eachPeer) => {
+        //if (myMediaStreamObj.getAudioTracks)
+        //  eachPeer.peer.replaceTrack(
+        //    myMediaStreamObj.getAudioTracks()[0],
+        //    stream.getAudioTracks()[0],
+        //    myMediaStreamObj
+        //  );
+        try {
+          eachPeer.peer.removeTrack(
+          myMediaStreamObj.getAudioTracks()[0],
+          myMediaStreamObj
+          );
+        } catch(err) {
+          console.log(err)
         }
-      }
+      });
+      myMediaStreamObj.getAudioTracks()[0].stop();
+      myMediaStreamObj.removeTrack(myMediaStreamObj.getAudioTracks()[0]);
+    }
+  }
+  if (mic) {
+    navigator.mediaDevices
+      .getUserMedia(
+      {
+        video: false, 
+        //video: { width: 320, height: 180 },
+        audio: mic ? { echoCancellation: true, noiseSuppression: true } : false
+      })
+    .then((stream) => {
+        if (connectedPeers) {
+          connectedPeers.map((eachPeer) => {
+            //TODO: REmove previous video tracks if any
+            try {
+              eachPeer.peer.addTrack(
+                stream.getAudioTracks()[0],
+                myMediaStreamObj
+              );
+            } catch (err) {
+              console.log(err);
+              //alert('could not share screen to this peer');
+            }
+          });
+        }
+        myMediaStreamObj.addTrack(stream.getAudioTracks()[0]);
     })
     .catch((err) => console.log(err));
+  }
 }
+
 function muteVideo(self, id) {
   const userStream = document.getElementById(id).srcObject;
   const deets = document.getElementById(id).nextElementSibling;
@@ -539,12 +567,14 @@ function createConnections(self, roomName, type) {
         socket.on('startconn', (their_id, their_name) => {
           //Remove previous connections with their_id
           //FACT: Comment this part to test reconnection.
+          /*
           connectedPeers.forEach((val, index) => {
             if (val && val.their_id == their_id) {
               val.ended = true;
               val.peer.destroy('Call Ended');
             }
           });
+          */
           var my_id = socket.id;
           var mediaStream;
           if (type == 'video') {
@@ -740,7 +770,7 @@ export async function stopScreenShare(self) {
     myScreenStreamObj.getTracks().forEach((track) => {
       myScreenStreamObj.removeTrack(track);
     });
-    myScreenStreamObj = MediaStream();
+    myScreenStreamObj = new MediaStream();
     deleteVideoElement('me-screen');
   }
 }
