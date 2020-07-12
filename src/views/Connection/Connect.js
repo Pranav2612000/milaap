@@ -6,16 +6,20 @@ import { store as NotifStore } from 'react-notifications-component';
 import axios from 'axios';
 import { store } from '../../redux/store';
 import * as action from '../../redux/userRedux/userAction';
-const socket = socketIOClient.connect(`${global.config.backendURL}`); //will be replaced by an appropriate room.
-var connectedPeers = []; 
-var myMediaStreamObj = new MediaStream();
-var myScreenStreamObj = new MediaStream();
+import setMediaBitrate from './VideoCodecs';
+
 const videoQuality = [
   { width: 1280, height: 720 }, //720p
   { width: 640, height: 360 }, //360p
   { width: 426, height: 240 }, //240p
   { width: 320, height: 180 } //144p
 ];
+var connectedPeers = []; 
+var myMediaStreamObj = new MediaStream();
+var myScreenStreamObj = new MediaStream();
+var socket = socketIOClient(`${global.config.backendURL}`, {
+  autoConnect: false 
+});
 store.subscribe(getVideoState);
 store.subscribe(getAudioState);
 
@@ -145,18 +149,28 @@ export class Peer {
   }
 
   async close() {
+    /* Destroy the current peer and delete its video elements. */
     this.peer.destroy();
     deleteVideoElement(this.their_id + '-video');
     deleteVideoElement(this.their_id + '-screen');
+
+    /* Handles corner cases of num_retries being null. */
     if (this.num_retries == null) {
       return;
     }
+
     const self = this;
+
+    /* If the call has ended, do not try to reconnect. */
     if (this.ended) {
       this.connected = false;
     } else {
+      /* Else try to reconnect. */
       console.log(this.num_retries);
+      /* If you have tried reconnecting more than 3 times, do not try
+       * again, the remote seems to be down. */
       if (this.num_retries > 3) {
+        /* Stop the current streams (if)being streamed. */
         if (self.stream) {
           self.stream.getTracks().forEach((track) => {
             track.stop();
@@ -167,121 +181,10 @@ export class Peer {
         }
         return;
       }
-      if (this.num_retries >= 1) {
-        if (self.stream) {
-          self.stream.getTracks().forEach((track) => {
-            track.stop();
-          });
-          self.stream.getTracks().forEach((track) => {
-            self.stream.removeTrack(track);
-          });
-        }
-      }
-      //Trying to reconnect.
       if (this.type == 'video') {
-        await navigator.mediaDevices
-          .getUserMedia({
-            video: videoQuality[this.num_retries],
-            audio: { echoCancellation: true, noiseSuppression: true }
-          })
-          .then((media) => {
-            self.num_retries = self.num_retries + 1;
-            self.stream = media;
-            var retrytime = Math.floor(Math.random() * 5000) + 1;
-            self.peer = new SimplePeer({
-              initiator: self.initiator,
-              stream: self.stream,
-              sdpTransform: (sdp) => {
-                let newSDP = sdp;
-                newSDP = setMediaBitrate(newSDP, 'video', 233);
-                newSDP = setMediaBitrate(newSDP, 'audio', 80);
-                return newSDP;
-              },
-              config: {
-                iceServers: [
-                  { urls: 'stun:stun.l.google.com:19302' },
-                  {
-                    urls: 'turn:numb.viagenie.ca',
-                    credential: 'HWeF3pu@u2RfeYD',
-                    username: 'veddandekar6@gmail.com'
-                  }
-                ]
-              }
-            });
-
-            self.peer.on('error', (err) => {
-              self.error = err;
-              self.close();
-            });
-
-            self.peer.on('close', (_) => {
-              self.close();
-            });
-            self.peer.on('signal', (data) => {
-              setTimeout(function () {
-                console.log(retrytime);
-                retrytime = 0;
-                var room = self.room;
-                socket.emit(
-                  'signalling',
-                  room,
-                  data,
-                  self.their_id,
-                  self.my_id,
-                  (resp) => {
-                    return;
-                  }
-                );
-              }, retrytime);
-            });
-            self.peer.on('connect', (data) => {
-              self.connected = true;
-            });
-            self.peer.on('stream', (data) => {
-              self.sharing = 0;
-
-              // If screen shared is of type screen, don't add handlers
-              if (self.next_stream_type == 'screen') {
-                createVideoElement(
-                  self,
-                  data,
-                  self.their_id + '-screen',
-                  self.their_name
-                );
-                return;
-              }
-              data.addEventListener('removetrack', (event) => {
-                changeStatusOfVideoElement(
-                  self,
-                  'video_off',
-                  data,
-                  self.their_id + '-video'
-                );
-              });
-              createVideoElement(
-                self,
-                data,
-                self.their_id + '-video',
-                self.their_name
-              );
-            });
-            self.peer.on('data', (data) => {
-              // Check if this is waiting to handle any stream.
-              if (data == 'screen- go ahead') {
-                //Handshake complete share screen
-                self.peer.addStream(self.stream_to_be_sent);
-              }
-              if (self.sharing == 0) {
-                if (data == 'sharing screen') {
-                  self.sharing = 1;
-                  self.next_stream_type = 'screen';
-                  self.peer.send('screen- go ahead');
-                }
-              }
-            });
-          });
-      } else if (this.type == 'screen') {
-        var retrytime = Math.floor(Math.random() * 5000) + 1;
+        this.stream.getVideoTracks()[0].applyConstraints(videoQuality[this.num_retries]);
+        self.num_retries = self.num_retries + 1;
+        var retrytime = Math.floor(Math.random() * 2000) + 1;
         self.peer = new SimplePeer({
           initiator: self.initiator,
           stream: self.stream,
@@ -302,72 +205,32 @@ export class Peer {
             ]
           }
         });
-
-        self.peer.on('error', (err) => {
-          self.error = err;
-          self.close();
-        });
-
-        self.peer.on('close', (_) => {
-          self.close();
-        });
-        self.peer.on('signal', (data) => {
-          setTimeout(function () {
-            console.log(retrytime);
-            retrytime = 0;
-            var room = self.room;
-            socket.emit(
-              'signalling',
-              room,
-              data,
-              self.their_id,
-              self.my_id,
-              (resp) => {
-                return;
+        self.addEventListenersToPeer(self.peer);
+      } else if (this.type == 'screen') {
+        //this.stream.getVideoTracks()[0].applyConstraints(videoQuality[this.num_retries]);
+        self.num_retries = self.num_retries + 1;
+        var retrytime = Math.floor(Math.random() * 2000) + 1;
+        self.peer = new SimplePeer({
+          initiator: self.initiator,
+          stream: self.stream,
+          sdpTransform: (sdp) => {
+            let newSDP = sdp;
+            newSDP = setMediaBitrate(newSDP, 'video', 233);
+            newSDP = setMediaBitrate(newSDP, 'audio', 80);
+            return newSDP;
+          },
+          config: {
+            iceServers: [
+              { urls: 'stun:stun.l.google.com:19302' },
+              {
+                urls: 'turn:numb.viagenie.ca',
+                credential: 'HWeF3pu@u2RfeYD',
+                username: 'veddandekar6@gmail.com'
               }
-            );
-          }, retrytime);
-        });
-        self.peer.on('connect', (data) => {
-          self.connected = true;
-        });
-        self.peer.on('stream', (data) => {
-          self.sharing = 0;
-
-          // If screen shared is of type screen, don't add handlers
-          if (self.next_stream_type == 'screen') {
-            createVideoElement(
-              self,
-              data,
-              self.their_id + '-screen',
-              self.their_name
-            );
-            return;
-          }
-          data.addEventListener('removetrack', (event) => {
-            changeStatusOfVideoElement(
-              self,
-              'video_off',
-              data,
-              self.their_id + '-video'
-            );
-          });
-          createVideoElement(self, data, self.their_id + '-video', self.their_name);
-        });
-        self.peer.on('data', (data) => {
-          // Check if this is waiting to handle any stream.
-          if (data == 'screen- go ahead') {
-            //Handshake complete share screen
-            self.peer.addStream(self.stream_to_be_sent);
-          }
-          if (self.sharing == 0) {
-            if (data == 'sharing screen') {
-              self.sharing = 1;
-              self.next_stream_type = 'screen';
-              self.peer.send('screen- go ahead');
-            }
+            ]
           }
         });
+        self.addEventListenersToPeer(self.peer);
       }
     }
   }
@@ -622,9 +485,15 @@ export async function getMyMediaStream(self, type, quality_index) {
 export function startCall(self, roomName, type) {
   /* Initialize connectedPeers to empty array */ 
   connectedPeers = [];
+  myMediaStreamObj = new MediaStream();
+  myScreenStreamObj = new MediaStream();
 
   /* create a socket to handle configuration messages. */
-  socket.connect();
+  socket = socketIOClient(`${global.config.backendURL}`, {
+    autoConnect: false 
+  });
+  socket.open();
+  console.log(socket);
   console.log(socket.id);
   socket.on('connect', () => {
     createConnections(self, roomName, type);
@@ -639,7 +508,7 @@ export function startCall(self, roomName, type) {
     }
     */
     connectedPeers.forEach((val) => {
-      if(val.their_id == from_id) {
+      if(val.their_id == from_id && !val.destroyed) {
         val.peer.signal(data);
       }
     });
@@ -779,13 +648,13 @@ function sendRequestToEndCall(self) {
 export async function endCall(self) {
   await sendRequestToEndCall(self);
   if (myMediaStreamObj) {
+    console.log('deleting my video streams');
     myMediaStreamObj.getTracks().forEach((track) => {
       track.stop();
     });
     myMediaStreamObj.getTracks().forEach((track) => {
       myMediaStreamObj.removeTrack(track);
     });
-    myMediaStreamObj = new MediaStream();
   }
   if (myScreenStreamObj) {
     myScreenStreamObj.getTracks().forEach((track) => {
@@ -794,13 +663,15 @@ export async function endCall(self) {
     myScreenStreamObj.getTracks().forEach((track) => {
       myScreenStreamObj.removeTrack(track);
     });
-    myScreenStreamObj = new MediaStream();
   }
   // Add by appropriate UI changes which clears the screen.
   deleteAllVideoElements();
 
   /* Delete the current socket connection. */
-  socket.close();
+  socket.close();  
+  console.log(socket);
+  myMediaStreamObj = new MediaStream();
+  myScreenStreamObj = new MediaStream();
 }
 
 function deleteAllVideoElements() {
@@ -874,40 +745,3 @@ export async function stopScreenShare(self) {
   }
 }
 
-function setMediaBitrate(sdp, media, bitrate) {
-  let lines = sdp.split('\n');
-  let line = -1;
-  for (let i = 0; i < lines.length; i++) {
-    if (lines[i].indexOf('m=' + media) === 0) {
-      line = i;
-      break;
-    }
-  }
-  if (line === -1) {
-    // log('Could not find the m line for', media)
-    return sdp;
-  }
-  // log('Found the m line for', media, 'at line', line)
-
-  // Pass the m line
-  line++;
-
-  // Skip i and c lines
-  while (lines[line].indexOf('i=') === 0 || lines[line].indexOf('c=') === 0) {
-    line++;
-  }
-
-  // If we're on a b line, replace it
-  if (lines[line].indexOf('b') === 0) {
-    // log('Replaced b line at line', line)
-    lines[line] = 'b=AS:' + bitrate;
-    return lines.join('\n');
-  }
-
-  // Add a new b line
-  // log('Adding new b line before line', line)
-  let newLines = lines.slice(0, line);
-  newLines.push('b=AS:' + bitrate);
-  newLines = newLines.concat(lines.slice(line, lines.length));
-  return newLines.join('\n');
-}
