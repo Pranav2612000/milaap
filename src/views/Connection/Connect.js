@@ -3,7 +3,6 @@ import SimplePeer from 'simple-peer';
 import $ from 'jquery';
 import socketIOClient, { connect } from 'socket.io-client';
 import { store as NotifStore } from 'react-notifications-component';
-import { Emitter } from './emmiter';
 import axios from 'axios';
 import { store } from '../../redux/store';
 import * as action from '../../redux/userRedux/userAction';
@@ -14,6 +13,7 @@ const videoQuality = [
   { width: 320, height: 180 } //144p
 ];
 const socket = socketIOClient.connect(`${global.config.backendURL}`); //will be replaced by an appropriate room.
+socket.connect();
 store.subscribe(getVideoState);
 store.subscribe(getAudioState);
 
@@ -25,26 +25,29 @@ function getAudioState() {
   let state = store.getState();
   return state.userReducer.audio;
 }
-socket.connect();
 
-export class Peer extends Emitter {
-  constructor(it, stream, room, initiator, their_id, their_name, my_id, type) {
+
+export class Peer {
+  constructor(stream, room, initiator, their_id, their_name, my_id, type) {
     if (type == null) {
       type = 'video';
     }
-    super();
-    this.error = null;
-    this.active = false;
+    /* save constructor variable */
     this.stream = stream;
+    this.room = room;
+    this.initiator = initiator;
     this.their_id = their_id;
+    this.their_name = their_name;
+    this.my_id = my_id;
+    this.type = type;
+
+    /* initialize connection variables. */
+    this.error = null;
     this.connected = false;
     this.ended = false;
     this.num_retries = 0;
-    this.type = type;
-    this.their_name = their_name;
-    this.my_id = my_id;
-    this.room = room;
-    this.initiator = initiator;
+
+    /* create a new simplepeer object for communication. */
     this.peer = new SimplePeer({
       initiator: initiator,
       stream: stream,
@@ -66,21 +69,35 @@ export class Peer extends Emitter {
       }
     });
 
-    this.peer.on('error', (err) => {
+    /* add event listeners to handle simplepeer communication. */
+    this.addEventListenersToPeer(this.peer);
+
+    socket.on('signalling', (data, from_id) => {
+      if (from_id != this.their_id) {
+        return;
+      }
+      if (this.peer && !this.peer.destroyed) {
+        this.peer.signal(data);
+      }
+    });
+  }
+
+  addEventListenersToPeer(peer) {
+    console.log(this);
+    peer.on('error', (err) => {
       this.error = err;
-      this.emit('error', err);
     });
 
-    this.peer.on('close', (_) => {
+    peer.on('close', (_) => {
       this.close();
     });
-    this.peer.on('signal', (data) => {
+    peer.on('signal', (data) => {
       var room = this.room;
       socket.emit('signalling', room, data, this.their_id, this.my_id, (resp) => {
         return;
       });
     });
-    this.peer.on('connect', (data) => {
+    peer.on('connect', (data) => {
       this.connected = true;
       NotifStore.addNotification({
         title: 'Member entered call',
@@ -95,7 +112,7 @@ export class Peer extends Emitter {
         }
       });
     });
-    this.peer.on('stream', (data) => {
+    peer.on('stream', (data) => {
       const self = this;
       this.sharing = 0;
 
@@ -114,7 +131,7 @@ export class Peer extends Emitter {
       });
       createVideoElement(self, data, self.their_id + '-video', self.their_name);
     });
-    this.peer.on('data', (data) => {
+    peer.on('data', (data) => {
       // Check if this is waiting to handle any stream.
       if (data == 'screen- go ahead') {
         //Handshake complete share screen
@@ -131,19 +148,10 @@ export class Peer extends Emitter {
         }
       }
     });
-    socket.on('signalling', (data, from_id) => {
-      if (from_id != this.their_id) {
-        return;
-      }
-      if (this.peer && !this.peer.destroyed) {
-        this.peer.signal(data);
-      }
-    });
   }
 
   async close() {
     this.peer.destroy();
-    this.emit('close');
     deleteVideoElement(this.their_id + '-video');
     deleteVideoElement(this.their_id + '-screen');
     if (this.num_retries == null) {
@@ -151,7 +159,7 @@ export class Peer extends Emitter {
     }
     const self = this;
     if (this.ended) {
-      this.active = false;
+      this.connected = false;
     } else {
       console.log(this.num_retries);
       if (this.num_retries > 3) {
@@ -209,7 +217,6 @@ export class Peer extends Emitter {
 
             self.peer.on('error', (err) => {
               self.error = err;
-              self.emit('error', err);
               self.close();
             });
 
@@ -304,7 +311,6 @@ export class Peer extends Emitter {
 
         self.peer.on('error', (err) => {
           self.error = err;
-          self.emit('error', err);
           self.close();
         });
 
@@ -666,7 +672,6 @@ export function startCall(self, roomName, type) {
           }
           // Create a new peer with initiator = false
           var peer = new Peer(
-            true,
             mediaStream,
             self.state.roomName,
             false,
@@ -696,7 +701,6 @@ export function startCall(self, roomName, type) {
               var their_id = onlineArray[index].id;
               var their_name = onlineArray[index].username;
               var my_name = resp.data.username;
-              //    create a new Peer with initiator = true
               var my_id = socket.id;
               socket.emit('startconn', their_id, my_id, my_name, (resp) => {
                 var my_id = socket.id;
@@ -711,8 +715,8 @@ export function startCall(self, roomName, type) {
                 mediaStream = null;
               }
               var my_id = socket.id;
+              //    create a new Peer with initiator = true
               var peer = new Peer(
-                true,
                 mediaStream,
                 self.state.roomName,
                 true,
