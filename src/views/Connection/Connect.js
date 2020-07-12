@@ -145,6 +145,14 @@ export class Peer {
     peer.on('connect', (data) => {
       this.connected = true;
       handleMemberJoined();
+      if(this.initiator == false) {
+        /* if I am already sharing screen,share with the newly joined peer. */
+        if(myScreenStreamObj.getVideoTracks().length != 0) {
+          console.log('sharing screen');
+          this.peer.send('sharing screen');
+          this.stream_to_be_sent = myScreenStreamObj;
+        }
+      }
     });
 
     /* called when stream received. */
@@ -621,6 +629,7 @@ function createConnections(self, roomName, type) {
             type
           );
           connectedPeers.push(peer);
+          
         });
 
         axios
