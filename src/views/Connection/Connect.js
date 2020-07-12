@@ -6,6 +6,7 @@ import { store as NotifStore } from 'react-notifications-component';
 import axios from 'axios';
 import { store } from '../../redux/store';
 import * as action from '../../redux/userRedux/userAction';
+var connectedPeers = []; 
 const videoQuality = [
   { width: 1280, height: 720 }, //720p
   { width: 640, height: 360 }, //360p
@@ -73,6 +74,7 @@ export class Peer {
     this.addEventListenersToPeer(this.peer);
 
     socket.on('signalling', (data, from_id) => {
+      console.log('signal received');
       if (from_id != this.their_id) {
         return;
       }
@@ -378,6 +380,7 @@ export class Peer {
     }
   }
 }
+
 export async function toggleVideo(self) {
   var webCam = getVideoState();
   navigator.mediaDevices
@@ -393,7 +396,7 @@ export async function toggleVideo(self) {
     )
     .then((stream) => {
       if (self.state.myMediaStreamObj.getVideoTracks().length != 0) {
-        self.state.myPeers.map((eachPeer) => {
+        connectedPeers.map((eachPeer) => {
           try {
             eachPeer.peer.removeTrack(
               self.state.myMediaStreamObj.getVideoTracks()[0],
@@ -417,8 +420,8 @@ export async function toggleVideo(self) {
         );
       }
       if (webCam) {
-        if (self.state.myPeers) {
-          self.state.myPeers.map((eachPeer) => {
+        if (connectedPeers) {
+          connectedPeers.map((eachPeer) => {
             //TODO: REmove previous video tracks if any
             try {
               eachPeer.peer.addTrack(
@@ -456,8 +459,8 @@ export async function toggleAudio(self) {
       audio: mic ? { echoCancellation: true, noiseSuppression: true } : false
     })
     .then((stream) => {
-      if (self.state.myPeers) {
-        self.state.myPeers.map((eachPeer) => {
+      if (connectedPeers) {
+        connectedPeers.map((eachPeer) => {
           if (self.state.myMediaStreamObj.getAudioTracks)
             eachPeer.peer.replaceTrack(
               self.state.myMediaStreamObj.getAudioTracks()[0],
@@ -574,7 +577,7 @@ export async function changeCameraFacing(self, facing) {
       audio: { echoCancellation: true, noiseSuppression: true }
     })
     .then((stream) => {
-      self.state.myPeers.map((eachPeer) => {
+      connectedPeers.map((eachPeer) => {
         eachPeer.peer.replaceTrack(
           self.state.myMediaStreamObj.getVideoTracks()[0],
           stream.getVideoTracks()[0],
@@ -631,6 +634,7 @@ export async function getMyMediaStream(self, type, quality_index) {
   }
 }
 export function startCall(self, roomName, type) {
+  connectedPeers = [];
   var my_id = socket.id;
   // Go online and get online array from express server.
   var reqData = {
@@ -649,13 +653,11 @@ export function startCall(self, roomName, type) {
       // Get myMyMediaStream
       getMyMediaStream(self, type).then((media) => {
         // Add eventhandler for "createConnection" signal, On receiving the signal:
-        self.setState({
-          myPeers: []
-        });
+        connectedPeers = [];
         socket.on('startconn', (their_id, their_name) => {
           //Remove previous connections with their_id
           //FACT: Comment this part to test reconnection.
-          self.state.myPeers.forEach((val, index) => {
+          connectedPeers.forEach((val, index) => {
             if (val && val.their_id == their_id) {
               val.ended = true;
               val.peer.destroy('Call Ended');
@@ -680,9 +682,7 @@ export function startCall(self, roomName, type) {
             my_id,
             type
           );
-          self.setState({
-            myPeers: [...self.state.myPeers, peer]
-          });
+          connectedPeers.push(peer);
         });
 
         axios
@@ -725,9 +725,7 @@ export function startCall(self, roomName, type) {
                 my_id,
                 type
               );
-              self.setState({
-                myPeers: [...self.state.myPeers, peer]
-              });
+              connectedPeers.push(peer);
             });
           });
       });
@@ -754,16 +752,14 @@ function sendRequestToEndCall(self) {
       console.log(err);
       return;
     });
-    self.state.myPeers.forEach((val, index) => {
+    connectedPeers.forEach((val, index) => {
       if (val) {
         val.ended = true;
         val.peer.destroy('Call Ended');
       }
     });
     // Clear all state variables associated with calls.
-    self.setState({
-      myPeers: []
-    });
+    connectedPeers = [];
 }
 export async function endCall(self) {
   await sendRequestToEndCall(self);
@@ -821,7 +817,7 @@ function deleteVideoElement(id) {
 
 export async function addScreenShareStream(self) {
   getMyMediaStream(self, 'screen').then((media) => {
-    self.state.myPeers.forEach((val, index) => {
+   connectedPeers.forEach((val, index) => {
       // send request to share screen. Reply for this
       // handled in peer.on('data') eventHandler.
       if (val.peer && !val.peer.destroyed && val.connected) {
@@ -839,7 +835,7 @@ export async function addScreenShareStream(self) {
 }
 
 export async function stopScreenShare(self) {
-  self.state.myPeers.forEach((val, index) => {
+  connectedPeers.forEach((val, index) => {
     // send request to share screen. Reply for this
     // handled in peer.on('data') eventHandler.
     if (val.peer && !val.peer.destroyed && val.connected) {
