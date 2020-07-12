@@ -27,14 +27,78 @@ function getVideoState() {
   let state = store.getState();
   return state.userReducer.video;
 }
+
 function getAudioState() {
   let state = store.getState();
   return state.userReducer.audio;
 }
 
+function chooseVideoOrScreen(type) {
+  var mediaStream;
+  if (type == 'video') {
+    mediaStream = myMediaStreamObj;
+  } else if (type == 'screen') {
+    mediaStream = myScreenStreamObj;
+  } else {
+    mediaStream = null;
+  }
+  return mediaStream;
+}
+
+function getSimplePeerConfObj(initiator, stream) {
+  return {
+    initiator: initiator,
+    stream: stream,
+    sdpTransform: (sdp) => {
+      let newSDP = sdp;
+      newSDP = setMediaBitrate(newSDP, 'video', 233);
+      newSDP = setMediaBitrate(newSDP, 'audio', 80);
+      return newSDP;
+    },
+    config: {
+      iceServers: [
+        { urls: 'stun:stun.l.google.com:19302' },
+        {
+          urls: 'turn:numb.viagenie.ca',
+          credential: 'HWeF3pu@u2RfeYD',
+          username: 'veddandekar6@gmail.com'
+        }
+      ]
+    }
+  };
+}
+
+function handleMemberJoined() {
+  NotifStore.addNotification({
+    title: 'Member entered call',
+    message: 'New member joined the call!',
+    type: 'success',
+    container: 'top-right',
+    animationIn: ['animated', 'fadeIn'],
+    animationOut: ['animated', 'fadeOut'],
+    dismiss: {
+      duration: 3000,
+      pauseOnHover: true
+    }
+  });
+}
+
+function clearMediaStream(stream) {
+  if(!stream) {
+    console.log('stream already cleared');
+    return;
+  }
+  stream.getTracks().forEach((track) => {
+    track.stop();
+  });
+  stream.getTracks().forEach((track) => {
+    stream.removeTrack(track);
+  });
+}
 
 export class Peer {
   constructor(stream, room, initiator, their_id, their_name, my_id, type) {
+    /* Set default type to video. */
     if (type == null) {
       type = 'video';
     }
@@ -54,34 +118,15 @@ export class Peer {
     this.num_retries = 0;
 
     /* create a new simplepeer object for communication. */
-    this.peer = new SimplePeer({
-      initiator: initiator,
-      stream: stream,
-      sdpTransform: (sdp) => {
-        let newSDP = sdp;
-        newSDP = setMediaBitrate(newSDP, 'video', 233);
-        newSDP = setMediaBitrate(newSDP, 'audio', 80);
-        return newSDP;
-      },
-      config: {
-        iceServers: [
-          { urls: 'stun:stun.l.google.com:19302' },
-          {
-            urls: 'turn:numb.viagenie.ca',
-            credential: 'HWeF3pu@u2RfeYD',
-            username: 'veddandekar6@gmail.com'
-          }
-        ]
-      }
-    });
+    this.peer = new SimplePeer(getSimplePeerConfObj(initiator, stream));
 
     /* add event listeners to handle simplepeer communication. */
     this.addEventListenersToPeer(this.peer);
-
   }
 
   addEventListenersToPeer(peer) {
-    console.log(this);
+    console.log('setting up peer');
+
     peer.on('error', (err) => {
       this.error = err;
     });
@@ -89,36 +134,30 @@ export class Peer {
     peer.on('close', (_) => {
       this.close();
     });
+
     peer.on('signal', (data) => {
       var room = this.room;
       socket.emit('signalling', room, data, this.their_id, this.my_id, (resp) => {
         return;
       });
     });
+
     peer.on('connect', (data) => {
       this.connected = true;
-      NotifStore.addNotification({
-        title: 'Member entered call',
-        message: 'New member joined the call!',
-        type: 'success',
-        container: 'top-right',
-        animationIn: ['animated', 'fadeIn'],
-        animationOut: ['animated', 'fadeOut'],
-        dismiss: {
-          duration: 3000,
-          pauseOnHover: true
-        }
-      });
+      handleMemberJoined();
     });
+
+    /* called when stream received. */
     peer.on('stream', (data) => {
       const self = this;
-      this.sharing = 0;
+      this.sharing = 0; // Allow others to share screen
 
       // If screen shared is of type screen, don't add handlers
       if (this.next_stream_type == 'screen') {
         createVideoElement(self, data, self.their_id + '-screen', self.their_name);
         return;
       }
+
       data.addEventListener('removetrack', (event) => {
         changeStatusOfVideoElement(
           self,
@@ -127,17 +166,23 @@ export class Peer {
           this.their_id + '-video'
         );
       });
+
       createVideoElement(self, data, self.their_id + '-video', self.their_name);
     });
+
+    /* called on receiving data. */
     peer.on('data', (data) => {
-      // Check if this is waiting to handle any stream.
+      
       if (data == 'screen- go ahead') {
         //Handshake complete share screen
         this.peer.addStream(this.stream_to_be_sent);
       }
       if (data == 'stop screen sharing') {
+        // clear display of the stopped screen 
         deleteVideoElement(this.their_id + '-screen');
       }
+
+      // Allow screen sharing only if currently no-one else wants to. */
       if (this.sharing == 0) {
         if (data == 'sharing screen') {
           this.sharing = 1;
@@ -166,70 +211,41 @@ export class Peer {
       this.connected = false;
     } else {
       /* Else try to reconnect. */
+
       console.log(this.num_retries);
+
       /* If you have tried reconnecting more than 3 times, do not try
        * again, the remote seems to be down. */
       if (this.num_retries > 3) {
+
         /* Stop the current streams (if)being streamed. */
-        if (self.stream) {
-          self.stream.getTracks().forEach((track) => {
-            track.stop();
-          });
-          self.stream.getTracks().forEach((track) => {
-            self.stream.removeTrack(track);
-          });
-        }
+        clearMediaStream(self.stream);
         return;
       }
       if (this.type == 'video') {
+
+        /* Reduce quality of current stream. */
         this.stream.getVideoTracks()[0].applyConstraints(videoQuality[this.num_retries]);
+
         self.num_retries = self.num_retries + 1;
+
+        /* choose a random time to retry request. */
         var retrytime = Math.floor(Math.random() * 2000) + 1;
-        self.peer = new SimplePeer({
-          initiator: self.initiator,
-          stream: self.stream,
-          sdpTransform: (sdp) => {
-            let newSDP = sdp;
-            newSDP = setMediaBitrate(newSDP, 'video', 233);
-            newSDP = setMediaBitrate(newSDP, 'audio', 80);
-            return newSDP;
-          },
-          config: {
-            iceServers: [
-              { urls: 'stun:stun.l.google.com:19302' },
-              {
-                urls: 'turn:numb.viagenie.ca',
-                credential: 'HWeF3pu@u2RfeYD',
-                username: 'veddandekar6@gmail.com'
-              }
-            ]
-          }
-        });
+
+        /* create a new peer and add handlers to it. */
+        self.peer = new SimplePeer(getSimplePeerConfObj(self.initiator, self.stream));
         self.addEventListenersToPeer(self.peer);
+
       } else if (this.type == 'screen') {
         //this.stream.getVideoTracks()[0].applyConstraints(videoQuality[this.num_retries]);
+        
         self.num_retries = self.num_retries + 1;
+
+        /* choose a random time to retry request. */
         var retrytime = Math.floor(Math.random() * 2000) + 1;
-        self.peer = new SimplePeer({
-          initiator: self.initiator,
-          stream: self.stream,
-          sdpTransform: (sdp) => {
-            let newSDP = sdp;
-            newSDP = setMediaBitrate(newSDP, 'video', 233);
-            newSDP = setMediaBitrate(newSDP, 'audio', 80);
-            return newSDP;
-          },
-          config: {
-            iceServers: [
-              { urls: 'stun:stun.l.google.com:19302' },
-              {
-                urls: 'turn:numb.viagenie.ca',
-                credential: 'HWeF3pu@u2RfeYD',
-                username: 'veddandekar6@gmail.com'
-              }
-            ]
-          }
-        });
+
+        /* create a new peer and add handlers to it. */
+        self.peer = new SimplePeer(getSimplePeerConfObj(self.initiator, self.stream));
         self.addEventListenersToPeer(self.peer);
       }
     }
@@ -250,6 +266,8 @@ export async function toggleVideo(self) {
           }
     )
     .then((stream) => {
+
+      /* Remove the current video track(if exists) locally & from all peers. */
       if (myMediaStreamObj.getVideoTracks().length != 0) {
         connectedPeers.map((eachPeer) => {
           try {
@@ -272,10 +290,13 @@ export async function toggleVideo(self) {
           'me' + '-video'
         );
       }
+
       if (webCam) {
+        /* We are here means, we are staring video, after stopping it, so add video track to all peers and locally. */
         if (connectedPeers) {
+
+          /* Add to all peers. */
           connectedPeers.map((eachPeer) => {
-            //TODO: REmove previous video tracks if any
             try {
               eachPeer.peer.addTrack(
                 stream.getVideoTracks()[0],
@@ -287,6 +308,8 @@ export async function toggleVideo(self) {
             }
           });
         }
+
+        /* Add locally. */
         myMediaStreamObj.addTrack(stream.getVideoTracks()[0]);
         changeStatusOfVideoElement(
           self,
@@ -294,26 +317,18 @@ export async function toggleVideo(self) {
           myMediaStreamObj,
           'me' + '-video'
         );
-      } /*else {
-        if (self.state.myPeers) {
-          self.state.myPeers.map((eachPeer) => {
-            eachPeer.peer.remove(stream.getVideoTracks()[0], self.state.myMediaStreamObj);
-          });
-        }
-      }*/
+      }
     });
 }
+
 export async function toggleAudio(self) {
   var mic = getAudioState();
+  
+      /* Remove the current audio track(if exists) locally & from all peers. */
   if (myMediaStreamObj.getAudioTracks().length != 0) {
     if (connectedPeers) {
+      /* Remove from all peers */
       connectedPeers.map((eachPeer) => {
-        //if (myMediaStreamObj.getAudioTracks)
-        //  eachPeer.peer.replaceTrack(
-        //    myMediaStreamObj.getAudioTracks()[0],
-        //    stream.getAudioTracks()[0],
-        //    myMediaStreamObj
-        //  );
         try {
           eachPeer.peer.removeTrack(
           myMediaStreamObj.getAudioTracks()[0],
@@ -323,11 +338,13 @@ export async function toggleAudio(self) {
           console.log(err)
         }
       });
+      /* Remove locally. */
       myMediaStreamObj.getAudioTracks()[0].stop();
       myMediaStreamObj.removeTrack(myMediaStreamObj.getAudioTracks()[0]);
     }
   }
   if (mic) {
+        /* We are here means, we are staring audio, after stopping it, so add video track to all peers and locally. */
     navigator.mediaDevices
       .getUserMedia(
       {
@@ -336,9 +353,9 @@ export async function toggleAudio(self) {
         audio: mic ? { echoCancellation: true, noiseSuppression: true } : false
       })
     .then((stream) => {
+        /* Add to all peers. */
         if (connectedPeers) {
           connectedPeers.map((eachPeer) => {
-            //TODO: REmove previous video tracks if any
             try {
               eachPeer.peer.addTrack(
                 stream.getAudioTracks()[0],
@@ -350,12 +367,16 @@ export async function toggleAudio(self) {
             }
           });
         }
+        /* Add locally. */
         myMediaStreamObj.addTrack(stream.getAudioTracks()[0]);
+
+        /* Not sure whether changeStatusOfVideoElement() needs to be called here. */
     })
     .catch((err) => console.log(err));
   }
 }
 
+/* Function to meet video of a particular user. */
 function muteVideo(self, id) {
   const userStream = document.getElementById(id).srcObject;
   const deets = document.getElementById(id).nextElementSibling;
@@ -372,7 +393,10 @@ function muteVideo(self, id) {
   }
 }
 
+/* Function to create a video screen. */
 export function createVideoElement(self, stream, friendtkn, username) {
+
+  /* create elements required. */
   const wrapper = document.createElement('div');
   const video = document.createElement('video');
   const row = document.createElement('div');
@@ -381,11 +405,17 @@ export function createVideoElement(self, stream, friendtkn, username) {
   const audioIcon = document.createElement('i');
   const context = document.getElementById('context');
   const contextOptions = document.getElementById('contextOptions');
+
+  /* Add button to mute a user. */
   audioIcon.classList.add('icon-volume-2', 'audio-icon');
   audioIcon.addEventListener('click', () => muteVideo(self, friendtkn));
   if (friendtkn == 'me-video') audioIcon.style.display = 'none';
+
+  /* Add nametag below screen. */
   nameTag.classList.add('name-label');
   nameTag.innerText = username || 'me';
+
+  /* create video element to be added. */
   video.width = '200';
   video.id = friendtkn;
   video.height = '350';
@@ -395,15 +425,20 @@ export function createVideoElement(self, stream, friendtkn, username) {
   if (video.id == 'me-video') {
     video.muted = 'true';
   }
+
+  /* place elements together to form screen. */
   wrapper.appendChild(video);
   row.appendChild(nameTag);
   row.appendChild(audioIcon);
   wrapper.appendChild(row);
   document.getElementById('videos').appendChild(wrapper);
   contextOptions.style.display = 'inline-flex';
+
+  /* add event handler to bring video to center. */
   if (!context.srcObject) switchContext(document.getElementById(friendtkn));
 }
 
+/* function to modify a previously created element. */
 function changeStatusOfVideoElement(
   self,
   status,
@@ -412,7 +447,7 @@ function changeStatusOfVideoElement(
   username = null
 ) {
   //let video = $('#' + friendtkn);
-  if (status == 'video_off') {
+  if (status == 'video_off') { // this works for audio toggling too- name needs to be changed.
     const video = document.getElementById(friendtkn);
     if (!video) {
       return;
@@ -431,6 +466,7 @@ function changeStatusOfVideoElement(
   }
 }
 
+/* bring chosen video to center context. */
 export function switchContext(e) {
   if (e.target) e = e.target;
   try {
@@ -451,6 +487,7 @@ export function switchContext(e) {
   }
 }
 
+/* function to change camera - not tested extensively. */
 export async function changeCameraFacing(self, facing) {
   navigator.mediaDevices
     .getUserMedia({
@@ -471,6 +508,7 @@ export async function changeCameraFacing(self, facing) {
     });
 }
 
+/* function to get mediastream by asking for permission from user. */
 export async function getMyMediaStream(self, type, quality_index) {
   if (quality_index == null) {
     quality_index = 0;
@@ -484,6 +522,8 @@ export async function getMyMediaStream(self, type, quality_index) {
       })
       .then((media) => {
         myScreenStreamObj = media;
+
+        /* display my stream on screen. */
         createVideoElement(self, media, 'me' + '-screen');
         return media;
       });
@@ -492,26 +532,25 @@ export async function getMyMediaStream(self, type, quality_index) {
 
     await navigator.mediaDevices
       .getUserMedia(
-        // webCam
-        //   ?
         {
           video: videoQuality[quality_index],
           audio: { echoCancellation: true, noiseSuppression: true }
         }
-        // : {
-        //     audio: { echoCancellation: true, noiseSuppression: true }
-        //   }
       )
       .then((media) => {
         myMediaStreamObj = media
+
+        /* display my stream on screen. */
         createVideoElement(self, media, 'me' + '-video');
         return media;
       });
-    // alert(self.state.myMediaStreamObj);
   }
 }
+
+/* function called when startCall butto pressed. */
 export function startCall(self, roomName, type) {
-  /* Initialize connectedPeers to empty array */ 
+
+  /* Initializations */ 
   connectedPeers = [];
   myMediaStreamObj = new MediaStream();
   myScreenStreamObj = new MediaStream();
@@ -523,18 +562,12 @@ export function startCall(self, roomName, type) {
   socket.open();
   console.log(socket);
   console.log(socket.id);
+
   socket.on('connect', () => {
     createConnections(self, roomName, type);
   });
+
   socket.on('signalling', (data, from_id) => {
-    /*
-    if (from_id != this.their_id) {
-      return;
-    }
-    if (this.peer && !this.peer.destroyed) {
-      this.peer.signal(data);
-    }
-    */
     connectedPeers.forEach((val) => {
       if(val.their_id == from_id && !val.destroyed) {
         val.peer.signal(data);
@@ -543,9 +576,10 @@ export function startCall(self, roomName, type) {
   });
 }
 
+/* function to initialize Peers to create connections. */
 function createConnections(self, roomName, type) {
   var my_id = socket.id;
-  console.log(socket.id);
+
   // Go online and get online array from express server.
   var reqData = {
     id: my_id,
@@ -560,13 +594,12 @@ function createConnections(self, roomName, type) {
     })
     .then((res) => {
       var onlineArray = res.data.online;
-      // Get myMyMediaStream
       getMyMediaStream(self, type).then((media) => {
         // Add eventhandler for "createConnection" signal, On receiving the signal:
         connectedPeers = [];
         socket.on('startconn', (their_id, their_name) => {
-          //Remove previous connections with their_id
           //FACT: Comment this part to test reconnection.
+            //Remove previous connections with their_id
           /*
           connectedPeers.forEach((val, index) => {
             if (val && val.their_id == their_id) {
@@ -576,17 +609,10 @@ function createConnections(self, roomName, type) {
           });
           */
           var my_id = socket.id;
-          var mediaStream;
-          if (type == 'video') {
-            mediaStream = myMediaStreamObj;
-          } else if (type == 'screen') {
-            mediaStream = myScreenStreamObj;
-          } else {
-            mediaStream = null;
-          }
-          // Create a new peer with initiator = false
+
+          /* Create a new peer with initiator = false and add it to record. */
           var peer = new Peer(
-            mediaStream,
+            chooseVideoOrScreen(type),
             self.state.roomName,
             false,
             their_id,
@@ -604,34 +630,31 @@ function createConnections(self, roomName, type) {
             }
           })
           .then((resp) => {
-            // Loop through online Array and make connections to online Peers
             console.log(onlineArray);
+
+            // Loop through online Array and make connections to online Peers
             onlineArray.forEach((val, index) => {
               // Ignore self;
-              if (val.username === resp.data.username /*&& val.type === type*/) {
+              if (val.username === resp.data.username /* ignore self*/) {
                 return;
               }
+              
               var their_id = onlineArray[index].id;
               var their_name = onlineArray[index].username;
               var my_name = resp.data.username;
               var my_id = socket.id;
               console.log(their_id, my_id, my_name);
+
+              /* emit startconn to create Peer at remote to handle sdp setting up. */
               socket.emit('startconn', their_id, my_id, my_name, (resp) => {
                 var my_id = socket.id;
                 //var peer = new Peer(true, self.state.myMediaStreamObj, self.state.roomName, true, their_id, my_id);
               });
-              var mediaStream;
-              if (type == 'video') {
-                mediaStream = myMediaStreamObj;
-              } else if (type == 'screen') {
-                mediaStream = myScreenStreamObj;
-              } else {
-                mediaStream = null;
-              }
               var my_id = socket.id;
-              //    create a new Peer with initiator = true
+
+              /* create a new Peer with initiator = true and add it to record. */
               var peer = new Peer(
-                mediaStream,
+                chooseVideoOrScreen(type),
                 self.state.roomName,
                 true,
                 their_id,
@@ -648,6 +671,8 @@ function createConnections(self, roomName, type) {
       console.log(err);
     });
 }
+
+/* function to send request to backend to clean database after ending call. */
 function sendRequestToEndCall(self) {
   const reqData = {
     roomName: self.state.roomName
@@ -666,44 +691,35 @@ function sendRequestToEndCall(self) {
       console.log(err);
       return;
     });
-    connectedPeers.forEach((val, index) => {
-      if (val) {
-        val.ended = true;
-        val.peer.destroy('Call Ended');
-      }
-    });
-    // Clear all state variables associated with calls.
-    connectedPeers = [];
 }
+
+/* function called when endcall is pressed. */
 export async function endCall(self) {
   await sendRequestToEndCall(self);
-  if (myMediaStreamObj) {
-    console.log('deleting my video streams');
-    myMediaStreamObj.getTracks().forEach((track) => {
-      track.stop();
-    });
-    myMediaStreamObj.getTracks().forEach((track) => {
-      myMediaStreamObj.removeTrack(track);
-    });
-  }
-  if (myScreenStreamObj) {
-    myScreenStreamObj.getTracks().forEach((track) => {
-      track.stop();
-    });
-    myScreenStreamObj.getTracks().forEach((track) => {
-      myScreenStreamObj.removeTrack(track);
-    });
-  }
-  // Add by appropriate UI changes which clears the screen.
+
+  /* Destroy & Clear all connection variables associated with calls. */
+  connectedPeers.forEach((val, index) => {
+    if (val) {
+      val.ended = true;
+      val.peer.destroy('Call Ended');
+    }
+  });
+  connectedPeers = [];
+
+  /* clear mediastreams and tracks. */
+  clearMediaStream(myMediaStreamObj);
+  clearMediaStream(myScreenStreamObj);
+  myMediaStreamObj = new MediaStream();
+  myScreenStreamObj = new MediaStream();
+
+  /* clear ui. */
   deleteAllVideoElements();
 
   /* Delete the current socket connection. */
   socket.close();  
-  console.log(socket);
-  myMediaStreamObj = new MediaStream();
-  myScreenStreamObj = new MediaStream();
 }
 
+/* function to delete all video elements. */
 function deleteAllVideoElements() {
   $('#videos').empty();
   const contextOptions = document.getElementById('contextOptions');
@@ -711,6 +727,7 @@ function deleteAllVideoElements() {
   clearContext();
 }
 
+/* function to clear context. */
 function clearContext() {
   const context = document.getElementById('context');
   if (context != null) {
@@ -718,6 +735,8 @@ function clearContext() {
     context.style.display = 'none';
   }
 }
+
+/* function to delete a particular video element. */
 function deleteVideoElement(id) {
   const video = document.getElementById(id);
   const context = $('#context');
@@ -730,11 +749,12 @@ function deleteVideoElement(id) {
   }
 }
 
+/* function called when start screen share button pressed. sends request to share screen to all peers and shares screen when request granted. */
 export async function addScreenShareStream(self) {
   getMyMediaStream(self, 'screen').then((media) => {
    connectedPeers.forEach((val, index) => {
-      // send request to share screen. Reply for this
-      // handled in peer.on('data') eventHandler.
+
+      /* send request to share screen to all peers.*/
       if (val.peer && !val.peer.destroyed && val.connected) {
         try {
           val.peer.send('sharing screen');
@@ -744,15 +764,14 @@ export async function addScreenShareStream(self) {
           //alert('could not share screen to this peer');
         }
       }
-      //val.peer.addStream(self.state.myScreenStreamObj);
     });
   });
 }
 
+/* function called when stop screen share button pressed. */
 export async function stopScreenShare(self) {
   connectedPeers.forEach((val, index) => {
-    // send request to share screen. Reply for this
-    // handled in peer.on('data') eventHandler.
+    /* send request to stop screen share to all peers.*/
     if (val.peer && !val.peer.destroyed && val.connected) {
       try {
         val.peer.removeStream(myScreenStreamObj);
@@ -763,15 +782,10 @@ export async function stopScreenShare(self) {
       }
     }
   });
-  if (myScreenStreamObj) {
-    myScreenStreamObj.getTracks().forEach((track) => {
-      track.stop();
-    });
-    myScreenStreamObj.getTracks().forEach((track) => {
-      myScreenStreamObj.removeTrack(track);
-    });
-    myScreenStreamObj = new MediaStream();
-    deleteVideoElement('me-screen');
-  }
+
+  /* clear the myScreenStreamObj mediastream locally. */
+  clearMediaStream(myScreenStreamObj);
+  myScreenStreamObj = new MediaStream();
+  deleteVideoElement('me-screen');
 }
 
