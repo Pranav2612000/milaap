@@ -6,13 +6,6 @@ import { Container, Row } from 'reactstrap';
 import * as action from '../../redux/roomRedux/roomAction';
 import * as userAction from '../../redux/userRedux/userAction';
 import DefaultAside from '../../containers/DefaultLayout/DefaultAside';
-import {
-  getMyMediaStream,
-  startCall,
-  endCall,
-  addScreenShareStream,
-  toggleVideo
-} from '../Connection/Connect';
 import video_slash from '../../assets/video_slash.png';
 import video from '../../assets/video.webp';
 import endcall from '../../assets/endcall.png';

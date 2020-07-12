@@ -1,6 +1,4 @@
-import socketIOClient from 'socket.io-client';
 import React, { Component } from 'react';
-import { store } from 'react-notifications-component';
 import { AwesomeButtonProgress } from 'react-awesome-button';
 import 'react-awesome-button/dist/styles.css';
 import * as actions from '../../redux/userRedux/userAction';
@@ -8,7 +6,6 @@ import { connect } from 'react-redux';
 import {
   toggleVideo,
   toggleAudio,
-  getMyMediaStream,
   startCall,
   endCall,
   addScreenShareStream,
@@ -16,33 +13,9 @@ import {
   stopScreenShare
 } from '../Connection/Connect';
 import {
-  Nav,
-  NavItem,
-  NavLink,
-  Progress,
-  TabContent,
-  TabPane,
-  ListGroup,
-  ListGroupItem,
-  Spinner,
-  Jumbotron,
-  Button,
-  ButtonGroup,
-  Badge,
-  Card,
-  CardBody,
-  CardFooter,
-  CardHeader,
-  Col,
   Container,
-  Row,
-  Collapse,
-  Fade
+  Row
 } from 'reactstrap';
-import classNames from 'classnames';
-import { AppSwitch } from '@coreui/react';
-import MessageView from '../../views/MessageList/index';
-import axios from 'axios';
 import $ from 'jquery';
 import './Controls.css';
 
