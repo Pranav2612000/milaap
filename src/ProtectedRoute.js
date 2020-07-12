@@ -36,7 +36,7 @@ const ProtectedRoute = (props) => {
   } else if (!credentialsValid && validated) {
     props.logout();
     localStorage.clear();
-    return <Redirect to="/login" />;
+    return <Redirect to="/join" />;
   } else {
     return <div className="animated fadeIn pt-1 text-center">Loading...</div>;
   }
