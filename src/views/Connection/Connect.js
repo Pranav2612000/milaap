@@ -33,15 +33,97 @@ function getAudioState() {
   return state.userReducer.audio;
 }
 
+function extractSocketID(element_id) {
+  var cut_index = element_id.lastIndexOf("-video");
+  if(cut_index == -1) {
+    return -1;
+  }
+  console.log(element_id.slice(0, cut_index));
+  return element_id.slice(0, cut_index);
+}
+
+function upgradeLocalStreamVideoQuality(stream) {
+  try {
+    stream.getVideoTracks()[0].applyConstraints(videoQuality[0]);
+    return stream;
+  } catch(err) {
+    console.log(err);
+    return;
+  }
+}
+
+function askToUpgradeStreamVideoQualityById(element_id) {
+  var their_id = extractSocketID(element_id);
+  if(their_id == -1 || their_id == "me") {
+    return;
+  }
+  /* search through connected peers to get the appropriate peer. */
+  connectedPeers.forEach((val, index) => {
+    if(val.their_id == their_id) {
+
+      /* ask the peer for better quality. */
+      val.peer.send('i want more');
+      console.log('asking for more');
+    }
+  });
+}
+
+function upgradeStreamVideoQuality(Peer) {
+  console.log(myMediaStreamObj.getVideoTracks());
+  try {
+    Peer.peer.replaceTrack(myMediaStreamObj.getVideoTracks()[0],
+                          upgradeLocalStreamVideoQuality(myMediaStreamObj).getVideoTracks()[0],
+                          myMediaStreamObj);
+  } catch(err) {
+    console.log(err);
+  }
+}
+
+export function degradeLocalStreamVideoQuality(stream) {
+  try {
+    stream.getVideoTracks()[0].applyConstraints(videoQuality[3]);
+    return stream;
+  } catch(err) {
+    console.log(err);
+  }
+}
+
+function askToDegradeStreamVideoQualityById(element_id) {
+  var their_id = extractSocketID(element_id);
+  if(their_id == -1 || their_id == "me") {
+    return;
+  }
+  /* search through connected peers to get the appropriate peer. */
+  connectedPeers.forEach((val, index) => {
+    if(val.their_id == their_id) {
+
+      /* ask the peer for better quality. */
+      val.peer.send('reduce quality');
+      console.log('request for reducing video quality sent');
+    }
+  });
+}
+
+function degradeStreamVideoQuality(Peer) {
+  try {
+    Peer.peer.replaceTrack(myMediaStreamObj.getVideoTracks()[0],
+                          degradeLocalStreamVideoQuality(myMediaStreamObj).getVideoTracks()[0],
+                          myMediaStreamObj);
+  } catch(err) {
+    console.log(err);
+  }
+}
+
 function chooseVideoOrScreen(type) {
   var mediaStream;
   if (type == 'video') {
-    mediaStream = myMediaStreamObj;
+    mediaStream = degradeLocalStreamVideoQuality(myMediaStreamObj);
   } else if (type == 'screen') {
     mediaStream = myScreenStreamObj;
   } else {
     mediaStream = null;
   }
+  console.log(mediaStream);
   return mediaStream;
 }
 
@@ -175,7 +257,7 @@ export class Peer {
         );
       });
 
-      createVideoElement(self, data, self.their_id + '-video', self.their_name);
+      createVideoElement(self, data, self.their_id + '-' + self.type, self.their_name);
     });
 
     /* called on receiving data. */
@@ -188,6 +270,15 @@ export class Peer {
       if (data == 'stop screen sharing') {
         // clear display of the stopped screen 
         deleteVideoElement(this.their_id + '-screen');
+      }
+      
+      if (data == 'i want more') {
+        console.log('no one is ever happy');
+        upgradeStreamVideoQuality(this);
+      }
+      if (data == 'reduce quality') {
+        console.log('request for reducing video quality received');
+        degradeStreamVideoQuality(this);
       }
 
       // Allow screen sharing only if currently no-one else wants to. */
@@ -233,6 +324,9 @@ export class Peer {
       if (this.type == 'video') {
 
         /* Reduce quality of current stream. */
+        if(!this.stream) {
+          return;
+        }
         this.stream.getVideoTracks()[0].applyConstraints(videoQuality[this.num_retries]);
 
         self.num_retries = self.num_retries + 1;
@@ -481,6 +575,8 @@ export function switchContext(e) {
     const context = document.getElementById('context');
     if (e.srcObject == context.srcObject) return;
     const username = e.nextElementSibling.innerText;
+    askToDegradeStreamVideoQualityById(context.className);
+    askToUpgradeStreamVideoQualityById(e.id);
     context.style.display = 'inline';
     context.poster =
       'https://dummyimage.com/1024x576/2f353a/ffffff.jpg&text=' + username;
