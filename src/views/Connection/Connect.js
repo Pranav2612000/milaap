@@ -327,7 +327,9 @@ export class Peer {
         if(!this.stream) {
           return;
         }
-        this.stream.getVideoTracks()[0].applyConstraints(videoQuality[this.num_retries]);
+        if(this.stream.getVideoTracks().length != 0) {
+          this.stream.getVideoTracks()[0].applyConstraints(videoQuality[this.num_retries]);
+        }
 
         self.num_retries = self.num_retries + 1;
 
