@@ -82,7 +82,9 @@ function upgradeStreamVideoQuality(Peer) {
 
 export function degradeLocalStreamVideoQuality(stream) {
   try {
-    stream.getVideoTracks()[0].applyConstraints(videoQuality[3]);
+    if(stream.getVideoTracks().length != 0) {
+      stream.getVideoTracks()[0].applyConstraints(videoQuality[3]);
+    }
     return stream;
   } catch (err) {
     console.log(err);
@@ -124,6 +126,7 @@ function degradeStreamVideoQuality(Peer) {
 function chooseVideoOrScreen(type) {
   var mediaStream;
   if (type == 'video') {
+    console.log(myMediaStreamObj);
     mediaStream = degradeLocalStreamVideoQuality(myMediaStreamObj);
   } else if (type == 'screen') {
     mediaStream = myScreenStreamObj;
