@@ -14,11 +14,11 @@ const videoQuality = [
   { width: 426, height: 240 }, //240p
   { width: 320, height: 180 } //144p
 ];
-var connectedPeers = []; 
+var connectedPeers = [];
 var myMediaStreamObj = new MediaStream();
 var myScreenStreamObj = new MediaStream();
 var socket = socketIOClient(`${global.config.backendURL}`, {
-  autoConnect: false 
+  autoConnect: false
 });
 store.subscribe(getVideoState);
 store.subscribe(getAudioState);
@@ -34,8 +34,8 @@ function getAudioState() {
 }
 
 function extractSocketID(element_id) {
-  var cut_index = element_id.lastIndexOf("-video");
-  if(cut_index == -1) {
+  var cut_index = element_id.lastIndexOf('-video');
+  if (cut_index == -1) {
     return -1;
   }
   console.log(element_id.slice(0, cut_index));
@@ -46,7 +46,7 @@ function upgradeLocalStreamVideoQuality(stream) {
   try {
     stream.getVideoTracks()[0].applyConstraints(videoQuality[0]);
     return stream;
-  } catch(err) {
+  } catch (err) {
     console.log(err);
     return;
   }
@@ -54,13 +54,12 @@ function upgradeLocalStreamVideoQuality(stream) {
 
 function askToUpgradeStreamVideoQualityById(element_id) {
   var their_id = extractSocketID(element_id);
-  if(their_id == -1 || their_id == "me") {
+  if (their_id == -1 || their_id == 'me') {
     return;
   }
   /* search through connected peers to get the appropriate peer. */
   connectedPeers.forEach((val, index) => {
-    if(val.their_id == their_id) {
-
+    if (val.their_id == their_id) {
       /* ask the peer for better quality. */
       val.peer.send('i want more');
       console.log('asking for more');
@@ -71,10 +70,12 @@ function askToUpgradeStreamVideoQualityById(element_id) {
 function upgradeStreamVideoQuality(Peer) {
   console.log(myMediaStreamObj.getVideoTracks());
   try {
-    Peer.peer.replaceTrack(myMediaStreamObj.getVideoTracks()[0],
-                          upgradeLocalStreamVideoQuality(myMediaStreamObj).getVideoTracks()[0],
-                          myMediaStreamObj);
-  } catch(err) {
+    Peer.peer.replaceTrack(
+      myMediaStreamObj.getVideoTracks()[0],
+      upgradeLocalStreamVideoQuality(myMediaStreamObj).getVideoTracks()[0],
+      myMediaStreamObj
+    );
+  } catch (err) {
     console.log(err);
   }
 }
@@ -83,14 +84,14 @@ export function degradeLocalStreamVideoQuality(stream) {
   try {
     stream.getVideoTracks()[0].applyConstraints(videoQuality[3]);
     return stream;
-  } catch(err) {
+  } catch (err) {
     console.log(err);
   }
 }
 
 function askToDegradeStreamVideoQualityById(element_id) {
   var their_id = extractSocketID(element_id);
-  if(their_id == -1 || their_id == "me") {
+  if (their_id == -1 || their_id == 'me') {
     return;
   }
   /* search through connected peers to get the appropriate peer. */
@@ -110,10 +111,12 @@ function askToDegradeStreamVideoQualityById(element_id) {
 
 function degradeStreamVideoQuality(Peer) {
   try {
-    Peer.peer.replaceTrack(myMediaStreamObj.getVideoTracks()[0],
-                          degradeLocalStreamVideoQuality(myMediaStreamObj).getVideoTracks()[0],
-                          myMediaStreamObj);
-  } catch(err) {
+    Peer.peer.replaceTrack(
+      myMediaStreamObj.getVideoTracks()[0],
+      degradeLocalStreamVideoQuality(myMediaStreamObj).getVideoTracks()[0],
+      myMediaStreamObj
+    );
+  } catch (err) {
     console.log(err);
   }
 }
@@ -170,7 +173,7 @@ function handleMemberJoined() {
 }
 
 function clearMediaStream(stream) {
-  if(!stream) {
+  if (!stream) {
     console.log('stream already cleared');
     return;
   }
@@ -231,9 +234,9 @@ export class Peer {
     peer.on('connect', (data) => {
       this.connected = true;
       handleMemberJoined();
-      if(this.initiator == false) {
+      if (this.initiator == false) {
         /* if I am already sharing screen,share with the newly joined peer. */
-        if(myScreenStreamObj.getVideoTracks().length != 0) {
+        if (myScreenStreamObj.getVideoTracks().length != 0) {
           console.log('sharing screen');
           this.peer.send('sharing screen');
           this.stream_to_be_sent = myScreenStreamObj;
@@ -257,25 +260,30 @@ export class Peer {
           self,
           'video_off',
           data,
-          this.their_id + '-video'
+          this.their_id + '-video',
+          this.their_name
         );
       });
 
-      createVideoElement(self, data, self.their_id + '-' + self.type, self.their_name);
+      createVideoElement(
+        self,
+        data,
+        self.their_id + '-' + self.type,
+        self.their_name
+      );
     });
 
     /* called on receiving data. */
     peer.on('data', (data) => {
-      
       if (data == 'screen- go ahead') {
         //Handshake complete share screen
         this.peer.addStream(this.stream_to_be_sent);
       }
       if (data == 'stop screen sharing') {
-        // clear display of the stopped screen 
+        // clear display of the stopped screen
         deleteVideoElement(this.their_id + '-screen');
       }
-      
+
       if (data == 'i want more') {
         console.log('no one is ever happy');
         upgradeStreamVideoQuality(this);
@@ -320,19 +328,19 @@ export class Peer {
       /* If you have tried reconnecting more than 3 times, do not try
        * again, the remote seems to be down. */
       if (this.num_retries > 3) {
-
         /* Stop the current streams (if)being streamed. */
         clearMediaStream(self.stream);
         return;
       }
       if (this.type == 'video') {
-
         /* Reduce quality of current stream. */
-        if(!this.stream) {
+        if (!this.stream) {
           return;
         }
-        if(this.stream.getVideoTracks().length != 0) {
-          this.stream.getVideoTracks()[0].applyConstraints(videoQuality[this.num_retries]);
+        if (this.stream.getVideoTracks().length != 0) {
+          this.stream
+            .getVideoTracks()[0]
+            .applyConstraints(videoQuality[this.num_retries]);
         }
 
         self.num_retries = self.num_retries + 1;
@@ -341,19 +349,22 @@ export class Peer {
         var retrytime = Math.floor(Math.random() * 2000) + 1;
 
         /* create a new peer and add handlers to it. */
-        self.peer = new SimplePeer(getSimplePeerConfObj(self.initiator, self.stream));
+        self.peer = new SimplePeer(
+          getSimplePeerConfObj(self.initiator, self.stream)
+        );
         self.addEventListenersToPeer(self.peer);
-
       } else if (this.type == 'screen') {
         //this.stream.getVideoTracks()[0].applyConstraints(videoQuality[this.num_retries]);
-        
+
         self.num_retries = self.num_retries + 1;
 
         /* choose a random time to retry request. */
         var retrytime = Math.floor(Math.random() * 2000) + 1;
 
         /* create a new peer and add handlers to it. */
-        self.peer = new SimplePeer(getSimplePeerConfObj(self.initiator, self.stream));
+        self.peer = new SimplePeer(
+          getSimplePeerConfObj(self.initiator, self.stream)
+        );
         self.addEventListenersToPeer(self.peer);
       }
     }
@@ -374,7 +385,6 @@ export async function toggleVideo(self) {
           }
     )
     .then((stream) => {
-
       /* Remove the current video track(if exists) locally & from all peers. */
       if (myMediaStreamObj.getVideoTracks().length != 0) {
         connectedPeers.map((eachPeer) => {
@@ -395,21 +405,18 @@ export async function toggleVideo(self) {
           self,
           'video_off',
           myMediaStreamObj,
-          'me' + '-video'
+          'me' + '-video',
+          'ME'
         );
       }
 
       if (webCam) {
         /* We are here means, we are staring video, after stopping it, so add video track to all peers and locally. */
         if (connectedPeers) {
-
           /* Add to all peers. */
           connectedPeers.map((eachPeer) => {
             try {
-              eachPeer.peer.addTrack(
-                stream.getVideoTracks()[0],
-                myMediaStreamObj
-              );
+              eachPeer.peer.addTrack(stream.getVideoTracks()[0], myMediaStreamObj);
             } catch (err) {
               console.log(err);
               //alert('could not share screen to this peer');
@@ -423,7 +430,8 @@ export async function toggleVideo(self) {
           self,
           'video_on',
           myMediaStreamObj,
-          'me' + '-video'
+          'me' + '-video',
+          'ME'
         );
       }
     });
@@ -431,19 +439,19 @@ export async function toggleVideo(self) {
 
 export async function toggleAudio(self) {
   var mic = getAudioState();
-  
-      /* Remove the current audio track(if exists) locally & from all peers. */
+
+  /* Remove the current audio track(if exists) locally & from all peers. */
   if (myMediaStreamObj.getAudioTracks().length != 0) {
     if (connectedPeers) {
       /* Remove from all peers */
       connectedPeers.map((eachPeer) => {
         try {
           eachPeer.peer.removeTrack(
-          myMediaStreamObj.getAudioTracks()[0],
-          myMediaStreamObj
+            myMediaStreamObj.getAudioTracks()[0],
+            myMediaStreamObj
           );
-        } catch(err) {
-          console.log(err)
+        } catch (err) {
+          console.log(err);
         }
       });
       /* Remove locally. */
@@ -452,23 +460,19 @@ export async function toggleAudio(self) {
     }
   }
   if (mic) {
-        /* We are here means, we are staring audio, after stopping it, so add video track to all peers and locally. */
+    /* We are here means, we are staring audio, after stopping it, so add video track to all peers and locally. */
     navigator.mediaDevices
-      .getUserMedia(
-      {
-        video: false, 
+      .getUserMedia({
+        video: false,
         //video: { width: 320, height: 180 },
         audio: mic ? { echoCancellation: true, noiseSuppression: true } : false
       })
-    .then((stream) => {
+      .then((stream) => {
         /* Add to all peers. */
         if (connectedPeers) {
           connectedPeers.map((eachPeer) => {
             try {
-              eachPeer.peer.addTrack(
-                stream.getAudioTracks()[0],
-                myMediaStreamObj
-              );
+              eachPeer.peer.addTrack(stream.getAudioTracks()[0], myMediaStreamObj);
             } catch (err) {
               console.log(err);
               //alert('could not share screen to this peer');
@@ -479,8 +483,8 @@ export async function toggleAudio(self) {
         myMediaStreamObj.addTrack(stream.getAudioTracks()[0]);
 
         /* Not sure whether changeStatusOfVideoElement() needs to be called here. */
-    })
-    .catch((err) => console.log(err));
+      })
+      .catch((err) => console.log(err));
   }
 }
 
@@ -503,7 +507,6 @@ function muteVideo(self, id) {
 
 /* Function to create a video screen. */
 export function createVideoElement(self, stream, friendtkn, username) {
-
   /* create elements required. */
   const wrapper = document.createElement('div');
   const video = document.createElement('video');
@@ -555,7 +558,8 @@ function changeStatusOfVideoElement(
   username = null
 ) {
   //let video = $('#' + friendtkn);
-  if (status == 'video_off') { // this works for audio toggling too- name needs to be changed.
+  if (status == 'video_off') {
+    // this works for audio toggling too- name needs to be changed.
     const video = document.getElementById(friendtkn);
     if (!video) {
       return;
@@ -612,7 +616,7 @@ export async function changeCameraFacing(self, facing) {
           myMediaStreamObj
         );
         deleteVideoElement('me' + '-video');
-        createVideoElement(self, stream, 'me' + '-video');
+        createVideoElement(self, stream, 'me' + '-video', 'ME');
       });
       myMediaStreamObj.getVideoTracks()[0].stop();
     });
@@ -634,24 +638,22 @@ export async function getMyMediaStream(self, type, quality_index) {
         myScreenStreamObj = media;
 
         /* display my stream on screen. */
-        createVideoElement(self, media, 'me' + '-screen');
+        createVideoElement(self, media, 'me' + '-screen', 'ME');
         return media;
       });
   } else if (type === 'video') {
     // TODO: Add try catch to handle case when user denies access
 
     await navigator.mediaDevices
-      .getUserMedia(
-        {
-          video: videoQuality[quality_index],
-          audio: { echoCancellation: true, noiseSuppression: true }
-        }
-      )
+      .getUserMedia({
+        video: videoQuality[quality_index],
+        audio: { echoCancellation: true, noiseSuppression: true }
+      })
       .then((media) => {
-        myMediaStreamObj = media
+        myMediaStreamObj = media;
 
         /* display my stream on screen. */
-        createVideoElement(self, media, 'me' + '-video');
+        createVideoElement(self, media, 'me' + '-video', 'ME');
         return media;
       });
   }
@@ -659,15 +661,15 @@ export async function getMyMediaStream(self, type, quality_index) {
 
 /* function called when startCall butto pressed. */
 export function startCall(self, roomName, type) {
+  /* Initializations */
 
-  /* Initializations */ 
   connectedPeers = [];
   myMediaStreamObj = new MediaStream();
   myScreenStreamObj = new MediaStream();
 
   /* create a socket to handle configuration messages. */
   socket = socketIOClient(`${global.config.backendURL}`, {
-    autoConnect: false 
+    autoConnect: false
   });
   socket.open();
   console.log(socket);
@@ -679,7 +681,7 @@ export function startCall(self, roomName, type) {
 
   socket.on('signalling', (data, from_id) => {
     connectedPeers.forEach((val) => {
-      if(val.their_id == from_id && !val.destroyed) {
+      if (val.their_id == from_id && !val.destroyed) {
         val.peer.signal(data);
       }
     });
@@ -709,7 +711,7 @@ function createConnections(self, roomName, type) {
 
         socket.on('startconn', (their_id, their_name) => {
           //FACT: Comment this part to test reconnection.
-            //Remove previous connections with their_id
+          //Remove previous connections with their_id
           /*
           connectedPeers.forEach((val, index) => {
             if (val && val.their_id == their_id) {
@@ -731,7 +733,6 @@ function createConnections(self, roomName, type) {
             type
           );
           connectedPeers.push(peer);
-          
         });
 
         axios
@@ -749,7 +750,7 @@ function createConnections(self, roomName, type) {
               if (val.username === resp.data.username /* ignore self*/) {
                 return;
               }
-              
+
               var their_id = onlineArray[index].id;
               var their_name = onlineArray[index].username;
               var my_name = resp.data.username;
@@ -827,7 +828,7 @@ export async function endCall(self) {
   deleteAllVideoElements();
 
   /* Delete the current socket connection. */
-  socket.close();  
+  socket.close();
 }
 
 /* function to delete all video elements. */
@@ -863,8 +864,7 @@ function deleteVideoElement(id) {
 /* function called when start screen share button pressed. sends request to share screen to all peers and shares screen when request granted. */
 export async function addScreenShareStream(self) {
   getMyMediaStream(self, 'screen').then((media) => {
-   connectedPeers.forEach((val, index) => {
-
+    connectedPeers.forEach((val, index) => {
       /* send request to share screen to all peers.*/
       if (val.peer && !val.peer.destroyed && val.connected) {
         try {
@@ -899,4 +899,3 @@ export async function stopScreenShare(self) {
   myScreenStreamObj = new MediaStream();
   deleteVideoElement('me-screen');
 }
-

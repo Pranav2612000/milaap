@@ -12,10 +12,7 @@ import {
   changeCameraFacing,
   stopScreenShare
 } from '../Connection/Connect';
-import {
-  Container,
-  Row
-} from 'reactstrap';
+import { Container, Row } from 'reactstrap';
 import $ from 'jquery';
 import './Controls.css';
 
@@ -26,6 +23,7 @@ class Controls extends Component {
       myPeers: [],
       roomName: this.props.roomName,
       isMuted: false,
+      isScreenShareOn: false,
       inCall: false,
       isWebcamOn: true,
       facing: 'user'
@@ -174,8 +172,9 @@ class Controls extends Component {
           <AwesomeButtonProgress
             type="primary"
             size="medium"
-            disabled={!self.state.inCall}
+            disabled={!(self.state.inCall && !self.state.isScreenShareOn)}
             action={(element, next) => {
+              this.setState({ isScreenShareOn: true });
               this.inCallShareHandler();
               setTimeout(next, 2000);
             }}>
@@ -187,8 +186,9 @@ class Controls extends Component {
           <AwesomeButtonProgress
             type="primary"
             size="medium"
-            disabled={!self.state.inCall}
+            disabled={!(self.state.inCall && self.state.isScreenShareOn)}
             action={(element, next) => {
+              this.setState({ isScreenShareOn: false });
               stopScreenShare(self);
               setTimeout(next, 2000);
             }}>
