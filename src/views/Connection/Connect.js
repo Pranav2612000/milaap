@@ -95,11 +95,15 @@ function askToDegradeStreamVideoQualityById(element_id) {
   }
   /* search through connected peers to get the appropriate peer. */
   connectedPeers.forEach((val, index) => {
-    if(val.their_id == their_id) {
-
+    if(!val.peer.destroyed && val.their_id == their_id) {
+      try {
       /* ask the peer for better quality. */
       val.peer.send('reduce quality');
       console.log('request for reducing video quality sent');
+      } catch(err) {
+        console.log(err);
+        console.log('seems like peer has been deleted');
+      }
     }
   });
 }
@@ -577,9 +581,9 @@ export function switchContext(e) {
     const context = document.getElementById('context');
     if (e.srcObject == context.srcObject) return;
     const username = e.nextElementSibling.innerText;
+    context.style.display = 'inline';
     askToDegradeStreamVideoQualityById(context.className);
     askToUpgradeStreamVideoQualityById(e.id);
-    context.style.display = 'inline';
     context.poster =
       'https://dummyimage.com/1024x576/2f353a/ffffff.jpg&text=' + username;
     context.srcObject = e.srcObject;
@@ -701,8 +705,8 @@ function createConnections(self, roomName, type) {
     .then((res) => {
       var onlineArray = res.data.online;
       getMyMediaStream(self, type).then((media) => {
-        // Add eventhandler for "createConnection" signal, On receiving the signal:
         connectedPeers = [];
+
         socket.on('startconn', (their_id, their_name) => {
           //FACT: Comment this part to test reconnection.
             //Remove previous connections with their_id
