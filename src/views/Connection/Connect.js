@@ -255,7 +255,8 @@ export class Peer {
           self,
           'video_off',
           data,
-          this.their_id + '-video'
+          this.their_id + '-video',
+          this.their_name
         );
       });
 
@@ -610,7 +611,7 @@ export async function changeCameraFacing(self, facing) {
           myMediaStreamObj
         );
         deleteVideoElement('me' + '-video');
-        createVideoElement(self, stream, 'me' + '-video');
+        createVideoElement(self, stream, 'me' + '-video', 'ME');
       });
       myMediaStreamObj.getVideoTracks()[0].stop();
     });
