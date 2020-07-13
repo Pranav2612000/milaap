@@ -255,7 +255,8 @@ export class Peer {
           self,
           'video_off',
           data,
-          this.their_id + '-video'
+          this.their_id + '-video',
+          this.their_name
         );
       });
 
@@ -331,9 +332,11 @@ export class Peer {
         if (!this.stream) {
           return;
         }
-        this.stream
-          .getVideoTracks()[0]
-          .applyConstraints(videoQuality[this.num_retries]);
+        if (this.stream.getVideoTracks().length != 0) {
+          this.stream
+            .getVideoTracks()[0]
+            .applyConstraints(videoQuality[this.num_retries]);
+        }
 
         self.num_retries = self.num_retries + 1;
 
@@ -397,7 +400,8 @@ export async function toggleVideo(self) {
           self,
           'video_off',
           myMediaStreamObj,
-          'me' + '-video'
+          'me' + '-video',
+          'ME'
         );
       }
 
@@ -421,7 +425,8 @@ export async function toggleVideo(self) {
           self,
           'video_on',
           myMediaStreamObj,
-          'me' + '-video'
+          'me' + '-video',
+          'ME'
         );
       }
     });
@@ -606,7 +611,7 @@ export async function changeCameraFacing(self, facing) {
           myMediaStreamObj
         );
         deleteVideoElement('me' + '-video');
-        createVideoElement(self, stream, 'me' + '-video');
+        createVideoElement(self, stream, 'me' + '-video', 'ME');
       });
       myMediaStreamObj.getVideoTracks()[0].stop();
     });
@@ -628,7 +633,7 @@ export async function getMyMediaStream(self, type, quality_index) {
         myScreenStreamObj = media;
 
         /* display my stream on screen. */
-        createVideoElement(self, media, 'me' + '-screen');
+        createVideoElement(self, media, 'me' + '-screen', 'ME');
         return media;
       });
   } else if (type === 'video') {
@@ -643,7 +648,7 @@ export async function getMyMediaStream(self, type, quality_index) {
         myMediaStreamObj = media;
 
         /* display my stream on screen. */
-        createVideoElement(self, media, 'me' + '-video');
+        createVideoElement(self, media, 'me' + '-video', 'ME');
         return media;
       });
   }
