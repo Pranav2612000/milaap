@@ -10,13 +10,15 @@
   <p align="center">
     A distributed video/audio calling application!
     <br />
-    <br />
     <!-- <a href="https://github.com/Pranav2612000/distrideochat">View Demo</a>
     · -->
     <a href="https://github.com/Pranav2612000/distrideochat/issues">Report Bug</a>
     ·
     <a href="https://github.com/Pranav2612000/distrideochat/issues">Request Feature</a>
   </p>
+</p>
+<p align="center">
+  <b>Distrideo Chat is live <a href="https://distrideo.ml">here</a>.</b>
 </p>
 
 <!-- TABLE OF CONTENTS -->
@@ -49,7 +51,7 @@ So we decided to develop a one-stop solution for not only addressing all these s
 
 Have used various libraries/frameworks for this project, the important ones mentioned here:
 
-- [PeerJS](https://peerjs.com/)
+- [Simple Peer](https://www.npmjs.com/package/simple-peer)
 - [ReactJS](https://reactjs.org/)
 <!-- - [Laravel](https://laravel.com) -->
 
