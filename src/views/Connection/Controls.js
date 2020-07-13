@@ -12,10 +12,7 @@ import {
   changeCameraFacing,
   stopScreenShare
 } from '../Connection/Connect';
-import {
-  Container,
-  Row
-} from 'reactstrap';
+import { Container, Row } from 'reactstrap';
 import $ from 'jquery';
 import './Controls.css';
 

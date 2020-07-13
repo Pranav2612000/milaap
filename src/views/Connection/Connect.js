@@ -399,7 +399,8 @@ export async function toggleVideo(self) {
           self,
           'video_off',
           myMediaStreamObj,
-          'me' + '-video'
+          'me' + '-video',
+          'ME'
         );
       }
 
@@ -423,7 +424,8 @@ export async function toggleVideo(self) {
           self,
           'video_on',
           myMediaStreamObj,
-          'me' + '-video'
+          'me' + '-video',
+          'ME'
         );
       }
     });
@@ -630,7 +632,7 @@ export async function getMyMediaStream(self, type, quality_index) {
         myScreenStreamObj = media;
 
         /* display my stream on screen. */
-        createVideoElement(self, media, 'me' + '-screen');
+        createVideoElement(self, media, 'me' + '-screen', 'ME');
         return media;
       });
   } else if (type === 'video') {
@@ -645,7 +647,7 @@ export async function getMyMediaStream(self, type, quality_index) {
         myMediaStreamObj = media;
 
         /* display my stream on screen. */
-        createVideoElement(self, media, 'me' + '-video');
+        createVideoElement(self, media, 'me' + '-video', 'ME');
         return media;
       });
   }
