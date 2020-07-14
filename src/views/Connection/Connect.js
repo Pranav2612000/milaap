@@ -566,37 +566,21 @@ function changeStatusOfVideoElement(
     if (!video) {
       return;
     }
-
-    //check if stream have MIC and Webcam both off
-    // If yes create a empty media source
-    /*
-    if (setNewMediaSource === true) {
-      const mediaSource = new MediaSource();
-      try {
-        video.srcObject = mediaSource;
-      } catch (error) {
-        video.src = URL.createObjectURL(mediaSource);
-      }
-    } else {
-      // Stream has audio on
-      video.srcObject = stream;
-    }
-    */
     video.srcObject = stream;
     video.poster =
       'https://dummyimage.com/1024x576/2f353a/ffffff.jpg&text=' + username;
-    video.autoplay = false;
-    video.load();
+    var isPlaying =
+      video.currentTime > 0 && !video.paused && !video.ended && video.readyState > 2;
+
+    if (!isPlaying) {
+      video.play();
+    }
   } else if (status == 'video_on') {
     const video = document.getElementById(friendtkn);
     if (!video) {
       return;
     }
     video.srcObject = stream;
-    /* write a function to update context. */
-    switchContext();
-
-    //video.play();
   }
 }
 
@@ -617,7 +601,10 @@ export function switchContext(e) {
       context.muted = 'true';
     }
     console.log(e.srcObject.getAudioTracks(), e.srcObject.getVideoTracks());
-    if(e.srcObject.getAudioTracks.length != 0 || e.srcObject.getVideoTracks.length != 0) {
+    if (
+      e.srcObject.getAudioTracks.length != 0 ||
+      e.srcObject.getVideoTracks.length != 0
+    ) {
       context.play();
     }
     $('#context').removeClass().addClass(e.id);
