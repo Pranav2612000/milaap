@@ -8,6 +8,7 @@ import socketIOClient from 'socket.io-client';
 import { connect } from 'react-redux';
 import './MessageList.css';
 import { store } from 'react-notifications-component';
+import ring from '../../assets/sounds/ring.mp3';
 
 const socket = socketIOClient(`${global.config.backendURL}/`);
 
@@ -89,6 +90,8 @@ class MessageList extends Component {
           const current = msg[msg.length - 1];
           const isMine = current.sender === this.state.MY_USER_ID;
           if (!isMine) {
+            document.getElementsByClassName('audio-element')[0].play();
+
             store.addNotification({
               title: 'New Message from ' + current.sender,
               message: current.msg,
@@ -182,6 +185,9 @@ class MessageList extends Component {
   render() {
     return (
       <div className="message-list bg-dark">
+        <audio className="audio-element" style={{ display: 'none' }}>
+          <source src={ring}></source>
+        </audio>
         <Toolbar
           title={this.props.roomName}
           /*
