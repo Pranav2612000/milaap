@@ -169,7 +169,7 @@ router.post('/gettokenfortempuser', async (req, res) => {
           res.status(400).json({ err: e });
         }
       } else {
-        res.status(400).json({ err: 'Username already taken' });
+        res.status(401).json({ err: 'Username already taken' });
       }
     }
   });
