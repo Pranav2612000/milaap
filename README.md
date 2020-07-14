@@ -20,6 +20,9 @@
 <p align="center">
   <b>Distrideo Chat is live <a href="https://distrideo.ml">here</a>.</b>
 </p>
+<p align="center">
+  <img src="public/assets/img/main.jpg">
+</p>
 
 <!-- TABLE OF CONTENTS -->
 
