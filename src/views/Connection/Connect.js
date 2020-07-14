@@ -566,7 +566,20 @@ function changeStatusOfVideoElement(
     if (!video) {
       return;
     }
-    video.srcObject = stream;
+
+    //check if stream have MIC and Webcam both off
+    // If yes create a empty media source
+    if (setNewMediaSource === true) {
+      const mediaSource = new MediaSource();
+      try {
+        video.srcObject = mediaSource;
+      } catch (error) {
+        video.src = URL.createObjectURL(mediaSource);
+      }
+    } else {
+      // Stream has audio on
+      video.srcObject = stream;
+    }
     video.poster =
       'https://dummyimage.com/1024x576/2f353a/ffffff.jpg&text=' + username;
     var isPlaying =
