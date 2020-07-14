@@ -3,7 +3,8 @@ import {
   FETCH_USERS_REQUEST,
   FETCH_USERS_SUCCESS,
   TOGGLE_VIDEO,
-  TOGGLE_AUDIO
+  TOGGLE_AUDIO,
+  SET_AUDIO_VIDEO_TO_INITIAL_STATE
 } from './userActionTypes';
 import axios from 'axios';
 import { loginSuccess } from '../loginRedux/loginAction';
@@ -35,6 +36,11 @@ export const toggleVideo = () => {
 export const toggleAudio = () => {
   return {
     type: TOGGLE_AUDIO
+  };
+};
+export const setAudioVideoToInitialState = () => {
+  return {
+    type: SET_AUDIO_VIDEO_TO_INITIAL_STATE
   };
 };
 export const fetchUsers = () => {
