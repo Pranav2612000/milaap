@@ -188,24 +188,26 @@ class Guest extends Component {
               </Card>
             </Row>
             <Row className="justify-content-center">
-              <Col md="8">
+              <Col md="6">
                 <CardGroup>
                   <Card className="p-4">
                     <CardBody>
                       <Form>
                         {this.state.room ? (
-                          <h2>Join Room {this.state.room}</h2>
+                          <h2 style={{ alignSelf: 'center' }}>
+                            Join Room {this.state.room}
+                          </h2>
                         ) : (
-                          <h2>Join a Meeting Room</h2>
+                          <h2 style={{ alignSelf: 'center' }}>
+                            Join a Meeting Room
+                          </h2>
                         )}
                         {localStorage.getItem('milaap-auth-token') ? (
                           <></>
                         ) : (
                           <InputGroup className="mb-3">
                             <InputGroupAddon addonType="prepend">
-                              <InputGroupText>
-                                <i className="icon-user"></i>
-                              </InputGroupText>
+                              <InputGroupText>Your Name</InputGroupText>
                             </InputGroupAddon>
                             <Input
                               type="text"
@@ -222,9 +224,7 @@ class Guest extends Component {
                         ) : (
                           <InputGroup className="mb-4">
                             <InputGroupAddon addonType="prepend">
-                              <InputGroupText>
-                                <i className="icon-drop"></i>
-                              </InputGroupText>
+                              <InputGroupText>Room Name</InputGroupText>
                             </InputGroupAddon>
                             <Input
                               type="text"
@@ -236,27 +236,43 @@ class Guest extends Component {
                           </InputGroup>
                         )}
 
-                        <Row>
-                          <Col xs="6">
-                            <Button
-                              color="primary"
-                              className="px-4"
-                              onClick={
-                                (e) => this.handleSubmit(e)
-                                /*
+                        <Row className="justify-content-center">
+                          <Button
+                            color="primary"
+                            className="px-4"
+                            onClick={
+                              (e) => this.handleSubmit(e)
+                              /*
                                 localStorage.getItem('milaap-auth-token')
                                   ? this.handleUserAdd(e)
                                   : this.handleSubmit(e)
                                   */
-                              }>
-                              Join
+                            }>
+                            Join
+                          </Button>
+                        </Row>
+                        <br />
+                        <Row className="justify-content-center">
+                          <h2>OR</h2>
+                        </Row>
+                        <Row className="justify-content-center">
+                          <h5>If you already have an account, click Login!</h5>
+                        </Row>
+                        <Row className="justify-content-center">
+                          <Link to="/login">
+                            <Button
+                              color="primary"
+                              className="px-4"
+                              active
+                              tabIndex={-1}>
+                              Login
                             </Button>
-                          </Col>
+                          </Link>
                         </Row>
                       </Form>
                     </CardBody>
                   </Card>
-                  <Card
+                  {/*<Card
                     className="text-white bg-primary py-5 d-md-down-none"
                     style={{ width: '44%' }}>
                     <CardBody className="text-center">
@@ -274,7 +290,7 @@ class Guest extends Component {
                         </Link>
                       </div>
                     </CardBody>
-                  </Card>
+                  </Card>*/}
                 </CardGroup>
               </Col>
             </Row>
