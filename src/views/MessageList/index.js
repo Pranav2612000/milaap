@@ -96,8 +96,8 @@ class MessageList extends Component {
               sound.currentTime = 0;
             }
             sound.play();
-            this.props.increaseMessageCount(this.props.roomName);
-            document.getElementById('badge').innerHTML = '1';
+            if (this.props.tab !== '2')
+              this.props.increaseMessageCount(this.props.roomName);
             store.addNotification({
               title: 'New Message from ' + current.sender,
               message: current.msg,
