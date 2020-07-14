@@ -401,7 +401,7 @@ export async function toggleVideo(self) {
       let setNewMediaSource = !mic && !webCam ? true : false;
       changeStatusOfVideoElement(
         self,
-        'video_on',
+        'video_off',
         myMediaStreamObj,
         'me' + '-video',
         'ME',
@@ -593,6 +593,9 @@ function changeStatusOfVideoElement(
       return;
     }
     video.srcObject = stream;
+    /* write a function to update context. */
+    switchContext();
+
     //video.play();
   }
 }
@@ -613,9 +616,7 @@ export function switchContext(e) {
     if (e.id == 'me-video') {
       context.muted = 'true';
     }
-    console.log(e.srcObject);
-    console.log(e.srcObject.getAudioTracks());
-    console.log(e.srcObject.getVideoTracks());
+    console.log(e.srcObject.getAudioTracks(), e.srcObject.getVideoTracks());
     if(e.srcObject.getAudioTracks.length != 0 || e.srcObject.getVideoTracks.length != 0) {
       context.play();
     }
