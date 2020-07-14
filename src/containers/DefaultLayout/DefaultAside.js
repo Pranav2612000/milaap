@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
 import { withRouter } from 'react-router-dom';
 import { store } from 'react-notifications-component';
-
+import { connect } from 'react-redux';
+import * as action from '../../redux/messageRedux/messageAction';
 import {
   Nav,
   NavItem,
@@ -102,8 +103,15 @@ class DefaultAside extends Component {
               className={classNames({ active: this.state.activeTab === '2' })}
               onClick={() => {
                 this.toggle('2');
+                this.props.resetMessageCount(this.state.roomName);
               }}>
               <i className="icon-speech"></i>
+              <span id="badge" class="badge badge-primary">
+                {this.props.count[this.state.roomName] === 0 ||
+                this.props.count[this.state.roomName] == undefined
+                  ? ''
+                  : this.props.count[this.state.roomName]}
+              </span>
             </NavLink>
           </NavItem>
           {/* <NavItem>
@@ -187,4 +195,18 @@ class DefaultAside extends Component {
   }
 }
 
-export default withRouter(DefaultAside);
+const mapStateToProps = (state) => {
+  return {
+    count: state.messageReducer.count
+  };
+};
+const mapDispatchToProps = (dispatch) => {
+  return {
+    resetMessageCount: (roomName) => dispatch(action.resetMessageCount(roomName))
+  };
+};
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(withRouter(DefaultAside));

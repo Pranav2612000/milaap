@@ -8,8 +8,8 @@ import socketIOClient from 'socket.io-client';
 import { connect } from 'react-redux';
 import './MessageList.css';
 import { store } from 'react-notifications-component';
+import * as action from '../../redux/messageRedux/messageAction';
 import ring from '../../assets/sounds/ring.mp3';
-
 const socket = socketIOClient(`${global.config.backendURL}/`);
 
 class MessageList extends Component {
@@ -90,8 +90,14 @@ class MessageList extends Component {
           const current = msg[msg.length - 1];
           const isMine = current.sender === this.state.MY_USER_ID;
           if (!isMine) {
-            document.getElementsByClassName('audio-element')[0].play();
-
+            var sound = document.getElementsByClassName('audio-element')[0];
+            if (sound.duration > 0 && !sound.paused) {
+              sound.pause();
+              sound.currentTime = 0;
+            }
+            sound.play();
+            this.props.increaseMessageCount(this.props.roomName);
+            document.getElementById('badge').innerHTML = '1';
             store.addNotification({
               title: 'New Message from ' + current.sender,
               message: current.msg,
@@ -222,8 +228,14 @@ class MessageList extends Component {
 
 const mapStateToProps = (state) => {
   return {
-    username: state.loginReducer.username
+    username: state.loginReducer.username,
+    count: state.messageReducer.count
   };
 };
-
-export default connect(mapStateToProps)(MessageList);
+const mapDispatchToProps = (dispatch) => {
+  return {
+    increaseMessageCount: (roomName) =>
+      dispatch(action.increaseMessageCount(roomName))
+  };
+};
+export default connect(mapStateToProps, mapDispatchToProps)(MessageList);
