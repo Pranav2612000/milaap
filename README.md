@@ -79,28 +79,34 @@ npm install npm@latest -g
 git clone https://github.com/Pranav2612000/distrideochat.git
 ```
 
-2. Install NPM packages
+2. Install NPM packages for frontend
 
 ```sh
 npm install
 ```
 
-3. Open the folder backend
+3. Start the project
+
+```sh
+npm start
+```
+
+4. In a new terminal tab, Open the folder backend
 
 ```JS
 cd backend
 ```
 
-4. Start the server
+5. Install NPM packages for backend
+
+```sh
+npm install
+```
+
+6. Start the server
 
 ```JS
 nodemon index.js
-```
-
-5. In a new terminal tab, Start the project
-
-```sh
-npm start
 ```
 
 <!-- - nodemon
