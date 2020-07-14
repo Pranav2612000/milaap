@@ -569,6 +569,7 @@ function changeStatusOfVideoElement(
 
     //check if stream have MIC and Webcam both off
     // If yes create a empty media source
+    /*
     if (setNewMediaSource === true) {
       const mediaSource = new MediaSource();
       try {
@@ -580,6 +581,8 @@ function changeStatusOfVideoElement(
       // Stream has audio on
       video.srcObject = stream;
     }
+    */
+    video.srcObject = stream;
     video.poster =
       'https://dummyimage.com/1024x576/2f353a/ffffff.jpg&text=' + username;
     video.autoplay = false;
@@ -610,7 +613,12 @@ export function switchContext(e) {
     if (e.id == 'me-video') {
       context.muted = 'true';
     }
-    context.play();
+    console.log(e.srcObject);
+    console.log(e.srcObject.getAudioTracks());
+    console.log(e.srcObject.getVideoTracks());
+    if(e.srcObject.getAudioTracks.length != 0 || e.srcObject.getVideoTracks.length != 0) {
+      context.play();
+    }
     $('#context').removeClass().addClass(e.id);
   } catch (err) {
     console.log(err);
