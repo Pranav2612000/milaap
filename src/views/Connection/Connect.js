@@ -457,7 +457,7 @@ export async function toggleAudio(self) {
         }
       });
       /* Remove locally. */
-      console.log(myMediaStreamObj.getAudioTracks()[0].stop());
+      myMediaStreamObj.getAudioTracks()[0].stop();
       myMediaStreamObj.removeTrack(myMediaStreamObj.getAudioTracks()[0]);
     }
   } else {
@@ -590,7 +590,7 @@ function changeStatusOfVideoElement(
       return;
     }
     video.srcObject = stream;
-    video.play();
+    //video.play();
   }
 }
 
@@ -859,6 +859,7 @@ function deleteAllVideoElements() {
 function clearContext() {
   const context = document.getElementById('context');
   if (context != null) {
+    context.src = null;
     context.srcObject = null;
     context.style.display = 'none';
   }
