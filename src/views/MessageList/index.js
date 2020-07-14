@@ -7,7 +7,9 @@ import moment from 'moment';
 import socketIOClient from 'socket.io-client';
 import { connect } from 'react-redux';
 import './MessageList.css';
-
+import { store } from 'react-notifications-component';
+import * as action from '../../redux/messageRedux/messageAction';
+import ring from '../../assets/sounds/ring.mp3';
 const socket = socketIOClient(`${global.config.backendURL}/`);
 
 class MessageList extends Component {
@@ -80,9 +82,37 @@ class MessageList extends Component {
     ) {
       var msg = messages;
       msg.push(data);
-      this.setState({
-        messages: msg
-      });
+      this.setState(
+        {
+          messages: msg
+        },
+        () => {
+          const current = msg[msg.length - 1];
+          const isMine = current.sender === this.state.MY_USER_ID;
+          if (!isMine) {
+            var sound = document.getElementsByClassName('audio-element')[0];
+            if (sound.duration > 0 && !sound.paused) {
+              sound.pause();
+              sound.currentTime = 0;
+            }
+            sound.play();
+            if (this.props.tab !== '2')
+              this.props.increaseMessageCount(this.props.roomName);
+            store.addNotification({
+              title: 'New Message from ' + current.sender,
+              message: current.msg,
+              type: 'info',
+              container: 'top-right',
+              animationIn: ['animated', 'fadeIn'],
+              animationOut: ['animated', 'fadeOut'],
+              dismiss: {
+                duration: 3000,
+                pauseOnHover: true
+              }
+            });
+          }
+        }
+      );
     }
     return;
   };
@@ -161,6 +191,9 @@ class MessageList extends Component {
   render() {
     return (
       <div className="message-list bg-dark">
+        <audio className="audio-element" style={{ display: 'none' }}>
+          <source src={ring}></source>
+        </audio>
         <Toolbar
           title={this.props.roomName}
           /*
@@ -195,8 +228,14 @@ class MessageList extends Component {
 
 const mapStateToProps = (state) => {
   return {
-    username: state.loginReducer.username
+    username: state.loginReducer.username,
+    count: state.messageReducer.count
   };
 };
-
-export default connect(mapStateToProps)(MessageList);
+const mapDispatchToProps = (dispatch) => {
+  return {
+    increaseMessageCount: (roomName) =>
+      dispatch(action.increaseMessageCount(roomName))
+  };
+};
+export default connect(mapStateToProps, mapDispatchToProps)(MessageList);

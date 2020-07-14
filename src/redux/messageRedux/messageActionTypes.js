@@ -1,0 +1,2 @@
+export const INCREASE_COUNT = 'INCREASE_COUNT';
+export const RESET_COUNT = 'RESET_COUNT';

@@ -59,6 +59,7 @@ export const redirectToJoinPage = () => {
 };
 
 export const logout = () => {
+  localStorage.clear();
   return {
     type: LOGOUT
   };
@@ -95,14 +96,26 @@ export const getTokenForTempUser = (reqData) => {
         dispatch(loginSuccess(reqData.username));
       })
       .catch((err) => {
-        dispatch(
-          Notifications.error({
-            title: 'Invalid Room',
-            message: 'Room Not Found',
-            position: 'tr',
-            autoDismiss: 2
-          })
-        );
+        if (err.response.status == 400) {
+          dispatch(
+            Notifications.error({
+              title: 'Invalid Room',
+              message: 'Room Not Found',
+              position: 'tr',
+              autoDismiss: 2
+            })
+          );
+        }
+        if (err.response.status == 401) {
+          dispatch(
+            Notifications.error({
+              title: 'Username already taken',
+              message: 'Try some other name',
+              position: 'tr',
+              autoDismiss: 3
+            })
+          );
+        }
       });
   };
 };
