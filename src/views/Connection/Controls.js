@@ -109,6 +109,10 @@ class Controls extends Component {
       <Container>
         <br />
         <Row className="justify-content-center text-center">
+          <h4>Room: {`${this.props.roomName}`}</h4>
+        </Row>
+        <br />
+        <Row className="justify-content-center text-center">
           <AwesomeButtonProgress
             type="primary"
             size="medium"
