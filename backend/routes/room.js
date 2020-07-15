@@ -8,13 +8,52 @@ const users = require('../models/User.model');
 const shortid = require('shortid');
 var io = require('../index');
 const auth = require('../middleware/auth');
-
+const cron = require('cron').CronJob;
 //Create a new room
 /* TODO: Modify the function rollback changes on failure*/
+
+//Run this function as a chron job every x hours
+function cleanDB() {
+  const now = new Date();
+  console.log(now);
+  rooms.find({ lastreq: { $lt: now } }, (err, room) => {
+    room.map((val, index) => {
+      const data = val.toObject();
+      //Getting the time since last join call by a user in room (in hours)
+      let timeSinceLastCall = (now - data.lastreq) / 36e5;
+      let clearoutTime = 0.01; // Set the time (in hours) after which the guest and online array need to be cleaned
+      console.log(timeSinceLastCall);
+      if (timeSinceLastCall > clearoutTime) {
+        rooms.updateOne(
+          { roomName: data.roomName },
+          { $set: { onlineSimple: [], guests: [] } },
+          (err, res) => {
+            if (err) console.log(err);
+          }
+        );
+      }
+    });
+  });
+}
+
+//This part runs the CronJob
+// var job = new cron(
+//   '0 0,4,8,12,16,20 * * *',
+//   function () {
+//     console.log('Running CronJob');
+//     cleanDB();
+//   },
+//   null,
+//   true,
+//   'America/Los_Angeles'
+// );
+
+// job.start();
+
 router.post('/createroom', auth, async (req, res) => {
   const host = req.user.id;
   const roomName = req.body.roomName;
-
+  cleanDB();
   // Create and save new room
   rooms.findOne({ roomName: roomName }, function (err, room) {
     if (err) {
@@ -22,7 +61,11 @@ router.post('/createroom', auth, async (req, res) => {
     }
     if (!room) {
       // Create a new room
-      room = new rooms({ roomName: roomName, users: [host], guests: [] });
+      room = new rooms({
+        roomName: roomName,
+        users: [host],
+        guests: []
+      });
       room.save((err) => {
         if (err) {
           return res.status(400).json({ err: 'Error Creating Room' });
@@ -511,7 +554,12 @@ router.post('/goonlinesimple', auth, async (req, res) => {
       //Update online array and return;
       rooms.updateOne(
         { roomName: roomName },
-        { $addToSet: { onlineSimple: onlinePersonObj } },
+        {
+          $addToSet: { onlineSimple: onlinePersonObj },
+          $set: {
+            lastreq: new Date()
+          }
+        },
         function (err, result) {
           if (err) {
             return res.status(400).json({ err: err });
@@ -556,7 +604,14 @@ router.post('/goonlinesimple', auth, async (req, res) => {
       } else {
         rooms.updateOne(
           { roomName: roomName },
-          { $addToSet: { onlineSimple: onlinePersonObj } },
+          {
+            $addToSet: {
+              onlineSimple: onlinePersonObj
+            },
+            $set: {
+              lastreq: new Date()
+            }
+          },
           function (err, result) {
             if (err) {
               return res.status(400).json({ err: err });
@@ -637,4 +692,5 @@ router.post('/exitstreamsimple', auth, async (req, res) => {
     }
   });
 });
+
 module.exports = router;
