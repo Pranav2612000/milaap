@@ -32,6 +32,7 @@ video::-webkit-media-controls-timeline {
   bottom: 2vh;
   background-color: rgba(100, 100, 100, 0.5);
   left: 215px;
+  border-radius: 10px;
 }
 
 @media only screen and (max-width: 900px) {
