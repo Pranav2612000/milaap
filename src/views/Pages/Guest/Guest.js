@@ -34,6 +34,7 @@ class Guest extends Component {
   }
 
   componentDidMount() {
+    console.log(this.props.location);
     this.setState({ room: this.props.location.room });
     this.setState({ roomName: this.props.location.room });
   }

@@ -3,13 +3,19 @@ import { Route, Redirect } from 'react-router-dom';
 import axios from 'axios';
 import * as action from './redux/loginRedux/loginAction';
 import { connect } from 'react-redux';
-
+function getRoomFromLocation(locationString) {
+  let room = '';
+  const lastslash = locationString.lastIndexOf('/');
+  room = locationString.slice(lastslash + 1);
+  return room;
+}
 const ProtectedRoute = (props) => {
   const { component: Component, ...rest } = props;
   const [credentialsValid, setCredentialsValid] = useState(false);
   const [validated, setValidated] = useState(false);
   var token = localStorage.getItem('milaap-auth-token');
   useEffect(() => {
+    console.log(props.location);
     const verifyToken = async () => {
       token = localStorage.getItem('milaap-auth-token');
       await axios
@@ -36,7 +42,16 @@ const ProtectedRoute = (props) => {
   } else if (!credentialsValid && validated) {
     props.logout();
     localStorage.clear();
-    return <Redirect to="/join" />;
+    if(props.location.pathname == '/') {
+      return <Redirect to="/login" />
+    }
+    var roomName = getRoomFromLocation(props.location.pathname);
+    console.log(roomName);
+    return <Redirect to={{
+                        pathname: "/join",
+                        room: roomName,
+                        }}
+    />;
   } else {
     return <div className="animated fadeIn pt-1 text-center">Loading...</div>;
   }
