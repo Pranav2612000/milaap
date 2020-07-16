@@ -122,14 +122,14 @@ export class Login extends Component {
         {this.props.notifications && (
           <Notifications notifications={this.props.notifications} />
         )}
-        <div className="app flex-row align-items-center">
+        <div className="flex-row align-items-center">
           <ReactNotification />
           <Container>
             <Row
               className="justify-content-center"
               style={{ margin: '0%', height: '15%', padding: '0px !important' }}>
               <Card
-                className="text-white bg-transparent py-5 d-md-down"
+                className="text-white bg-transparent d-md-down"
                 style={{
                   margin: 0,
                   width: '59%',
