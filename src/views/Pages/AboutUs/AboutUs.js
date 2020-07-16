@@ -52,6 +52,7 @@ class AboutUs extends Component {
                     style={{ cursor: 'pointer' }}
                     height={'220px'}
                     width={'320px'}
+                    alt="milaap"
                   />
                 </CardBody>
                 <h1
@@ -98,7 +99,7 @@ class AboutUs extends Component {
                   }}>
                   We are still in out Development Phase. Feel free to contribute{' '}
                   <a
-                    href="https://github.com/pranav2612000/distrideochat"
+                    href="https://github.com/pranav2612000/milaap"
                     style={{
                       textAlign: 'center',
                       width: '100%',

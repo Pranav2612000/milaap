@@ -100,6 +100,7 @@ export class Register extends Component {
                     alt={'logo'}
                     height={'220px'}
                     width={'320px'}
+                    alt="milaap"
                   />
                 </CardBody>
               </Card>

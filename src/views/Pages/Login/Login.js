@@ -155,6 +155,7 @@ export class Login extends Component {
                     }}
                     height={'220px'}
                     width={'320px'}
+                    alt="milaap"
                   />
                 </CardBody>
               </Card>

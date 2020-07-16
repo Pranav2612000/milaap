@@ -1,7 +1,7 @@
 <!-- PROJECT LOGO -->
 <br />
 <p align="center">
-  <a href="https://github.com/Pranav2612000/distrideochat/">
+  <a href="https://github.com/Pranav2612000/milaap">
     <img src="public/assets/img/finallogo.jpg" alt="Logo" width="220" height="130">
 
   </a>

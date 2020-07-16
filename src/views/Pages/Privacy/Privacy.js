@@ -53,6 +53,7 @@ class Privacy extends Component {
                     height={'20px'}
                     height={'120px'}
                     className="mx-auto"
+                    alt="milaap"
                   />
                 </CardBody>
                 <h1
