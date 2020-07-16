@@ -9,23 +9,30 @@ const users = require('../models/User.model');
 router.post('/', async (req, res) => {
   const username = req.body.username;
   const password = req.body.password;
+
   users.findOne({ username: username }, function (err, user) {
     if (err) {
       return res.status(400).json({ err: 'Error Creating Room.' });
     }
     if (!user) {
-      var user = new userLogins({ username: username, password: password });
-      user.save((err) => {
-        if (err) {
-          return res.status(400).json({ err: 'Error Registering User' });
-        }
-        var userdata = new users({ username: username });
-        userdata.save((errr) => {
-          if (errr) {
-            return res.status(400).json({ err: 'Error Registering User' });
-          } else {
-            return res.status(200).json({ msg: 'Registered Successfully' });
-          }
+      const saltRounds = 10;
+      bcrypt.genSalt(saltRounds, (err, salt) => {
+        bcrypt.hash(password, salt, (err, hash) => {
+          console.log(hash);
+          var user = new userLogins({ username: username, password: hash });
+          user.save((err) => {
+            if (err) {
+              return res.status(400).json({ err: 'Error Registering User' });
+            }
+            var userdata = new users({ username: username });
+            userdata.save((errr) => {
+              if (errr) {
+                return res.status(400).json({ err: 'Error Registering User' });
+              } else {
+                return res.status(200).json({ msg: 'Registered Successfully' });
+              }
+            });
+          });
         });
       });
       console.log(username);
