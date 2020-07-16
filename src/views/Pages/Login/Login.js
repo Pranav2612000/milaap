@@ -168,6 +168,9 @@ export class Login extends Component {
                       <Form onSubmit={this.handleSubmit}>
                         <h1>Login</h1>
                         <p className="text-muted">Sign In to your account</p>
+                        <p className="text-muted">
+                          We've updated our database which forced us to delete all previous logins. Please create a new account if you are unable to login.
+                        </p>
                         <InputGroup className="mb-3">
                           <InputGroupAddon addonType="prepend">
                             <InputGroupText>
