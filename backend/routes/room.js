@@ -21,7 +21,7 @@ function cleanDB() {
       const data = val.toObject();
       //Getting the time since last join call by a user in room (in hours)
       let timeSinceLastCall = (now - data.lastreq) / 36e5;
-      let clearoutTime = 4; // Set the time (in hours) after which the guest and online array need to be cleaned
+      let clearoutTime = 12; // Set the time (in hours) after which the guest and online array need to be cleaned
       console.log(timeSinceLastCall);
       if (timeSinceLastCall > clearoutTime) {
         rooms.updateOne(
@@ -39,7 +39,7 @@ function cleanDB() {
 //This part runs the CronJob
 //Currently runs every 4 hours
 var job = new cron(
-  '0 0,4,8,12,16,20 * * *',
+  '0 1,13 * * *',
   function () {
     console.log('Running CronJob');
     cleanDB();
