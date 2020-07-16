@@ -104,6 +104,7 @@ class Landing extends Component {
                         style={{ cursor: 'pointer' }}
                         height={'220px'}
                         width={'320px'}
+                        alt="milaap"
                       />
                     </CardBody>
                   </Card>
