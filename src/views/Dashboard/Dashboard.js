@@ -62,9 +62,13 @@ class Dashboard extends Component {
       })
       .then((res) => {
         this.toggle();
+        /* TODO: Replace with appropriate state handling, to add room without reloading. */
+        window.location.reload();
       })
       .catch((err) => {
         console.log(err);
+        /* TODO: Appropriate Error handling. */
+        alert('Room exists, try a different room');
       });
   }
 
