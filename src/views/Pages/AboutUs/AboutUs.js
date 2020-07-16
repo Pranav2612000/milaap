@@ -98,7 +98,7 @@ class AboutUs extends Component {
                   }}>
                   We are still in out Development Phase. Feel free to contribute{' '}
                   <a
-                    href="https://github.com/pranav2612000/distrideochat"
+                    href="https://github.com/pranav2612000/milaap"
                     style={{
                       textAlign: 'center',
                       width: '100%',

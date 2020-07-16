@@ -106,11 +106,6 @@ class Dashboard extends Component {
               Welcome {`${this.props.username}`} to Milaap!
             </h1>
             <br />
-            {/*
-            <h1 style={{ color: 'white', opacity: '0.5' }}>
-              Distrideo Chat - Dashboard
-            </h1>
-             */}
             <br />
             <Container>
               <Row className="justify-content-center">
