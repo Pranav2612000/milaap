@@ -43,7 +43,7 @@ const ProtectedRoute = (props) => {
     props.logout();
     localStorage.clear();
     if(props.location.pathname == '/') {
-      return <Redirect to="/login" />
+      return <Redirect to="/landing" />
     }
     var roomName = getRoomFromLocation(props.location.pathname);
     console.log(roomName);
