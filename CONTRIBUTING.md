@@ -1,6 +1,6 @@
-# Contributing to CoreUI Free React Admin Template
+# Contributing to Milaap 
 
-Looking to contribute something to CoreUI Free React Admin Template? **Here's how you can help.**
+Looking to contribute to Milaap **Here's how you can help.**
 
 Please take a moment to review this document in order to make the contribution process easy and effective for everyone involved.
 
@@ -8,15 +8,13 @@ Following these guidelines helps to communicate that you respect the time of the
 
 ## Using the issue tracker
 
-The [issue tracker](https://github.com/coreui/coreui-free-react-admin-template/issues) is the preferred channel for [bug reports](#bug-reports), [features requests](#feature-requests) and [submitting pull requests](#pull-requests), but please respect the following restrictions:
+The [issue tracker](https://github.com/Pranav2612000/milaap/issues) is the preferred channel for [bug reports](#bug-reports), [features requests](#feature-requests) and [submitting pull requests](#pull-requests), but please respect the following restrictions:
 
 - Please **do not** use the issue tracker for personal support requests.
 
 - Please **do not** post comments consisting solely of "+1" or ":thumbsup:".
   Use [GitHub's "reactions" feature](https://github.com/blog/2119-add-reactions-to-pull-requests-issues-and-comments)
   instead.
-
-- Please **do not** open issues or pull requests regarding the code in [`@coreui/coreui`](https://github.com/coreui/coreui-react) (open them in their respective repositories).
 
 ## Bug reports
 
@@ -84,11 +82,11 @@ included in the project:
 
    ```bash
    # Clone your fork of the repo into the current directory
-   git clone https://github.com/<your-username>/free-react-admin-template.git
+   git clone https://github.com/<your-username>/milaap.git
    # Navigate to the newly cloned directory
-   cd free-react-admin-template
+   cd milaap 
    # Assign the original repo to a remote called "upstream"
-   git remote add upstream https://github.com/coreui/coreui-free-react-admin-template.git
+   git remote add upstream https://github.com/pranav2612000/milaap.git
    ```
 
 2. If you cloned a while ago, get the latest changes from upstream:
@@ -146,23 +144,12 @@ Inspired by Sparkbox's awesome article on [semantic commit messages](http://sees
 [Adhere to the Code Guide.](http://codeguide.co/#html)
 
 - Use tags and elements appropriate for an HTML5 doctype (e.g., self-closing tags).
-- Use CDNs and HTTPS for third-party JS when possible. We don't use protocol-relative URLs in this case because they break when viewing the page locally via `file://`.
 - Use [WAI-ARIA](https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA) attributes in documentation examples to promote accessibility.
-
-### CSS
-
-[Adhere to the Code Guide.](http://codeguide.co/#css)
-
-- When feasible, default color palettes should comply with [WCAG color contrast guidelines](http://www.w3.org/TR/WCAG20/#visual-audio-contrast).
-- Except in rare cases, don't remove default `:focus` styles (via e.g. `outline: none;`) without providing alternative styles. See [this A11Y Project post](http://a11yproject.com/posts/never-remove-css-outlines) for more details.
 
 ### JS
 
-- No semicolons (in client-side JS)
 - 2 spaces (no tabs)
-- strict mode
 - "Attractive"
-- Don't use [jQuery event alias convenience methods](https://github.com/jquery/jquery/blob/master/src/event/alias.js) (such as `$().focus()`). Instead, use [`$().trigger(eventType, ...)`](http://api.jquery.com/trigger/) or [`$().on(eventType, ...)`](http://api.jquery.com/on/), depending on whether you're firing an event or listening for an event. (For example, `$().trigger('focus')` or `$().on('focus', function (event) { /* handle focus event */ })`) We do this to be compatible with custom builds of jQuery where the event aliases module has been excluded.
 
 ## License
 
