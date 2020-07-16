@@ -39,12 +39,13 @@ class DefaultHeader extends Component {
       friendid: '',
       roomName: ''
     };
-    this.toggle = this.toggle.bind(this);
+    /*this.toggle = this.toggle.bind(this);
     this.handleFriendChange = this.handleFriendChange.bind(this);
     this.handleRoomNameChange = this.handleRoomNameChange.bind(this);
     this.addFriend = this.addFriend.bind(this);
+    */
   }
-
+  /*
   addFriend() {
     const reqData = {
       user: this.state.friendid,
@@ -81,7 +82,7 @@ class DefaultHeader extends Component {
       modal: !this.state.modal
     });
   }
-
+*/
   render() {
     // eslint-disable-next-line
     const { children, ...attributes } = this.props;
@@ -107,9 +108,9 @@ class DefaultHeader extends Component {
         <AppSidebarToggler className="d-md-down-none bg-dark" display="lg" />
         <Nav className="d-block d-md-down" navbar>
           <NavItem className="ml-0 px-2">
-            <NavLink to="#" className="nav-link" onClick={this.toggle}>
+            <NavLink to="/dashboard" className="nav-link">
               <button type="button" class="btn btn-pill btn-secondary">
-                Create Room
+                Home
               </button>
             </NavLink>
           </NavItem>
@@ -143,7 +144,7 @@ class DefaultHeader extends Component {
           />
         </Nav>
 
-        {/* Migrate the Modal to a new file. */}
+        {/* Migrate the Modal to a new file. 
 
         <Modal
           isOpen={this.state.modal}
@@ -177,6 +178,7 @@ class DefaultHeader extends Component {
             </Button>
           </ModalFooter>
         </Modal>
+        */}
       </React.Fragment>
     );
   }
