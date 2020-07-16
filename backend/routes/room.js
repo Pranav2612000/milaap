@@ -37,7 +37,7 @@ function cleanDB() {
 }
 
 //This part runs the CronJob
-//Currently runs every 4 hours
+//Currently runs every 12 hours(1 AM and 1PM)
 var job = new cron(
   '0 1,13 * * *',
   function () {
