@@ -50,6 +50,9 @@ class Privacy extends Component {
                     src={logo}
                     onClick={() => this.props.history.push('landing')}
                     style={{ cursor: 'pointer' }}
+                    height={'20px'}
+                    height={'120px'}
+                    className="mx-auto"
                   />
                 </CardBody>
                 <h1
@@ -74,18 +77,18 @@ class Privacy extends Component {
                 marginRight: '3%',
                 marginLeft: '3%'
               }}>
-              INTRODUCTION: The Distrideo Chat(“we” or “us”) values its visitors’
-              privacy. This privacy policy is effective from 28/06/2020; it
-              summarizes what information we might collect from a person who has
-              registered for our events (competitions / workshops) or for events in
-              which we provide services, or other visitor (“you”) before or during
-              such events, or users of our online services and applications, and what
-              we will and will not do with it. Please note that this privacy policy
-              does not govern the collection and use of information by individuals,
-              groups or companies that are not part of or controlled by The Distrideo
-              Chat. If you visit a website that we mention or link to, be sure to
-              review its privacy policy before providing the site with any
-              information. <br /> <br />
+              INTRODUCTION: The Milaap(“we” or “us”) values its visitors’ privacy.
+              This privacy policy is effective from 28/06/2020; it summarizes what
+              information we might collect from a person who has registered for our
+              events (competitions / workshops) or for events in which we provide
+              services, or other visitor (“you”) before or during such events, or
+              users of our online services and applications, and what we will and
+              will not do with it. Please note that this privacy policy does not
+              govern the collection and use of information by individuals, groups or
+              companies that are not part of or controlled by The Milaap. If you
+              visit a website that we mention or link to, be sure to review its
+              privacy policy before providing the site with any information. <br />{' '}
+              <br />
               WHAT WE DO WITH YOUR PERSONALLY IDENTIFIABLE INFORMATION It is always
               up to you whether to disclose personally identifiable information to
               us, although if you elect not to do so, we reserve the right not to
@@ -105,26 +108,24 @@ class Privacy extends Component {
               subpoena or search warrant. ◦ to outside auditors who have agreed to
               keep the information confidential. ◦ as necessary to enforce the Terms
               of Service. ◦ as necessary to protect the rights, safety, or property
-              of The Distrideo Chat, its users, or others; this may include (for
-              example) exchanging information with other organizations for fraud
-              protection and/or risk reduction. All such created media is owned by
-              The Distrideo Chat, and may be distributed by us, across our media
-              channels online or offline. However, we shall try to ensure none of
-              these can be used to trace you directly. If you have any issues with
-              any media content owned by us, please raise a concern at
-              milaap.techteam@gmail.com.
+              of The Milaap, its users, or others; this may include (for example)
+              exchanging information with other organizations for fraud protection
+              and/or risk reduction. All such created media is owned by The Milaap,
+              and may be distributed by us, across our media channels online or
+              offline. However, we shall try to ensure none of these can be used to
+              trace you directly. If you have any issues with any media content owned
+              by us, please raise a concern at milaap.techteam@gmail.com.
               <br />  <br />
               APP-SPECIFIC INFORMATION COLLECTED. Uses audio and video with
-              permission. COOKIES The Distrideo Chat’s website(s) uses “cookies” to
-              store personal data on your computer. We may also link information
-              stored on your computer in cookies with personal data about specific
-              individuals stored on servers rented, owned or controlled by The
-              Distrideo Chat. If you set up your Web browser (for example, Internet
-              Explorer or Firefox) so that cookies are not allowed, you might not be
-              able to use some or all of the features of our website(s). EXTERNAL
-              DATA STORAGE SITES We may store your data on servers provided by third
-              party hosting vendors with whom we have contracted or use(d)for our
-              administration.
+              permission. COOKIES The Milaap’s website(s) uses “cookies” to store
+              personal data on your computer. We may also link information stored on
+              your computer in cookies with personal data about specific individuals
+              stored on servers rented, owned or controlled by The Milaap. If you set
+              up your Web browser (for example, Internet Explorer or Firefox) so that
+              cookies are not allowed, you might not be able to use some or all of
+              the features of our website(s). EXTERNAL DATA STORAGE SITES We may
+              store your data on servers provided by third party hosting vendors with
+              whom we have contracted or use(d)for our administration.
               <br /> <br /> YOUR PRIVACY RESPONSIBILITIES To help protect your
               privacy, be sure: • not to share your unique codes with anyone • to
               take customary precautions to guard against “malware” (viruses, Trojan
@@ -132,9 +133,8 @@ class Privacy extends Component {
               anti-virus software.
               <br />
               <br /> INFORMATION COLLECTED FROM CHILDREN You must be at least 13
-              years old to use The Distrideo Chat’s website(s) and service(s). The
-              Distrideo Chatdoes not knowingly collect information from children
-              under 13.
+              years old to use The Milaap’s website(s) and service(s). The Milaap
+              does not knowingly collect information from children under 13.
               <br /> <br />
               CHANGES TO THIS PRIVACY POLICY We reserve the right to change this
               privacy policy as we deem necessary or appropriate because of legal
@@ -144,9 +144,9 @@ class Privacy extends Component {
               personally identifiable information, as may be necessary.
               <br />
               <br /> QUESTIONS OR COMMENTS? If you have questions or comments about
-              The Distrideo Chat’s privacy policy, send an email to{' '}
+              The Milaap's privacy policy, send an email to{' '}
               <b>milaap.techteam@gmail.com</b>. Thank you for believing in The
-              Distrideo Chat!
+              Milaap!
             </h5>
           </Row>
         </div>

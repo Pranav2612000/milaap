@@ -50,6 +50,8 @@ class AboutUs extends Component {
                     src={logo}
                     onClick={() => this.props.history.push('landing')}
                     style={{ cursor: 'pointer' }}
+                    height={'220px'}
+                    width={'320px'}
                   />
                 </CardBody>
                 <h1
@@ -67,9 +69,9 @@ class AboutUs extends Component {
                     width: '100%',
                     color: 'white'
                   }}>
-                  Distrideochat a DISTRIbuted viDEO/audio CHAT/conferencing
-                  application, which is designed to work on the edge, with very less
-                  interference of the server(i.e. peer to peer connection).
+                  Milaap a decentralised video/audio chat/conferencing application,
+                  which is designed to work on the edge, with very less interference
+                  of the server(i.e. peer to peer connection).
                 </h4>
                 <br />
                 <h5
