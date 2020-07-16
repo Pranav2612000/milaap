@@ -1,6 +1,19 @@
+html {
+  overflow: scroll;
+  overflow-x: hidden;
+}
+body {
+  height: 100%;
+}
+::-webkit-scrollbar {
+  width: 0px;
+  background: transparent;
+}
+
 .message-list-container {
   padding: 10px;
   padding-bottom: 70px;
   max-height: fit-content;
   scroll-behavior: auto;
+  /* margin-bottom: 55px; */
 }

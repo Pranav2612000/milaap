@@ -184,6 +184,8 @@ class Guest extends Component {
                     src={logo}
                     onClick={() => this.props.history.push('landing')}
                     style={{ cursor: 'pointer' }}
+                    height={'220px'}
+                    width={'320px'}
                   />
                 </CardBody>
               </Card>

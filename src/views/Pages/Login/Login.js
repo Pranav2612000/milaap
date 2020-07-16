@@ -153,6 +153,8 @@ export class Login extends Component {
                       margin: 0,
                       padding: '0px !important'
                     }}
+                    height={'220px'}
+                    width={'320px'}
                   />
                 </CardBody>
               </Card>
