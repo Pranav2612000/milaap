@@ -15,13 +15,13 @@ const cron = require('cron').CronJob;
 //Run this function as a chron job every x hours
 function cleanDB() {
   const now = new Date();
-  console.log(now);
+  // console.log(now);
   rooms.find({ lastreq: { $lt: now } }, (err, room) => {
     room.map((val, index) => {
       const data = val.toObject();
       //Getting the time since last join call by a user in room (in hours)
       let timeSinceLastCall = (now - data.lastreq) / 36e5;
-      let clearoutTime = 0.01; // Set the time (in hours) after which the guest and online array need to be cleaned
+      let clearoutTime = 4; // Set the time (in hours) after which the guest and online array need to be cleaned
       console.log(timeSinceLastCall);
       if (timeSinceLastCall > clearoutTime) {
         rooms.updateOne(
@@ -37,23 +37,24 @@ function cleanDB() {
 }
 
 //This part runs the CronJob
-// var job = new cron(
-//   '0 0,4,8,12,16,20 * * *',
-//   function () {
-//     console.log('Running CronJob');
-//     cleanDB();
-//   },
-//   null,
-//   true,
-//   'America/Los_Angeles'
-// );
+//Currently runs every 4 hours
+var job = new cron(
+  '0 0,4,8,12,16,20 * * *',
+  function () {
+    console.log('Running CronJob');
+    cleanDB();
+  },
+  null,
+  true,
+  'America/Los_Angeles'
+);
 
-// job.start();
+job.start();
 
 router.post('/createroom', auth, async (req, res) => {
   const host = req.user.id;
   const roomName = req.body.roomName;
-  cleanDB();
+  // cleanDB();
   // Create and save new room
   rooms.findOne({ roomName: roomName }, function (err, room) {
     if (err) {
