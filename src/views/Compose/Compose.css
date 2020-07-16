@@ -9,6 +9,7 @@
   margin-left: 0em;
   bottom: 0px;
   outline: none;
+  height: 10vh;
 }
 
 @supports (backdrop-filter: blur(20px)) {
