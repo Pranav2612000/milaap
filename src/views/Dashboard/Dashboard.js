@@ -110,7 +110,6 @@ class Dashboard extends Component {
               Welcome {`${this.props.username}`} to Milaap!
             </h1>
             <br />
-            <br />
             <Container>
               <Row className="justify-content-center">
                 <Col></Col>
@@ -131,40 +130,55 @@ class Dashboard extends Component {
                 </Col>
                 <Col></Col>
               </Row>
+              <br />
+              <br />
               <Row
                 className="justify-content-center"
-                style={{
+                style={{ opacity: '0.5' }}
+                /*style={{
                   margin: '0%',
                   height: '25%',
                   padding: '0',
                   opacity: '0.5'
-                }}>
+                }}*/
+              >
+                <img
+                  src={logo}
+                  onClick={() => this.props.history.push('dashboard')}
+                  width="30%"
+                  height="21.7%"
+                  style={{ cursor: 'pointer' }}
+                />
+
+                {/* 
                 <Card
                   className="text-white bg-transparent py-5 d-md-down"
-                  style={{ width: '80%' }}
+                  /*style={{ width: '80%' }}
                   style={{
                     backgroundColor: 'transparent',
                     border: 0,
                     padding: '0'
-                  }}>
+                  }}
+                >
                   <CardBody
                     className="text-center"
-                    style={{
+                    /*style={{
                       backgroundColor: 'transparent',
                       border: 0,
                       padding: '0'
-                    }}>
+                    }}
+                  >
                     <img
                       src={logo}
-                      width={'50%'}
-                      height={'60%'}
                       onClick={() => this.props.history.push('dashboard')}
                       style={{ cursor: 'pointer' }}
                     />
                   </CardBody>
                 </Card>
+              */}
               </Row>
             </Container>
+            <br />
             <h4 style={{ color: 'white', opacity: '0.5' }}>
               1. To create a room, click on 'Create Room', at the top
             </h4>
