@@ -244,6 +244,7 @@ class Guest extends Component {
                           <Button
                             color="primary"
                             className="px-4"
+                            type="submit"
                             onClick={
                               (e) => this.handleSubmit(e)
                               /*
