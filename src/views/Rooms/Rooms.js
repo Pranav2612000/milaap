@@ -11,6 +11,7 @@ import video from '../../assets/video.webp';
 import endcall from '../../assets/endcall.png';
 import flip from '../../assets/flip.png';
 import mic from '../../assets/mic.png';
+
 class Room extends Component {
   constructor(props) {
     super(props);
@@ -58,12 +59,14 @@ class Room extends Component {
         <main class="main">
           <br />
           <Container className="room">
-            <div className="d-flex justify-content-center align-items-center">
-              <video id="context" controls autoPlay></video>
+            <div
+              id="wrap"
+              className="d-flex justify-content-center align-items-center">
+              <video id="context" autoPlay playsInline></video>
               <br />
               <div id="contextOptions">
                 <button
-                  id="end"
+                  id="switch"
                   style={{
                     backgroundColor: 'white',
                     margin: '15px',
