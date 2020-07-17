@@ -12,7 +12,8 @@ import {
   InputGroup,
   InputGroupAddon,
   InputGroupText,
-  Row
+  Row,
+  Spinner
 } from 'reactstrap';
 
 import logo from '../../../assets/img/brand/logo.png';
@@ -29,7 +30,8 @@ class Guest extends Component {
       room: false,
       roomName: '',
       error: false,
-      disabled: false
+      disabled: false,
+      loading: false
     };
   }
 
@@ -64,6 +66,10 @@ class Guest extends Component {
     console.log(this.state.roomName);
     if (this.state.roomName == undefined || this.state.roomName == '') {
       alert('Enter a roomname to proceed');
+      this.setState({
+        loading: true,
+        error: true
+      });
       return;
     }
 
@@ -75,6 +81,10 @@ class Guest extends Component {
         roomName: this.state.roomName,
         username: this.state.name
       };
+      this.setState({
+        loading: true,
+        error: true
+      });
       this.props.getTokenForTempUser(reqData);
       // axios
       //   .post(`${global.config.backendURL}/api/user/gettokenfortempuser`, reqData)
@@ -103,8 +113,11 @@ class Guest extends Component {
       //   });
     } else {
       this.setState({
-        login: true
+        login: true,
+        error: false,
+        loading: true
       });
+
       return;
     }
     return;
@@ -169,23 +182,23 @@ class Guest extends Component {
           <Notifications notifications={this.props.notifications} />
         )}
         <div className="flex-row align-items-center">
+          <br />
           <Container>
             <Row
               className="justify-content-center"
               style={{ margin: '0%', height: '15%' }}>
               <Card
                 className="text-white bg-transparent d-md-down"
-                style={{ width: '59%' }}
                 style={{ backgroundColor: 'transparent', border: 0 }}>
                 <CardBody
                   className="text-center"
-                  style={{ backgroundColor: 'transparent', border: 0 }}>
+                  style={{ backgroundColor: 'transparent', border: 0,margin: 0, padding: '0px !important' }}>
                   <img
                     src={logo}
                     onClick={() => this.props.history.push('landing')}
                     style={{ cursor: 'pointer' }}
                     height={'220px'}
-                    width={'320px'}
+                    width={'300px'}
                     alt="milaap"
                   />
                 </CardBody>
@@ -241,20 +254,28 @@ class Guest extends Component {
                         )}
 
                         <Row className="justify-content-center">
-                          <Button
-                            color="primary"
-                            className="px-4"
-                            type="submit"
-                            onClick={
-                              (e) => this.handleSubmit(e)
-                              /*
+                          {this.state.loading && !this.state.error ? (
+                            <Button color="primary" className="px-4">
+                              <Spinner
+                                animation={'grow'}
+                                variant="primary"></Spinner>
+                            </Button>
+                          ) : (
+                            <Button
+                              color="primary"
+                              className="px-4"
+                              type="submit"
+                              onClick={
+                                (e) => this.handleSubmit(e)
+                                /*
                                 localStorage.getItem('milaap-auth-token')
                                   ? this.handleUserAdd(e)
                                   : this.handleSubmit(e)
                                   */
-                            }>
-                            Join
-                          </Button>
+                              }>
+                              Join
+                            </Button>
+                          )}
                         </Row>
                         <br />
                         <Row className="justify-content-center">
@@ -310,7 +331,8 @@ const mapStateToProps = (state) => {
   return {
     loggedIn: state.loginReducer.loggedIn,
     error: state.loginReducer.error,
-    notifications: state.notifications
+    notifications: state.notifications,
+    loading: state.loading
   };
 };
 

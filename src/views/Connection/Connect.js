@@ -534,6 +534,7 @@ export function createVideoElement(self, stream, friendtkn, username) {
   video.srcObject = stream;
   video.autoplay = true;
   video.onclick = switchContext;
+  video.playsinline = true;
   if (video.id == 'me-video') {
     video.muted = 'true';
   }
