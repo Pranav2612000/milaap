@@ -62,14 +62,7 @@ class Room extends Component {
             <div
               id="wrap"
               className="d-flex justify-content-center align-items-center">
-              <video id="context" autoPlay onLoad={this.handlePIP}></video>
-              {/* <button
-                id="togglePIP"
-                type="button"
-                onClick={this.handlePIP}
-                style={{ display: 'block' }}>
-                Toggle
-              </button> */}
+              <video id="context" autoPlay playsInline></video>
               <br />
               <div id="contextOptions">
                 <button
