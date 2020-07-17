@@ -50,6 +50,7 @@ class DefaultAside extends Component {
     }
   }
 
+
   changeRoomType = () => {
     this.setState({
       roomType: this.state.roomType === 'Public' ? 'Private' : 'Public'
