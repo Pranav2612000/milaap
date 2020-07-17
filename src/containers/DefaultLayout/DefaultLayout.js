@@ -19,6 +19,7 @@ import {
 } from '@coreui/react';
 import routes from '../../routes';
 
+const socket = socketIOClient(`${global.config.backendURL}/`);
 const DefaultHeader = React.lazy(() => import('./DefaultHeader'));
 function getGroupElements(rooms) {
   const groupElements = [];
@@ -164,6 +165,9 @@ class DefaultLayout extends Component {
         }
       });
     }
+    socket.on('newRoom', (data) => {
+      this.getRooms();
+    });
   }
 
   render() {
