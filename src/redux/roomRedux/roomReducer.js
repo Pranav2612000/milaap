@@ -17,7 +17,8 @@ export const roomReducer = (state = initalState, action) => {
         currentRoom: undefined,
         msgs: undefined,
         users: undefined,
-        guests: undefined
+        guests: undefined,
+        error: null
       };
     case ENTER_ROOM_SUCCESS:
       return {

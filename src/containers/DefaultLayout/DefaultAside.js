@@ -50,28 +50,6 @@ class DefaultAside extends Component {
     }
   }
 
-  componentDidMount = () => {
-    setTimeout(() => {
-      if (this.props.roomName === undefined) {
-        this.setState({
-          invalid: true
-        });
-        store.addNotification({
-          title: `Invalid Room`,
-          message: `Entered Room does not exist. Please create a new one.`,
-          type: 'danger',
-          // insert: "top",
-          container: 'top-right',
-          animationIn: ['animated', 'fadeIn'],
-          animationOut: ['animated', 'fadeOut'],
-          dismiss: {
-            duration: 3000,
-            pauseOnHover: true
-          }
-        });
-      }
-    }, 1000);
-  };
 
   changeRoomType = () => {
     this.setState({
@@ -108,11 +86,11 @@ class DefaultAside extends Component {
   render() {
     // eslint-disable-next-line
     const { children, ...attributes } = this.props;
-    if (this.state.invalid === true) {
-      return <Redirect to="/dashboard"></Redirect>;
-    }
     return (
       <React.Fragment>
+        {this.props.loading === false && this.props.error === 'NOROOM' && (
+          <Redirect to="/404"></Redirect>
+        )}
         <Nav tabs>
           <NavItem>
             <NavLink
@@ -228,7 +206,8 @@ class DefaultAside extends Component {
 const mapStateToProps = (state) => {
   return {
     count: state.messageReducer.count,
-    roomName: state.roomReducer.currentRoom
+    error: state.roomReducer.error,
+    loading: state.roomReducer.loading
   };
 };
 const mapDispatchToProps = (dispatch) => {
