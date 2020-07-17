@@ -182,6 +182,7 @@ class Guest extends Component {
           <Notifications notifications={this.props.notifications} />
         )}
         <div className="flex-row align-items-center">
+          <br />
           <Container>
             <Row
               className="justify-content-center"
@@ -197,7 +198,7 @@ class Guest extends Component {
                     onClick={() => this.props.history.push('landing')}
                     style={{ cursor: 'pointer' }}
                     height={'220px'}
-                    width={'320px'}
+                    width={'300px'}
                     alt="milaap"
                   />
                 </CardBody>

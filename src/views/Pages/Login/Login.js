@@ -124,6 +124,7 @@ export class Login extends Component {
         )}
         <div className="flex-row align-items-center">
           <ReactNotification />
+          <br />
           <Container>
             <Row
               className="justify-content-center"
@@ -136,22 +137,13 @@ export class Login extends Component {
                 }}>
                 <CardBody
                   className="text-center"
-                  style={{
-                    backgroundColor: 'transparent',
-                    border: 0,
-                    margin: 0,
-                    padding: '0px !important'
-                  }}>
+                  style={{ backgroundColor: 'transparent', border: 0 }}>
                   <img
                     src={logo}
                     onClick={() => this.props.history.push('landing')}
-                    style={{
-                      cursor: 'pointer',
-                      margin: 0,
-                      padding: '0px !important'
-                    }}
+                    style={{ cursor: 'pointer' }}
                     height={'220px'}
-                    width={'320px'}
+                    width={'300px'}
                     alt="milaap"
                   />
                 </CardBody>
@@ -166,7 +158,9 @@ export class Login extends Component {
                         <h1>Login</h1>
                         <p className="text-muted">Sign In to your account</p>
                         <p className="text-muted">
-                          We've updated our database which forced us to delete all previous logins. Please create a new account if you are unable to login.
+                          We've updated our database which forced us to delete all
+                          previous logins. Please create a new account if you are
+                          unable to login.
                         </p>
                         <InputGroup className="mb-3">
                           <InputGroupAddon addonType="prepend">
