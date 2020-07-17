@@ -76,16 +76,16 @@ class Guest extends Component {
       });
       return;
     }
-    if (this.state.roomName == undefined || this.state.roomName == '') {
-      alert('Enter a roomname to proceed');
-      this.setState({
-        loading: false
-      });
-      return;
-    }
 
     /* Get a valid token if user doesn't have one. */
-    if (!global.config.secureStorage.getItem('milaap-auth-token')) {
+    if (!localStorage.getItem('milaap-auth-token')) {
+      if (this.state.roomName == undefined || this.state.roomName == '') {
+        alert('Enter a roomname to proceed');
+        this.setState({
+          loading: false
+        });
+        return;
+      }
       console.log('exists');
       var reqData = {
         name: this.state.name,
