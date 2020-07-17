@@ -62,6 +62,8 @@ export const enterRoom = (room) => {
           return;
         }
         dispatch(enterRoomSuccess(reqData.roomName, res.data));
+        console.clear();
+        console.log(res.data);
       })
       .catch((err) => {
         dispatch(enterRoomFailure(err));
