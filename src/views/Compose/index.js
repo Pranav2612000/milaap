@@ -5,11 +5,14 @@ import axios from 'axios';
 export default function Compose(props) {
   const [msg, setMsg] = useState('');
   async function sendMessage() {
-    if (msg === '') return;
+    // var text = document.getElementById('textMsg').innerHTML;
+    // if (text.replace('/\n/g', '') === '') return;
+    if (msg === '' || msg.replace(/(\r\n|\n|\r)/gm, '') === '') return;
     const reqData = {
       msg: msg,
       roomName: props.roomName
     };
+    setMsg('');
     axios
       .post(`${global.config.backendURL}/api/room/sendmessage`, reqData, {
         headers: {
@@ -28,6 +31,7 @@ export default function Compose(props) {
     <div className="compose bg-dark" style={{ borderTop: 'white solid 1px' }}>
       <textarea
         type="text"
+        id="textMsg"
         className="md-textarea form-control"
         placeholder="Type a message, @name"
         value={msg}
@@ -39,8 +43,11 @@ export default function Compose(props) {
         }}
         style={styleSheet.inputStyles}
       />
-      <button className="compose-button" onClick={sendMessage}>
-        <i class="fa fa-paper-plane" aria-hidden="true"></i>
+      <button
+        className="compose-button"
+        onClick={sendMessage}
+        style={{ scale: '1.3' }}>
+        <i class="fa fa-paper-plane" aria-hidden="true" style={{ scale: '1.3' }}></i>
       </button>
 
       {props.rightItems}
@@ -54,7 +61,9 @@ const styleSheet = {
     backgroundColor: 'white',
     marginRight: '5px',
     borderWidth: '2.5px',
-    borderColor: 'black'
+    borderColor: 'black',
+    color: 'black',
+    fontSize: '1rem'
   },
   composeStyles: {
     backgroundColor: 'transparent',

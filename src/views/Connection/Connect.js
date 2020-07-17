@@ -549,41 +549,6 @@ export function createVideoElement(self, stream, friendtkn, username) {
 
   /* add event handler to bring video to center. */
   if (!context.srcObject) switchContext(document.getElementById(friendtkn));
-  document.addEventListener(
-    'visibilitychange',
-    async () => {
-      if ('pictureInPictureEnabled' in document) {
-        if (!document.pictureInPictureElement)
-          try {
-            const video = document.getElementById('context');
-            video.play();
-            if (video) {
-              await video.requestPictureInPicture().then(() => {
-                // setTimeout(() => {
-                //   document.exitPictureInPicture();
-                // }, 5000);
-              });
-            }
-          } catch (error) {
-            console.log(error);
-          }
-        else {
-          await document.exitPictureInPicture();
-
-          // await new Promise((r) => setTimeout(r, 2000));
-          var evt = new MouseEvent('click', {
-            view: window,
-            bubbles: false,
-            cancelable: false
-            // clientX: 20
-            /* whatever properties you want to give it */
-          });
-          document.getElementById('context').dispatchEvent(evt);
-        }
-      }
-    },
-    false
-  );
 }
 
 /* function to modify a previously created element. */

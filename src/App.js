@@ -82,7 +82,9 @@ class App extends Component {
               <Route
                 path="/"
                 name="Home"
-                render={(props) => <ProtectedRoute path="/" component={DefaultLayout} {...props}/>}
+                render={(props) => (
+                  <ProtectedRoute path="/" component={DefaultLayout} {...props} />
+                )}
               />
             </Switch>
           </React.Suspense>
