@@ -83,6 +83,7 @@ class DefaultHeader extends Component {
     });
   }
 */
+
   render() {
     // eslint-disable-next-line
     const { children, ...attributes } = this.props;
@@ -107,13 +108,15 @@ class DefaultHeader extends Component {
         </NavLink>
         <AppSidebarToggler className="d-md-down-none bg-dark" display="lg" />
         <Nav className="d-block d-md-down" navbar>
-          <NavItem className="ml-0 px-2">
-            <NavLink to="/dashboard" className="nav-link">
-              <button type="button" class="btn btn-pill btn-secondary">
-                Home
-              </button>
-            </NavLink>
-          </NavItem>
+          {this.props.guests && !this.props.guests.includes(this.props.username) && (
+            <NavItem className="ml-0 px-2">
+              <NavLink to="/dashboard" className="nav-link">
+                <button type="button" class="btn btn-pill btn-secondary">
+                  Home
+                </button>
+              </NavLink>
+            </NavItem>
+          )}
         </Nav>
 
         <Nav className="ml-auto" navbar>
@@ -189,7 +192,8 @@ DefaultHeader.defaultProps = defaultProps;
 
 const mapStateToProps = (state) => {
   return {
-    username: state.loginReducer.username
+    username: state.loginReducer.username,
+    guests: state.roomReducer.guests
   };
 };
 
