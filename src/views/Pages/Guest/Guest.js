@@ -63,12 +63,21 @@ class Guest extends Component {
 
   handleSubmit = (e) => {
     e.preventDefault();
+    this.setState({
+      loading: true
+    });
     console.log(this.state.roomName);
+    if (this.state.name == undefined || this.state.name === '') {
+      alert('Enter a username to proceed');
+      this.setState({
+        loading: false
+      });
+      return;
+    }
     if (this.state.roomName == undefined || this.state.roomName == '') {
       alert('Enter a roomname to proceed');
       this.setState({
-        loading: true,
-        error: true
+        loading: false
       });
       return;
     }
@@ -82,8 +91,7 @@ class Guest extends Component {
         username: this.state.name
       };
       this.setState({
-        loading: true,
-        error: true
+        loading: true
       });
       this.props.getTokenForTempUser(reqData);
       // axios
@@ -114,7 +122,6 @@ class Guest extends Component {
     } else {
       this.setState({
         login: true,
-        error: false,
         loading: true
       });
 
@@ -254,7 +261,7 @@ class Guest extends Component {
                         )}
 
                         <Row className="justify-content-center">
-                          {this.state.loading && !this.state.error ? (
+                          {this.props.loading && !this.props.error ? (
                             <Button color="primary" className="px-4">
                               <Spinner
                                 animation={'grow'}
@@ -332,7 +339,7 @@ const mapStateToProps = (state) => {
     loggedIn: state.loginReducer.loggedIn,
     error: state.loginReducer.error,
     notifications: state.notifications,
-    loading: state.loading
+    loading: state.loginReducer.loading
   };
 };
 
