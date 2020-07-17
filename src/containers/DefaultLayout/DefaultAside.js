@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { withRouter } from 'react-router-dom';
+import { withRouter, Redirect } from 'react-router-dom';
 import { store } from 'react-notifications-component';
 import { connect } from 'react-redux';
 import * as action from '../../redux/messageRedux/messageAction';
@@ -50,6 +50,29 @@ class DefaultAside extends Component {
     }
   }
 
+  componentDidMount = () => {
+    setTimeout(() => {
+      if (this.props.roomName === undefined) {
+        this.setState({
+          invalid: true
+        });
+        store.addNotification({
+          title: `Invalid Room`,
+          message: `Entered Room does not exist. Please create a new one.`,
+          type: 'danger',
+          // insert: "top",
+          container: 'top-right',
+          animationIn: ['animated', 'fadeIn'],
+          animationOut: ['animated', 'fadeOut'],
+          dismiss: {
+            duration: 3000,
+            pauseOnHover: true
+          }
+        });
+      }
+    }, 200);
+  };
+
   changeRoomType = () => {
     this.setState({
       roomType: this.state.roomType === 'Public' ? 'Private' : 'Public'
@@ -85,7 +108,9 @@ class DefaultAside extends Component {
   render() {
     // eslint-disable-next-line
     const { children, ...attributes } = this.props;
-
+    if (this.state.invalid === true) {
+      return <Redirect to="/dashboard"></Redirect>;
+    }
     return (
       <React.Fragment>
         <Nav tabs>
@@ -202,7 +227,8 @@ class DefaultAside extends Component {
 
 const mapStateToProps = (state) => {
   return {
-    count: state.messageReducer.count
+    count: state.messageReducer.count,
+    roomName: state.roomReducer.currentRoom
   };
 };
 const mapDispatchToProps = (dispatch) => {
