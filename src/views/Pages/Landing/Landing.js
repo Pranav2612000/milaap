@@ -37,7 +37,7 @@ class Landing extends Component {
           style={{ overflow: 'hidden' }}>
           <Container>
             <Row className="justify-content-center">
-              <Col sm={2}/>
+              <Col sm={2} />
               <Col sm={4}>
                 <CardGroup style={{ border: 0 }}>
                   <Card
@@ -91,17 +91,19 @@ class Landing extends Component {
                   </Card>
                 </CardGroup>
               </Col>
-              <Col sm={5} className="d-flex justify-content-center align-items-center">
-                  <img
-                    src={logo}
-                    onClick={() => this.props.history.push('landing')}
-                    style={{ cursor: 'pointer' }}
-                    height={'220px'}
-                    width={'320px'}
-                    alt="milaap"
-                  />
+              <Col
+                sm={5}
+                className="d-flex justify-content-center align-items-center">
+                <img
+                  src={logo}
+                  onClick={() => this.props.history.push('landing')}
+                  style={{ cursor: 'pointer' }}
+                  height={'220px'}
+                  width={'320px'}
+                  alt="milaap"
+                />
               </Col>
-              <Col sm={1}/>
+              <Col sm={1} />
             </Row>
           </Container>
         </div>
