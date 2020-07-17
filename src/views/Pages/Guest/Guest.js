@@ -188,11 +188,10 @@ class Guest extends Component {
               style={{ margin: '0%', height: '15%' }}>
               <Card
                 className="text-white bg-transparent d-md-down"
-                style={{ width: '59%' }}
                 style={{ backgroundColor: 'transparent', border: 0 }}>
                 <CardBody
                   className="text-center"
-                  style={{ backgroundColor: 'transparent', border: 0 }}>
+                  style={{ backgroundColor: 'transparent', border: 0,margin: 0, padding: '0px !important' }}>
                   <img
                     src={logo}
                     onClick={() => this.props.history.push('landing')}
