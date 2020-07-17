@@ -193,7 +193,9 @@ class MessageList extends Component {
 
   render() {
     return (
-      <div className="message-list bg-dark">
+      <div
+        className="message-list bg-dark"
+        style={{ paddingTop: '0px !important', marginTop: '0px !important' }}>
         <audio className="audio-element" style={{ display: 'none' }}>
           <source src={ring}></source>
         </audio>
