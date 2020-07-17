@@ -376,44 +376,45 @@ export class Peer {
 
 export async function toggleVideo(self) {
   var webCam = getVideoState();
-  navigator.mediaDevices
-    .getUserMedia(
-      webCam
-        ? {
-            video: { width: 320, height: 180 },
-            audio: { echoCancellation: true, noiseSuppression: true }
-          }
-        : {
-            audio: { echoCancellation: true, noiseSuppression: true }
-          }
-    )
-    .then((stream) => {
-      /* Remove the current video track(if exists) locally & from all peers. */
-      if (myMediaStreamObj.getVideoTracks().length != 0) {
-        connectedPeers.map((eachPeer) => {
-          try {
-            eachPeer.peer.removeTrack(
-              myMediaStreamObj.getVideoTracks()[0],
-              myMediaStreamObj
-            );
-          } catch (err) {
-            console.log(err);
-            //alert('could not share screen to this peer');
-          }
-        });
-        //Remove locally
-        myMediaStreamObj.getVideoTracks()[0].stop();
-        myMediaStreamObj.removeTrack(myMediaStreamObj.getVideoTracks()[0]);
-        changeStatusOfVideoElement(
-          self,
-          'video_off',
-          myMediaStreamObj,
-          'me' + '-video',
-          'ME'
-        );
-      }
+  var mic = getAudioState();
 
-      if (webCam) {
+  if (!webCam) {
+    if (myMediaStreamObj.getVideoTracks().length != 0) {
+      connectedPeers.map((eachPeer) => {
+        try {
+          eachPeer.peer.removeTrack(
+            myMediaStreamObj.getVideoTracks()[0],
+            myMediaStreamObj
+          );
+        } catch (err) {
+          console.log(err);
+          //alert('could not share screen to this peer');
+        }
+      });
+
+      //Remove locally
+      myMediaStreamObj.getVideoTracks()[0].stop();
+      myMediaStreamObj.removeTrack(myMediaStreamObj.getVideoTracks()[0]);
+
+      // If both mic and webcam is off then loading stream in video will cause error
+      // So pass setNewMediaSource as true to create empty Media source and assign it to video
+      let setNewMediaSource = !mic && !webCam ? true : false;
+      changeStatusOfVideoElement(
+        self,
+        'video_off',
+        myMediaStreamObj,
+        'me' + '-video',
+        'ME',
+        setNewMediaSource
+      );
+    }
+  } else {
+    navigator.mediaDevices
+      .getUserMedia({
+        video: { width: 320, height: 180 },
+        audio: false
+      })
+      .then((stream) => {
         /* We are here means, we are staring video, after stopping it, so add video track to all peers and locally. */
         if (connectedPeers) {
           /* Add to all peers. */
@@ -426,7 +427,6 @@ export async function toggleVideo(self) {
             }
           });
         }
-
         /* Add locally. */
         myMediaStreamObj.addTrack(stream.getVideoTracks()[0]);
         changeStatusOfVideoElement(
@@ -436,15 +436,14 @@ export async function toggleVideo(self) {
           'me' + '-video',
           'ME'
         );
-      }
-    });
+      });
+  }
 }
 
 export async function toggleAudio(self) {
   var mic = getAudioState();
-
   /* Remove the current audio track(if exists) locally & from all peers. */
-  if (myMediaStreamObj.getAudioTracks().length != 0) {
+  if (!mic) {
     if (connectedPeers) {
       /* Remove from all peers */
       connectedPeers.map((eachPeer) => {
@@ -461,8 +460,7 @@ export async function toggleAudio(self) {
       myMediaStreamObj.getAudioTracks()[0].stop();
       myMediaStreamObj.removeTrack(myMediaStreamObj.getAudioTracks()[0]);
     }
-  }
-  if (mic) {
+  } else {
     /* We are here means, we are staring audio, after stopping it, so add video track to all peers and locally. */
     navigator.mediaDevices
       .getUserMedia({
@@ -536,6 +534,7 @@ export function createVideoElement(self, stream, friendtkn, username) {
   video.srcObject = stream;
   video.autoplay = true;
   video.onclick = switchContext;
+  video.playsinline = true;
   if (video.id == 'me-video') {
     video.muted = 'true';
   }
@@ -593,7 +592,8 @@ function changeStatusOfVideoElement(
   status,
   stream,
   friendtkn,
-  username = null
+  username = null,
+  setNewMediaSource = false
 ) {
   //let video = $('#' + friendtkn);
   if (status == 'video_off') {
@@ -605,14 +605,18 @@ function changeStatusOfVideoElement(
     video.srcObject = stream;
     video.poster =
       'https://dummyimage.com/1024x576/2f353a/ffffff.jpg&text=' + username;
-    video.play();
+    var isPlaying =
+      video.currentTime > 0 && !video.paused && !video.ended && video.readyState > 2;
+
+    if (!isPlaying) {
+      video.play();
+    }
   } else if (status == 'video_on') {
     const video = document.getElementById(friendtkn);
     if (!video) {
       return;
     }
     video.srcObject = stream;
-    video.play();
   }
 }
 
@@ -632,7 +636,13 @@ export function switchContext(e) {
     if (e.id == 'me-video') {
       context.muted = 'true';
     }
-    context.play();
+    console.log(e.srcObject.getAudioTracks(), e.srcObject.getVideoTracks());
+    if (
+      e.srcObject.getAudioTracks.length != 0 ||
+      e.srcObject.getVideoTracks.length != 0
+    ) {
+      context.play();
+    }
     $('#context').removeClass().addClass(e.id);
   } catch (err) {
     console.log(err);
@@ -881,6 +891,7 @@ function deleteAllVideoElements() {
 function clearContext() {
   const context = document.getElementById('context');
   if (context != null) {
+    context.src = null;
     context.srcObject = null;
     context.style.display = 'none';
   }

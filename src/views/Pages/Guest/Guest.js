@@ -12,7 +12,8 @@ import {
   InputGroup,
   InputGroupAddon,
   InputGroupText,
-  Row
+  Row,
+  Spinner
 } from 'reactstrap';
 
 import logo from '../../../assets/img/brand/logo.png';
@@ -29,11 +30,13 @@ class Guest extends Component {
       room: false,
       roomName: '',
       error: false,
-      disabled: false
+      disabled: false,
+      loading: false
     };
   }
 
   componentDidMount() {
+    console.log(this.props.location);
     this.setState({ room: this.props.location.room });
     this.setState({ roomName: this.props.location.room });
   }
@@ -63,6 +66,10 @@ class Guest extends Component {
     console.log(this.state.roomName);
     if (this.state.roomName == undefined || this.state.roomName == '') {
       alert('Enter a roomname to proceed');
+      this.setState({
+        loading: true,
+        error: true
+      });
       return;
     }
 
@@ -74,6 +81,10 @@ class Guest extends Component {
         roomName: this.state.roomName,
         username: this.state.name
       };
+      this.setState({
+        loading: true,
+        error: true
+      });
       this.props.getTokenForTempUser(reqData);
       // axios
       //   .post(`${global.config.backendURL}/api/user/gettokenfortempuser`, reqData)
@@ -102,8 +113,11 @@ class Guest extends Component {
       //   });
     } else {
       this.setState({
-        login: true
+        login: true,
+        error: false,
+        loading: true
       });
+
       return;
     }
     return;
@@ -167,13 +181,13 @@ class Guest extends Component {
         {this.props.notifications && (
           <Notifications notifications={this.props.notifications} />
         )}
-        <div className="app flex-row align-items-center">
+        <div className="flex-row align-items-center">
           <Container>
             <Row
               className="justify-content-center"
               style={{ margin: '0%', height: '15%' }}>
               <Card
-                className="text-white bg-transparent py-5 d-md-down"
+                className="text-white bg-transparent d-md-down"
                 style={{ width: '59%' }}
                 style={{ backgroundColor: 'transparent', border: 0 }}>
                 <CardBody
@@ -183,29 +197,34 @@ class Guest extends Component {
                     src={logo}
                     onClick={() => this.props.history.push('landing')}
                     style={{ cursor: 'pointer' }}
+                    height={'220px'}
+                    width={'320px'}
+                    alt="milaap"
                   />
                 </CardBody>
               </Card>
             </Row>
             <Row className="justify-content-center">
-              <Col md="8">
+              <Col md="6">
                 <CardGroup>
                   <Card className="p-4">
                     <CardBody>
                       <Form>
                         {this.state.room ? (
-                          <h2>Join Room {this.state.room}</h2>
+                          <h2 style={{ alignSelf: 'center' }}>
+                            Join Room {this.state.room}
+                          </h2>
                         ) : (
-                          <h2>Join a Meeting Room</h2>
+                          <h2 style={{ alignSelf: 'center' }}>
+                            Join a Meeting Room
+                          </h2>
                         )}
                         {localStorage.getItem('milaap-auth-token') ? (
                           <></>
                         ) : (
                           <InputGroup className="mb-3">
                             <InputGroupAddon addonType="prepend">
-                              <InputGroupText>
-                                <i className="icon-user"></i>
-                              </InputGroupText>
+                              <InputGroupText>Your Name</InputGroupText>
                             </InputGroupAddon>
                             <Input
                               type="text"
@@ -222,9 +241,7 @@ class Guest extends Component {
                         ) : (
                           <InputGroup className="mb-4">
                             <InputGroupAddon addonType="prepend">
-                              <InputGroupText>
-                                <i className="icon-drop"></i>
-                              </InputGroupText>
+                              <InputGroupText>Room Name</InputGroupText>
                             </InputGroupAddon>
                             <Input
                               type="text"
@@ -236,11 +253,18 @@ class Guest extends Component {
                           </InputGroup>
                         )}
 
-                        <Row>
-                          <Col xs="6">
+                        <Row className="justify-content-center">
+                          {this.state.loading && !this.state.error ? (
+                            <Button color="primary" className="px-4">
+                              <Spinner
+                                animation={'grow'}
+                                variant="primary"></Spinner>
+                            </Button>
+                          ) : (
                             <Button
                               color="primary"
                               className="px-4"
+                              type="submit"
                               onClick={
                                 (e) => this.handleSubmit(e)
                                 /*
@@ -251,12 +275,30 @@ class Guest extends Component {
                               }>
                               Join
                             </Button>
-                          </Col>
+                          )}
+                        </Row>
+                        <br />
+                        <Row className="justify-content-center">
+                          <h2>OR</h2>
+                        </Row>
+                        <Row className="justify-content-center">
+                          <h5>If you already have an account, click Login!</h5>
+                        </Row>
+                        <Row className="justify-content-center">
+                          <Link to="/login">
+                            <Button
+                              color="primary"
+                              className="px-4"
+                              active
+                              tabIndex={-1}>
+                              Login
+                            </Button>
+                          </Link>
                         </Row>
                       </Form>
                     </CardBody>
                   </Card>
-                  <Card
+                  {/*<Card
                     className="text-white bg-primary py-5 d-md-down-none"
                     style={{ width: '44%' }}>
                     <CardBody className="text-center">
@@ -274,7 +316,7 @@ class Guest extends Component {
                         </Link>
                       </div>
                     </CardBody>
-                  </Card>
+                  </Card>*/}
                 </CardGroup>
               </Col>
             </Row>
@@ -289,7 +331,8 @@ const mapStateToProps = (state) => {
   return {
     loggedIn: state.loginReducer.loggedIn,
     error: state.loginReducer.error,
-    notifications: state.notifications
+    notifications: state.notifications,
+    loading: state.loading
   };
 };
 

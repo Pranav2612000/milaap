@@ -1,24 +1,28 @@
 <!-- PROJECT LOGO -->
 <br />
 <p align="center">
-  <a href="https://github.com/Pranav2612000/distrideochat/">
-    <img src="public/assets/img/finallogo.png" alt="Logo" width="130" height="130">
+  <a href="https://github.com/Pranav2612000/milaap">
+    <img src="public/assets/img/finallogo.jpg" alt="Logo" width="220" height="130">
+
   </a>
 
-  <h3 align="center">Distrideo Chat</h3>
+  <h3 align="center">Milaap</h3>
 
   <p align="center">
-    A distributed video/audio calling application!
+    A decentralized video/audio calling application!
     <br />
-    <!-- <a href="https://github.com/Pranav2612000/distrideochat">View Demo</a>
+    <!-- <a href="https://github.com/Pranav2612000/milaap">View Demo</a>
     · -->
-    <a href="https://github.com/Pranav2612000/distrideochat/issues">Report Bug</a>
+    <a href="https://github.com/Pranav2612000/milaap/issues">Report Bug</a>
     ·
-    <a href="https://github.com/Pranav2612000/distrideochat/issues">Request Feature</a>
+    <a href="https://github.com/Pranav2612000/milaap/issues">Request Feature</a>
   </p>
 </p>
 <p align="center">
-  <b>Distrideo Chat is live <a href="https://distrideo.ml">here</a>.</b>
+  <b>Milaap is live <a href="https://milaap.video/">here</a>.</b>
+</p>
+<p align="center">
+  <img src="public/assets/img/main.jpg">
 </p>
 
 <!-- TABLE OF CONTENTS -->
@@ -45,7 +49,7 @@
 
 There are many video calling applications around the globe, but they are mostly server based applications providing maximum load on the server, wherein the audio and video quality decreases with increase in the number of participants. Many don't even support end-to-end encryption.
 
-So we decided to develop a one-stop solution for not only addressing all these solution, but to give a seamless experience to the user. Distrideo Chat is a distributed video/audio conferencing application, which is designed to work on the edge, with very less interference of the server(i.e. peer to peer connection). It is designed to work efficiently on all platforms.
+So we decided to develop a one-stop solution for not only addressing all these solution, but to give a seamless experience to the user. Milaap is a decentralized video/audio conferencing application, which is designed to work on the edge, with very less interference of the server(i.e. peer to peer connection). It is designed to work efficiently on all platforms.
 
 ### Built With
 
@@ -76,31 +80,37 @@ npm install npm@latest -g
 1. Clone the repo
 
 ```sh
-git clone https://github.com/Pranav2612000/distrideochat.git
+git clone https://github.com/Pranav2612000/milaap.git
 ```
 
-2. Install NPM packages
+2. Install NPM packages for frontend
 
 ```sh
 npm install
 ```
 
-3. Open the folder backend
+3. Start the project
+
+```sh
+npm start
+```
+
+4. In a new terminal tab, Open the folder backend
 
 ```JS
 cd backend
 ```
 
-4. Start the server
+5. Install NPM packages for backend
+
+```sh
+npm install
+```
+
+6. Start the server
 
 ```JS
 nodemon index.js
-```
-
-5. In a new terminal tab, Start the project
-
-```sh
-npm start
 ```
 
 <!-- - nodemon
@@ -125,7 +135,7 @@ In progress
 
 ## Roadmap
 
-See the [open issues](https://github.com/Pranav2612000/distrideochat/issues) for a list of proposed features (and known issues).
+See the [open issues](https://github.com/Pranav2612000/milaap/issues) for a list of proposed features (and known issues).
 
 <!-- CONTRIBUTING -->
 

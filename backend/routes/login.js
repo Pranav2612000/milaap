@@ -15,34 +15,37 @@ router.post('/', async (req, res) => {
     if (!user) {
       return res.status(400).json({ err: 'Invalid Credentials' });
     }
-    if (password === user.password) {
-      //       return res.status(200).json({ msg: "Correct Credentials" });
-      const payload = {
-        user: {
-          id: user.username
-        }
-      };
-      try {
-        jwt.sign(
-          payload,
-          config.get('jwtSecret'),
-          { expiresIn: 3600 },
-          (err, token) => {
-            if (err) throw err;
-            res.status(200).json({
-              token,
-              user_details: {
-                userId: user.username
-              }
-            });
+    bcrypt.compare(password, user.password, (lerr, result) => {
+      if (result === true) {
+        console.log('Hash matched');
+        const payload = {
+          user: {
+            id: user.username
           }
-        );
-      } catch (e) {
-        res.status(400).json({ err: e });
+        };
+        try {
+          jwt.sign(
+            payload,
+            config.get('jwtSecret'),
+            { expiresIn: 3600 },
+            (err, token) => {
+              if (err) throw err;
+              res.status(200).json({
+                token,
+                user_details: {
+                  userId: user.username
+                }
+              });
+            }
+          );
+        } catch (e) {
+          res.status(400).json({ err: e });
+        }
+      } else {
+        console.log(lerr);
+        return res.status(400).json({ err: 'Invalid Credentials' });
       }
-    } else {
-      return res.status(400).json({ err: 'Invalid Credentials' });
-    }
+    });
   });
 });
 module.exports = router;

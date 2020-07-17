@@ -26,7 +26,8 @@ class Controls extends Component {
       isScreenShareOn: false,
       inCall: false,
       isWebcamOn: true,
-      facing: 'user'
+      facing: 'user',
+      addOptionsCalled: false
     };
     this.submitVideoHandler = this.submitVideoHandler.bind(this);
     this.submitScreenHandler = this.submitScreenHandler.bind(this);
@@ -36,6 +37,7 @@ class Controls extends Component {
   }
 
   componentWillUnmount() {
+    this.props.setAudioVideoToInitialState();
     endCall(this);
   }
 
@@ -81,8 +83,14 @@ class Controls extends Component {
   };
   submitVideoHandler() {
     startCall(this, this.state.roomName, 'video');
-    this.addOptions();
+    if (!this.state.addOptionsCalled) {
+      this.setState({
+        addOptionsCalled: true
+      });
+      this.addOptions();
+    }
   }
+
   submitScreenHandler() {
     startCall(this, this.state.roomName, 'screen');
   }
@@ -91,6 +99,7 @@ class Controls extends Component {
   }
 
   endCallHandler() {
+    this.props.setAudioVideoToInitialState();
     endCall(this);
   }
 
@@ -98,6 +107,10 @@ class Controls extends Component {
     const self = this;
     return (
       <Container>
+        <br />
+        <Row className="justify-content-center text-center">
+          <h4>Room: {`${this.props.roomName}`}</h4>
+        </Row>
         <br />
         <Row className="justify-content-center text-center">
           <AwesomeButtonProgress
@@ -244,7 +257,9 @@ const mapStateToProps = (state) => {
 const mapDispatchToProps = (dispatch) => {
   return {
     toggleVideo: () => dispatch(actions.toggleVideo()),
-    toggleAudio: () => dispatch(actions.toggleAudio())
+    toggleAudio: () => dispatch(actions.toggleAudio()),
+    setAudioVideoToInitialState: () =>
+      dispatch(actions.setAudioVideoToInitialState())
   };
 };
 export default connect(mapStateToProps, mapDispatchToProps)(Controls);

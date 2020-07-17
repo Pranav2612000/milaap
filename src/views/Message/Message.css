@@ -18,6 +18,8 @@
   font-size: 14px;
   display: flex;
   border-top-right-radius: 20px;
+  word-wrap: break-word;
+  overflow-y: hidden;
 }
 
 .message.mine .bubble-container {
@@ -40,8 +42,9 @@
 }
 
 .sendBy {
-  font-size: 14px;
+  font-size: 12px;
   margin-right: 10px;
+  max-width: 45px;
 }
 
 .sendBy .mine {

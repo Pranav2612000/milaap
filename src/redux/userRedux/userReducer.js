@@ -3,7 +3,8 @@ import {
   FETCH_USERS_REQUEST,
   FETCH_USERS_SUCCESS,
   TOGGLE_VIDEO,
-  TOGGLE_AUDIO
+  TOGGLE_AUDIO,
+  SET_AUDIO_VIDEO_TO_INITIAL_STATE
 } from './userActionTypes';
 
 const initalState = {
@@ -42,6 +43,12 @@ export const userReducer = (state = initalState, action) => {
       return {
         ...state,
         audio: !state.audio
+      };
+    case SET_AUDIO_VIDEO_TO_INITIAL_STATE:
+      return {
+        ...state,
+        audio: true,
+        video: true
       };
     default:
       return state;

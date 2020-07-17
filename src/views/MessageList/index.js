@@ -39,12 +39,15 @@ class MessageList extends Component {
   }
 
   componentDidUpdate(prevProps) {
-    window.scrollTo(0, document.querySelector('#message-list').scrollHeight);
     if (prevProps.roomName !== this.props.roomName) {
       this.setState({
         messages: this.props.msgs
       });
     }
+
+    var div = document.querySelector('#message-list');
+    div.scrollIntoView(false);
+    // window.scrollTo(0, document.querySelector('.message-list').scrollHeight);
   }
 
   formatMsgs(tempMsg, update = false) {
@@ -96,8 +99,8 @@ class MessageList extends Component {
               sound.currentTime = 0;
             }
             sound.play();
-            this.props.increaseMessageCount(this.props.roomName);
-            document.getElementById('badge').innerHTML = '1';
+            if (this.props.tab !== '2')
+              this.props.increaseMessageCount(this.props.roomName);
             store.addNotification({
               title: 'New Message from ' + current.sender,
               message: current.msg,

@@ -1,4 +1,4 @@
-var CACHE_NAME = 'distrideochat';
+var CACHE_NAME = 'milaap';
 var urlsToCache = ['/', '/landing', 'index.html'];
 
 const self = this; // Install a service worker
@@ -28,7 +28,7 @@ self.addEventListener('fetch', (event) => {
 
 // Update a service worker
 self.addEventListener('activate', (event) => {
-  var cacheWhitelist = ['distrideochat'];
+  var cacheWhitelist = ['milaap'];
   event.waitUntil(
     caches.keys().then((cacheNames) => {
       return Promise.all(

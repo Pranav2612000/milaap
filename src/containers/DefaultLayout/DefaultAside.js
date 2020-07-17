@@ -106,6 +106,7 @@ class DefaultAside extends Component {
                 this.props.resetMessageCount(this.state.roomName);
               }}>
               <i className="icon-speech"></i>
+
               <span id="badge" class="badge badge-primary">
                 {this.props.count[this.state.roomName] === 0 ||
                 this.props.count[this.state.roomName] == undefined
@@ -141,7 +142,11 @@ class DefaultAside extends Component {
             tabId="2"
             className="p-3 bg-dark overflow-auto"
             key={this.state.change}>
-            <MessageView roomName={this.props.roomName} msgs={this.props.msgs} />
+            <MessageView
+              roomName={this.props.roomName}
+              msgs={this.props.msgs}
+              tab={this.state.activeTab}
+            />
           </TabPane>
 
           {/* <TabPane tabId="3" className="p-3 bg-dark">

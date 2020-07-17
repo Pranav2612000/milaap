@@ -96,7 +96,7 @@ export const getTokenForTempUser = (reqData) => {
         dispatch(loginSuccess(reqData.username));
       })
       .catch((err) => {
-        if (err.response.status == 400) {
+        if (err && err.response && err.response.status == 400) {
           dispatch(
             Notifications.error({
               title: 'Invalid Room',
@@ -106,7 +106,7 @@ export const getTokenForTempUser = (reqData) => {
             })
           );
         }
-        if (err.response.status == 401) {
+        if (err && err.response && err.response.status == 401) {
           dispatch(
             Notifications.error({
               title: 'Username already taken',

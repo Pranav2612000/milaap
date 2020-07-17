@@ -50,7 +50,7 @@ class Landing extends Component {
                           margin: '14px',
                           color: 'white'
                         }}>
-                        Distrideo Chat
+                        Milaap
                       </h1>
                       <p
                         style={{
@@ -102,6 +102,9 @@ class Landing extends Component {
                         src={logo}
                         onClick={() => this.props.history.push('landing')}
                         style={{ cursor: 'pointer' }}
+                        height={'220px'}
+                        width={'320px'}
+                        alt="milaap"
                       />
                     </CardBody>
                   </Card>
