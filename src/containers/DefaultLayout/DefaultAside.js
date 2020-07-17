@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { withRouter } from 'react-router-dom';
+import { withRouter, Redirect } from 'react-router-dom';
 import { store } from 'react-notifications-component';
 import { connect } from 'react-redux';
 import * as action from '../../redux/messageRedux/messageAction';
@@ -85,9 +85,11 @@ class DefaultAside extends Component {
   render() {
     // eslint-disable-next-line
     const { children, ...attributes } = this.props;
-
     return (
       <React.Fragment>
+        {this.props.loading === false && this.props.error === 'NOROOM' && (
+          <Redirect to="/404"></Redirect>
+        )}
         <Nav tabs>
           <NavItem>
             <NavLink
@@ -202,7 +204,9 @@ class DefaultAside extends Component {
 
 const mapStateToProps = (state) => {
   return {
-    count: state.messageReducer.count
+    count: state.messageReducer.count,
+    error: state.roomReducer.error,
+    loading: state.roomReducer.loading
   };
 };
 const mapDispatchToProps = (dispatch) => {

@@ -124,37 +124,26 @@ export class Login extends Component {
         )}
         <div className="flex-row align-items-center">
           <ReactNotification />
+          <br />
           <Container>
             <Row
               className="justify-content-center"
-              style={{ margin: '0%', height: '15%', padding: '0px !important' }}>
+              style={{ margin: '0%', height: '15%' }}>
               <Card
                 className="text-white bg-transparent d-md-down"
                 style={{
-                  margin: 0,
-                  width: '59%',
                   backgroundColor: 'transparent',
-                  border: 0,
-                  padding: '0px !important'
+                  border: 0
                 }}>
                 <CardBody
                   className="text-center"
-                  style={{
-                    backgroundColor: 'transparent',
-                    border: 0,
-                    margin: 0,
-                    padding: '0px !important'
-                  }}>
+                  style={{ backgroundColor: 'transparent', border: 0 }}>
                   <img
                     src={logo}
                     onClick={() => this.props.history.push('landing')}
-                    style={{
-                      cursor: 'pointer',
-                      margin: 0,
-                      padding: '0px !important'
-                    }}
+                    style={{ cursor: 'pointer' }}
                     height={'220px'}
-                    width={'320px'}
+                    width={'300px'}
                     alt="milaap"
                   />
                 </CardBody>

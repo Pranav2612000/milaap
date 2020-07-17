@@ -37,8 +37,10 @@ class Guest extends Component {
 
   componentDidMount() {
     console.log(this.props.location);
-    this.setState({ room: this.props.location.room });
-    this.setState({ roomName: this.props.location.room });
+    if (this.props.location.room) {
+      this.setState({ room: this.props.location.room });
+      this.setState({ roomName: this.props.location.room });
+    }
   }
   componentDidUpdate(prevProps) {
     if (prevProps.loggedIn !== this.props.loggedIn)
@@ -122,6 +124,8 @@ class Guest extends Component {
     } else {
       this.setState({
         login: true,
+        room: this.state.roomName,
+        error: false,
         loading: true
       });
 
@@ -168,7 +172,6 @@ class Guest extends Component {
     return (
       /* Add Milaap Logo somewhere on this page. */
       <>
-        {console.log(this.state.loggedIn)}
         {this.state.login === true && (
           <Redirect
             to={{
@@ -177,7 +180,7 @@ class Guest extends Component {
             }}
           />
         )}
-        {this.props.loggedIn === true && (
+        {this.props.loggedIn === true && this.state.room && (
           <Redirect
             to={{
               pathname: `/rooms/${this.state.roomName}`,
@@ -189,23 +192,28 @@ class Guest extends Component {
           <Notifications notifications={this.props.notifications} />
         )}
         <div className="flex-row align-items-center">
+          <br />
           <Container>
             <Row
               className="justify-content-center"
               style={{ margin: '0%', height: '15%' }}>
               <Card
                 className="text-white bg-transparent d-md-down"
-                style={{ width: '59%' }}
                 style={{ backgroundColor: 'transparent', border: 0 }}>
                 <CardBody
                   className="text-center"
-                  style={{ backgroundColor: 'transparent', border: 0 }}>
+                  style={{
+                    backgroundColor: 'transparent',
+                    border: 0,
+                    margin: 0,
+                    padding: '0px !important'
+                  }}>
                   <img
                     src={logo}
                     onClick={() => this.props.history.push('landing')}
                     style={{ cursor: 'pointer' }}
                     height={'220px'}
-                    width={'320px'}
+                    width={'300px'}
                     alt="milaap"
                   />
                 </CardBody>
@@ -285,23 +293,27 @@ class Guest extends Component {
                           )}
                         </Row>
                         <br />
-                        <Row className="justify-content-center">
-                          <h2>OR</h2>
-                        </Row>
-                        <Row className="justify-content-center">
-                          <h5>If you already have an account, click Login!</h5>
-                        </Row>
-                        <Row className="justify-content-center">
-                          <Link to="/login">
-                            <Button
-                              color="primary"
-                              className="px-4"
-                              active
-                              tabIndex={-1}>
-                              Login
-                            </Button>
-                          </Link>
-                        </Row>
+                        {!this.props.loggedIn && (
+                          <>
+                            <Row className="justify-content-center">
+                              <h2>OR</h2>
+                            </Row>
+                            <Row className="justify-content-center">
+                              <h5>If you already have an account, click Login!</h5>
+                            </Row>
+                            <Row className="justify-content-center">
+                              <Link to="/login">
+                                <Button
+                                  color="primary"
+                                  className="px-4"
+                                  active
+                                  tabIndex={-1}>
+                                  Login
+                                </Button>
+                              </Link>
+                            </Row>
+                          </>
+                        )}
                       </Form>
                     </CardBody>
                   </Card>

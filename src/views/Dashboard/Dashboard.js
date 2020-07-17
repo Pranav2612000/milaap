@@ -114,12 +114,15 @@ class Dashboard extends Component {
               <Row className="justify-content-center">
                 <Col></Col>
                 <Col className="justify-content-center">
-                  <button
-                    type="button"
-                    class="btn btn-pill btn-secondary"
-                    onClick={this.toggle}>
-                    Create Room
-                  </button>
+                  {this.props.guests &&
+                    !this.props.guests.includes(this.props.username) && (
+                      <button
+                        type="button"
+                        class="btn btn-pill btn-secondary"
+                        onClick={this.toggle}>
+                        Create Room
+                      </button>
+                    )}
                 </Col>
                 <Col className="justify-content-center">
                   <button
@@ -239,7 +242,8 @@ Dashboard.defaultProps = defaultProps;
 const mapStateToProps = (state) => {
   console.log(state);
   return {
-    username: state.loginReducer.username
+    username: state.loginReducer.username,
+    guests: state.roomReducer.guests
   };
 };
 

@@ -23,6 +23,7 @@ import {
   Label
 } from 'reactstrap';
 import './MemberList.css';
+import { connect } from 'react-redux';
 // const socket = socketIOClient(`${global.config.backendURL}/`);
 
 class MemberList extends Component {
@@ -140,15 +141,17 @@ class MemberList extends Component {
             <h3> Members </h3>
           </Col>
           <Col>
-            <button type="button" className="btn btn-pill btn-secondary">
-              <i
-                style={{ cursor: 'pointer' }}
-                class="fa fa-user-plus"
-                onClick={this.toggle}>
-                {' '}
-                Invite
-              </i>
-            </button>
+            {this.state.guests && !this.state.guests.includes(this.props.username) && (
+              <button type="button" className="btn btn-pill btn-secondary">
+                <i
+                  style={{ cursor: 'pointer' }}
+                  class="fa fa-user-plus"
+                  onClick={this.toggle}>
+                  {' '}
+                  Invite
+                </i>
+              </button>
+            )}
           </Col>
         </Row>
         <h5> Admins </h5>
@@ -230,4 +233,10 @@ class MemberList extends Component {
   }
 }
 
-export default MemberList;
+const mapStateToProps = (state) => {
+  return {
+    username: state.loginReducer.username
+  };
+};
+
+export default connect(mapStateToProps)(MemberList);

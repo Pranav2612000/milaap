@@ -37,7 +37,8 @@ class Landing extends Component {
           style={{ overflow: 'hidden' }}>
           <Container>
             <Row className="justify-content-center">
-              <Col sm="8">
+              <Col sm={2} />
+              <Col sm={4}>
                 <CardGroup style={{ border: 0 }}>
                   <Card
                     className="text-black bg-transparent"
@@ -88,28 +89,21 @@ class Landing extends Component {
                       </Row>
                     </CardBody>
                   </Card>
-                  <Card
-                    className="text-white bg-transparent py-5 d-md-down justify-content-center align-items-center"
-                    style={{
-                      width: '59%',
-                      backgroundColor: 'transparent',
-                      border: 0
-                    }}>
-                    <CardBody
-                      className="text-center"
-                      style={{ backgroundColor: 'transparent', border: 0 }}>
-                      <img
-                        src={logo}
-                        onClick={() => this.props.history.push('landing')}
-                        style={{ cursor: 'pointer' }}
-                        height={'220px'}
-                        width={'320px'}
-                        alt="milaap"
-                      />
-                    </CardBody>
-                  </Card>
                 </CardGroup>
               </Col>
+              <Col
+                sm={5}
+                className="d-flex justify-content-center align-items-center">
+                <img
+                  src={logo}
+                  onClick={() => this.props.history.push('landing')}
+                  style={{ cursor: 'pointer' }}
+                  height={'220px'}
+                  width={'320px'}
+                  alt="milaap"
+                />
+              </Col>
+              <Col sm={1} />
             </Row>
           </Container>
         </div>
