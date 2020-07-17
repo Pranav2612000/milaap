@@ -47,12 +47,14 @@ export const enterRoom = (room) => {
     axios
       .post(`${global.config.backendURL}/api/room/enterroom`, reqData, {
         headers: {
-          'milaap-auth-token': localStorage.getItem('milaap-auth-token')
+          'milaap-auth-token': global.config.secureStorage.getItem(
+            'milaap-auth-token'
+          )
         }
       })
       .then((res) => {
         if (res.data.err == 'UEXISTS') {
-          localStorage.removeItem('milaap-auth-token');
+          global.config.secureStorage.removeItem('milaap-auth-token');
           dispatch(redirectToJoinPage());
           dispatch(enterRoomFailure('UEXISTS'));
           return;

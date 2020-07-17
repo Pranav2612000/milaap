@@ -13,11 +13,11 @@ const ProtectedRoute = (props) => {
   const { component: Component, ...rest } = props;
   const [credentialsValid, setCredentialsValid] = useState(false);
   const [validated, setValidated] = useState(false);
-  var token = localStorage.getItem('milaap-auth-token');
+  var token = global.config.secureStorage.getItem('milaap-auth-token');
   useEffect(() => {
     console.log(props.location);
     const verifyToken = async () => {
-      token = localStorage.getItem('milaap-auth-token');
+      token = global.config.secureStorage.getItem('milaap-auth-token');
       await axios
         .post(`${global.config.backendURL}/api/user/verify`, {
           headers: { 'milaap-auth-token': token }
@@ -41,7 +41,7 @@ const ProtectedRoute = (props) => {
     );
   } else if (!credentialsValid && validated) {
     props.logout();
-    localStorage.clear();
+    global.config.secureStorage.clear();
     if (props.location.pathname == '/') {
       return <Redirect to="/landing" />;
     }

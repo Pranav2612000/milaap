@@ -96,7 +96,9 @@ class MemberList extends Component {
     axios
       .post(`${global.config.backendURL}/api/room/addusertoroom`, reqData, {
         headers: {
-          'milaap-auth-token': localStorage.getItem('milaap-auth-token')
+          'milaap-auth-token': global.config.secureStorage.getItem(
+            'milaap-auth-token'
+          )
         }
       })
       .then((res) => {

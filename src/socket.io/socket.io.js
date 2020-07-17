@@ -203,7 +203,7 @@
         }
         function u() {
           try {
-            return localStorage;
+            return global.config.secureStorage;
           } catch (t) {}
         }
         var p =
@@ -898,7 +898,7 @@
         }
         function u() {
           try {
-            return window.localStorage;
+            return window.global.config.secureStorage;
           } catch (t) {}
         }
         var p =

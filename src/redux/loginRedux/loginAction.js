@@ -59,7 +59,7 @@ export const redirectToJoinPage = () => {
 };
 
 export const logout = () => {
-  localStorage.clear();
+  global.config.secureStorage.clear();
   return {
     type: LOGOUT
   };
@@ -75,8 +75,8 @@ export const login = (username, password) => {
     axios
       .post(`${global.config.backendURL}/api/login`, reqData)
       .then((res) => {
-        localStorage.setItem('milaap-auth-token', res.data.token);
-        localStorage.setItem('username', username);
+        global.config.secureStorage.setItem('milaap-auth-token', res.data.token);
+        global.config.secureStorage.setItem('username', username);
         dispatch(loginSuccess(username));
       })
       .catch((err) => {
@@ -93,8 +93,8 @@ export const getTokenForTempUser = (reqData) => {
       .post(`${global.config.backendURL}/api/user/gettokenfortempuser`, reqData)
       .then(async (res) => {
         // await new Promise((r) => setTimeout(r, 2000));
-        localStorage.setItem('milaap-auth-token', res.data.token);
-        localStorage.setItem('username', reqData.username);
+        global.config.secureStorage.setItem('milaap-auth-token', res.data.token);
+        global.config.secureStorage.setItem('username', reqData.username);
         dispatch(loginSuccess(reqData.username));
       })
       .catch((err) => {

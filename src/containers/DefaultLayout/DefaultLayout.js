@@ -39,7 +39,7 @@ function getGroupElements(rooms) {
 
 class DefaultLayout extends Component {
   getRooms = async () => {
-    const token = localStorage.getItem('milaap-auth-token');
+    const token = global.config.secureStorage.getItem('milaap-auth-token');
     const reqHeader = { 'milaap-auth-token': token };
     await axios
       .post(
@@ -107,7 +107,7 @@ class DefaultLayout extends Component {
     const GroupList = [];
     this.state = {
       rooms: [],
-      userToken: localStorage.getItem('milaap-auth-token'),
+      userToken: global.config.secureStorage.getItem('milaap-auth-token'),
       navigation: {
         items: [
           {
@@ -142,7 +142,7 @@ class DefaultLayout extends Component {
   signOut(e) {
     e.preventDefault();
     this.props.logout();
-    localStorage.clear();
+    global.config.secureStorage.clear();
     this.props.history.push('/landing');
   }
 
@@ -172,7 +172,7 @@ class DefaultLayout extends Component {
 
   render() {
     //TODO: Also check if the token is valid.
-    if (localStorage.getItem('milaap-auth-token') === null) {
+    if (global.config.secureStorage.getItem('milaap-auth-token') === null) {
       if (this.props.location.pathname.match('/rooms/')) {
         var room = this.props.location.pathname.split('/')[2];
         return <Redirect to={{ pathname: '/join', room: room }} />;

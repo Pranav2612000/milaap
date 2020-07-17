@@ -16,7 +16,9 @@ export default function Compose(props) {
     axios
       .post(`${global.config.backendURL}/api/room/sendmessage`, reqData, {
         headers: {
-          'milaap-auth-token': localStorage.getItem('milaap-auth-token')
+          'milaap-auth-token': global.config.secureStorage.getItem(
+            'milaap-auth-token'
+          )
         }
       })
       .then((res) => {

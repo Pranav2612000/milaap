@@ -53,7 +53,7 @@ export class Login extends Component {
         }
       });
     }
-    localStorage.removeItem('milaap-auth-token');
+    global.config.secureStorage.removeItem('milaap-auth-token');
   }
 
   componentDidUpdate(prevProps) {
@@ -96,7 +96,7 @@ export class Login extends Component {
     axios
       .post('http://localhost:5000/api/login', reqData)
       .then((res) => {
-        localStorage.setItem('milaap-auth-token', res.data.token);
+        global.config.secureStorage.setItem('milaap-auth-token', res.data.token);
         this.setState({
           login: true
         });
@@ -113,7 +113,10 @@ export class Login extends Component {
       <>
         {this.props.loggedIn === true && (
           <Redirect
-            to={{ pathname: '/dashboard', state: localStorage.getItem('username') }}
+            to={{
+              pathname: '/dashboard',
+              state: global.config.secureStorage.getItem('username')
+            }}
           />
         )}
         {/* <ReactNotification /> */}

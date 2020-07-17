@@ -22,6 +22,7 @@
     "chart.js": "^2.8.0",
     "classnames": "^2.2.6",
     "core-js": "^3.1.4",
+    "crypto-js": "^4.0.0",
     "enzyme": "^3.11.0",
     "enzyme-adapter-react-16": "^1.14.0",
     "flag-icon-css": "^3.3.0",
@@ -44,6 +45,7 @@
     "react-sortablejs": "^2.0.11",
     "react-test-renderer": "^16.13.1",
     "reactstrap": "^8.0.0",
+    "secure-web-storage": "^1.0.2",
     "simple-line-icons": "^2.4.1",
     "socket.io-client": "^2.3.0"
   },

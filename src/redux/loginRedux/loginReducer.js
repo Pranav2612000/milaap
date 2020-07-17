@@ -10,9 +10,9 @@ const initalState = {
   loading: false,
   error: false,
   username:
-    localStorage.getItem('username') == null
+    global.config.secureStorage.getItem('username') == null
       ? undefined
-      : localStorage.getItem('username')
+      : global.config.secureStorage.getItem('username')
 };
 
 export const loginReducer = (state = initalState, action) => {

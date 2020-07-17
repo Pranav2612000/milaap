@@ -60,7 +60,9 @@ class DefaultHeader extends Component {
     axios
       .post(reqData, `${global.config.backendURL}/api/user/adduser`, {
         headers: {
-          'milaap-auth-token': localStorage.getItem('milaap-auth-token')
+          'milaap-auth-token': global.config.secureStorage.getItem(
+            'milaap-auth-token'
+          )
         }
       })
       .then((res) => {

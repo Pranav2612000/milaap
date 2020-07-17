@@ -85,7 +85,7 @@ class Guest extends Component {
     }
 
     /* Get a valid token if user doesn't have one. */
-    if (!localStorage.getItem('milaap-auth-token')) {
+    if (!global.config.secureStorage.getItem('milaap-auth-token')) {
       console.log('exists');
       var reqData = {
         name: this.state.name,
@@ -99,7 +99,7 @@ class Guest extends Component {
       // axios
       //   .post(`${global.config.backendURL}/api/user/gettokenfortempuser`, reqData)
       //   .then((res) => {
-      //     localStorage.setItem('milaap-auth-token', res.data.token);
+      //     global.config.secureStorage.setItem('milaap-auth-token', res.data.token);
       //     this.setState({
       //       login: true
       //     });
@@ -143,7 +143,7 @@ class Guest extends Component {
     axios
       .post('http://localhost:5000/api/room/m', reqData)
       .then((res) => {
-        localStorage.setItem('milaap-auth-token', res.data.token);
+        global.config.secureStorage.setItem('milaap-auth-token', res.data.token);
         this.setState({
           login: true
         });
@@ -234,7 +234,7 @@ class Guest extends Component {
                             Join a Meeting Room
                           </h2>
                         )}
-                        {localStorage.getItem('milaap-auth-token') ? (
+                        {global.config.secureStorage.getItem('milaap-auth-token') ? (
                           <></>
                         ) : (
                           <InputGroup className="mb-3">
@@ -283,7 +283,7 @@ class Guest extends Component {
                               onClick={
                                 (e) => this.handleSubmit(e)
                                 /*
-                                localStorage.getItem('milaap-auth-token')
+                                global.config.secureStorage.getItem('milaap-auth-token')
                                   ? this.handleUserAdd(e)
                                   : this.handleSubmit(e)
                                   */

@@ -1,5 +1,6 @@
 import 'react-app-polyfill/ie9'; // For IE 9-11 support
 import 'react-app-polyfill/stable';
+import './config.js';
 // import 'react-app-polyfill/ie11'; // For IE 11 support
 import './polyfill';
 import React from 'react';
@@ -8,7 +9,6 @@ import './index.css';
 import App from './App';
 import * as serviceWorker from './serviceWorker';
 import 'react-notifications-component/dist/theme.css';
-import './config.js';
 
 ReactDOM.render(<App />, document.getElementById('root'));
 

@@ -208,7 +208,9 @@ class Controls extends Component {
       axios
         .post(`${global.config.backendURL}/api/room/goonline`, reqData, {
           headers: {
-            'milaap-auth-token': localStorage.getItem('milaap-auth-token')
+            'milaap-auth-token': global.config.secureStorage.getItem(
+              'milaap-auth-token'
+            )
           }
         })
         .then((res) => {
@@ -576,7 +578,9 @@ videos.empty();
     axios
       .post(`${global.config.backendURL}/api/room/exitstream`, reqData, {
         headers: {
-          'milaap-auth-token': localStorage.getItem('milaap-auth-token')
+          'milaap-auth-token': global.config.secureStorage.getItem(
+            'milaap-auth-token'
+          )
         }
       })
       .then((res) => {
@@ -594,7 +598,9 @@ videos.empty();
     axios
       .post(`${global.config.backendURL}/api/room/exitstream`, reqData, {
         headers: {
-          'milaap-auth-token': localStorage.getItem('milaap-auth-token')
+          'milaap-auth-token': global.config.secureStorage.getItem(
+            'milaap-auth-token'
+          )
         }
       })
       .then((res) => {
