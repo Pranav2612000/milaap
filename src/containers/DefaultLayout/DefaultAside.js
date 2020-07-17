@@ -70,7 +70,7 @@ class DefaultAside extends Component {
           }
         });
       }
-    }, 200);
+    }, 1000);
   };
 
   changeRoomType = () => {
