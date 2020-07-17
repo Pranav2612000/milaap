@@ -85,9 +85,6 @@ class DefaultAside extends Component {
   render() {
     // eslint-disable-next-line
     const { children, ...attributes } = this.props;
-    if (this.state.invalid === true) {
-      return <Redirect to="/dashboard"></Redirect>;
-    }
     return (
       <React.Fragment>
         {this.props.loading === false && this.props.error === 'NOROOM' && (

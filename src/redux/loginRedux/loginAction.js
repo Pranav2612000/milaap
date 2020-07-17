@@ -88,15 +88,18 @@ export const login = (username, password) => {
 
 export const getTokenForTempUser = (reqData) => {
   return function (dispatch) {
+    dispatch(loginRequest());
     axios
       .post(`${global.config.backendURL}/api/user/gettokenfortempuser`, reqData)
-      .then((res) => {
+      .then(async (res) => {
+        // await new Promise((r) => setTimeout(r, 2000));
         localStorage.setItem('milaap-auth-token', res.data.token);
         localStorage.setItem('username', reqData.username);
         dispatch(loginSuccess(reqData.username));
       })
       .catch((err) => {
-        if (err && err.response && err.response.status == 400) {
+        dispatch(loginFailure(err));
+        if (err && err.response?.status == 400) {
           dispatch(
             Notifications.error({
               title: 'Invalid Room',
@@ -106,7 +109,7 @@ export const getTokenForTempUser = (reqData) => {
             })
           );
         }
-        if (err && err.response && err.response.status == 401) {
+        if (err && err.response?.status == 401) {
           dispatch(
             Notifications.error({
               title: 'Username already taken',

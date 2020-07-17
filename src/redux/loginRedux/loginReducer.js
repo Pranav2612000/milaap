@@ -8,6 +8,7 @@ import {
 
 const initalState = {
   loading: false,
+  error: false,
   username:
     localStorage.getItem('username') == null
       ? undefined
@@ -19,7 +20,8 @@ export const loginReducer = (state = initalState, action) => {
     case LOGIN_REQUEST:
       return {
         ...state,
-        loading: true
+        loading: true,
+        error: false
       };
     case LOGIN_SUCCESS:
       return {

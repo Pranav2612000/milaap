@@ -3,12 +3,12 @@
   "short_name": "Milaap",
   "icons": [
     {
-      "src": "img/logo.png",
+      "src": "img/logo512.png",
       "sizes": "512x512",
       "type": "image/png"
     },
     {
-      "src": "img/logo.png",
+      "src": "img/logo144.png",
       "sizes": "144x144",
       "type": "image/png"
     }
@@ -16,6 +16,6 @@
   "start_url": "/",
   "display": "standalone",
   "orientation": "portrait",
-  "background_color": "#f0f2f5",
-  "theme_color": "#96f2d7"
+  "background_color": "#1d2027",
+  "theme_color": "#1d2027"
 }

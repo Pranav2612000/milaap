@@ -63,7 +63,7 @@ class Dashboard extends Component {
       .then((res) => {
         this.toggle();
         /* TODO: Replace with appropriate state handling, to add room without reloading. */
-        window.location.reload();
+        // window.location.reload();
       })
       .catch((err) => {
         console.log(err);
@@ -125,11 +125,14 @@ class Dashboard extends Component {
                     )}
                 </Col>
                 <Col className="justify-content-center">
-                  <Link to="/join">
-                    <button type="button" class="btn btn-pill btn-secondary">
-                      Join Room
-                    </button>
-                  </Link>
+                  <button
+                    type="button"
+                    class="btn btn-pill btn-secondary"
+                    onClick={() => {
+                      this.props.history.push('/join');
+                    }}>
+                    Join Room
+                  </button>
                 </Col>
                 <Col></Col>
               </Row>

@@ -42,16 +42,19 @@ const ProtectedRoute = (props) => {
   } else if (!credentialsValid && validated) {
     props.logout();
     localStorage.clear();
-    if(props.location.pathname == '/') {
-      return <Redirect to="/landing" />
+    if (props.location.pathname == '/') {
+      return <Redirect to="/landing" />;
     }
     var roomName = getRoomFromLocation(props.location.pathname);
     console.log(roomName);
-    return <Redirect to={{
-                        pathname: "/join",
-                        room: roomName,
-                        }}
-    />;
+    return (
+      <Redirect
+        to={{
+          pathname: '/join',
+          room: roomName
+        }}
+      />
+    );
   } else {
     return <div className="animated fadeIn pt-1 text-center">Loading...</div>;
   }

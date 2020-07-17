@@ -17,7 +17,7 @@
 .message .bubble-container {
   font-size: 14px;
   display: flex;
-  border-top-right-radius: 20px;
+  border-top-right-radius: 5px;
   word-wrap: break-word;
   overflow-y: hidden;
 }
