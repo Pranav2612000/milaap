@@ -11,7 +11,6 @@ import video from '../../assets/video.webp';
 import endcall from '../../assets/endcall.png';
 import flip from '../../assets/flip.png';
 import mic from '../../assets/mic.png';
-import ifvisible from 'ifvisible';
 
 class Room extends Component {
   constructor(props) {

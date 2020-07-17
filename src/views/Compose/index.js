@@ -27,31 +27,41 @@ export default function Compose(props) {
         console.log(err);
       });
   }
+  const addEmoji = (e) => {
+    let emoji = e.native;
+    setMsg(msg + emoji);
+  };
   return (
-    <div className="compose bg-dark" style={{ borderTop: 'white solid 1px' }}>
-      <textarea
-        type="text"
-        id="textMsg"
-        className="md-textarea form-control"
-        placeholder="Type a message, @name"
-        value={msg}
-        onKeyDown={(e) => {
-          if (e.keyCode === 13) sendMessage();
-        }}
-        onChange={(e) => {
-          setMsg(e.target.value);
-        }}
-        style={styleSheet.inputStyles}
-      />
-      <button
-        className="compose-button"
-        onClick={sendMessage}
-        style={{ scale: '1.3' }}>
-        <i class="fa fa-paper-plane" aria-hidden="true" style={{ scale: '1.3' }}></i>
-      </button>
+    <>
+      <div className="compose bg-dark" style={{ borderTop: 'white solid 1px' }}>
+        <textarea
+          type="text"
+          id="textMsg"
+          className="md-textarea form-control"
+          placeholder="Type a message, @name"
+          value={msg}
+          onKeyDown={(e) => {
+            if (e.keyCode === 13) sendMessage();
+          }}
+          onChange={(e) => {
+            setMsg(e.target.value);
+          }}
+          style={styleSheet.inputStyles}
+        />
 
-      {props.rightItems}
-    </div>
+        <button
+          className="compose-button"
+          onClick={sendMessage}
+          style={{ scale: '1.3' }}>
+          <i
+            class="fa fa-paper-plane"
+            aria-hidden="true"
+            style={{ scale: '1.3' }}></i>
+        </button>
+
+        {props.rightItems}
+      </div>
+    </>
   );
 }
 
