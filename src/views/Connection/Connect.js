@@ -592,14 +592,18 @@ export function switchContext(e) {
   if (e.target) e = e.target;
   try {
     const context = document.getElementById('context');
-    if (e.srcObject == context.srcObject) return;
+    if (!context.srcObject) context.srcObject = new MediaStream().remoteStream;
+    // if (e.srcObject == context.srcObject) return;
     const username = e.nextElementSibling.innerText;
     context.style.display = 'inline';
     askToDegradeStreamVideoQualityById(context.className);
     askToUpgradeStreamVideoQualityById(e.id);
     context.poster =
       'https://dummyimage.com/1024x576/2f353a/ffffff.jpg&text=' + username;
-    context.srcObject = e.srcObject;
+    // context.srcObject = e.srcObject;
+    context.srcObject.replaceVideoTrack(e.srcObject.getVideoTracks()[0]);
+    context.srcObject.replaceAudioTrack(e.srcObject.getAudioTracks()[0]);
+    context.play();
     if (e.id == 'me-video') {
       context.muted = 'true';
     }
@@ -914,4 +918,32 @@ export async function stopScreenShare(self) {
   clearMediaStream(myScreenStreamObj);
   myScreenStreamObj = new MediaStream();
   deleteVideoElement('me-screen');
+}
+
+/* begin recording */
+export async function startRecord(self) {
+  self.recorder = new MediaRecorder(document.getElementById('context').srcObject, {
+    mimeType: 'video/webm; codecs=vp9'
+  });
+  self.chunks = [];
+  self.recorder.ondataavailable = function (e) {
+    /* Calling when recording pauses or stops */
+    self.chunks.push(e.data);
+    var blob = new Blob(self.chunks, { type: self.chunks[0].type });
+    /* Trigger a download of the blob */
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    document.body.appendChild(a);
+    a.style = 'display: none';
+    a.href = url;
+    a.download = 'recorded_session.webm';
+    a.click();
+    window.URL.revokeObjectURL(url);
+  };
+  self.recorder.start();
+}
+
+/* stop recording*/
+export async function stopRecord(self) {
+  self.recorder.stop();
 }

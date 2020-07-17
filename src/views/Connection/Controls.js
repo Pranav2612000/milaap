@@ -10,7 +10,9 @@ import {
   endCall,
   addScreenShareStream,
   changeCameraFacing,
-  stopScreenShare
+  stopScreenShare,
+  startRecord,
+  stopRecord
 } from '../Connection/Connect';
 import { Container, Row } from 'reactstrap';
 import $ from 'jquery';
@@ -27,6 +29,7 @@ class Controls extends Component {
       inCall: false,
       isWebcamOn: true,
       facing: 'user',
+      recording: false,
       addOptionsCalled: false
     };
     this.submitVideoHandler = this.submitVideoHandler.bind(this);
@@ -34,6 +37,8 @@ class Controls extends Component {
     this.endCallHandler = this.endCallHandler.bind(this);
     this.inCallShareHandler = this.inCallShareHandler.bind(this);
     this.changeCamera = this.changeCamera.bind(this);
+    this.startRecordHandler = this.startRecordHandler.bind(this);
+    this.stopRecordHandler = this.stopRecordHandler.bind(this);
   }
 
   componentWillUnmount() {
@@ -80,6 +85,10 @@ class Controls extends Component {
       this.setState({ inCall: false });
       this.endCallHandler();
     });
+    contextOptions.children[4].addEventListener('click', () => {
+      this.state.recording ? this.stopRecordHandler() : this.startRecordHandler();
+      this.setState({ recording: !this.state.recording });
+    });
   };
   submitVideoHandler() {
     startCall(this, this.state.roomName, 'video');
@@ -101,6 +110,14 @@ class Controls extends Component {
   endCallHandler() {
     this.props.setAudioVideoToInitialState();
     endCall(this);
+  }
+
+  startRecordHandler() {
+    startRecord(this);
+  }
+
+  stopRecordHandler() {
+    stopRecord(this);
   }
 
   render() {

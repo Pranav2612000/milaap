@@ -11,6 +11,7 @@ import video from '../../assets/video.webp';
 import endcall from '../../assets/endcall.png';
 import flip from '../../assets/flip.png';
 import mic from '../../assets/mic.png';
+import record from '../../assets/record.png';
 
 class Room extends Component {
   constructor(props) {
@@ -126,6 +127,18 @@ class Room extends Component {
                     padding: '10px'
                   }}>
                   <img src={endcall} style={{ height: '2.5em', width: '2.5em' }} />
+                </button>
+                <button
+                  id="record"
+                  style={{
+                    backgroundColor: 'red',
+                    margin: '15px',
+                    borderWidth: '1px',
+                    borderColor: 'transparent',
+                    borderRadius: '50px',
+                    padding: '10px'
+                  }}>
+                  <img src={record} style={{ height: '2.5em', width: '2.5em' }} />
                 </button>
               </div>
               {/* </Row> */}
