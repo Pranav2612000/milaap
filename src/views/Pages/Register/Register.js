@@ -98,6 +98,9 @@ export class Register extends Component {
                     onClick={() => this.props.history.push('landing')}
                     style={{ cursor: 'pointer' }}
                     alt={'logo'}
+                    height={'220px'}
+                    width={'320px'}
+                    alt="milaap"
                   />
                 </CardBody>
               </Card>

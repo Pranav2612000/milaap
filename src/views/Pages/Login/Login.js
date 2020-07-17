@@ -122,14 +122,14 @@ export class Login extends Component {
         {this.props.notifications && (
           <Notifications notifications={this.props.notifications} />
         )}
-        <div className="app flex-row align-items-center">
+        <div className="flex-row align-items-center">
           <ReactNotification />
           <Container>
             <Row
               className="justify-content-center"
               style={{ margin: '0%', height: '15%', padding: '0px !important' }}>
               <Card
-                className="text-white bg-transparent py-5 d-md-down"
+                className="text-white bg-transparent d-md-down"
                 style={{
                   margin: 0,
                   width: '59%',
@@ -153,6 +153,9 @@ export class Login extends Component {
                       margin: 0,
                       padding: '0px !important'
                     }}
+                    height={'220px'}
+                    width={'320px'}
+                    alt="milaap"
                   />
                 </CardBody>
               </Card>
@@ -165,6 +168,9 @@ export class Login extends Component {
                       <Form onSubmit={this.handleSubmit}>
                         <h1>Login</h1>
                         <p className="text-muted">Sign In to your account</p>
+                        <p className="text-muted">
+                          We've updated our database which forced us to delete all previous logins. Please create a new account if you are unable to login.
+                        </p>
                         <InputGroup className="mb-3">
                           <InputGroupAddon addonType="prepend">
                             <InputGroupText>

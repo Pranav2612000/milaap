@@ -62,9 +62,13 @@ class Dashboard extends Component {
       })
       .then((res) => {
         this.toggle();
+        /* TODO: Replace with appropriate state handling, to add room without reloading. */
+        window.location.reload();
       })
       .catch((err) => {
         console.log(err);
+        /* TODO: Appropriate Error handling. */
+        alert('Room exists, try a different room');
       });
   }
 
@@ -103,14 +107,9 @@ class Dashboard extends Component {
             <br />
             <br />
             <h1 style={{ color: 'white', opacity: '0.5' }}>
-              Welcome {`${this.props.username}`} to Distrideo Chat!
+              Welcome {`${this.props.username}`} to Milaap!
             </h1>
             <br />
-            {/*
-            <h1 style={{ color: 'white', opacity: '0.5' }}>
-              Distrideo Chat - Dashboard
-            </h1>
-             */}
             <br />
             <Container>
               <Row className="justify-content-center">
@@ -157,8 +156,8 @@ class Dashboard extends Component {
                     }}>
                     <img
                       src={logo}
-                      width={'100%'}
-                      height={'100%'}
+                      width={'50%'}
+                      height={'60%'}
                       onClick={() => this.props.history.push('dashboard')}
                       style={{ cursor: 'pointer' }}
                     />

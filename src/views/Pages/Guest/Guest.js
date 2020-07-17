@@ -34,6 +34,7 @@ class Guest extends Component {
   }
 
   componentDidMount() {
+    console.log(this.props.location);
     this.setState({ room: this.props.location.room });
     this.setState({ roomName: this.props.location.room });
   }
@@ -167,13 +168,13 @@ class Guest extends Component {
         {this.props.notifications && (
           <Notifications notifications={this.props.notifications} />
         )}
-        <div className="app flex-row align-items-center">
+        <div className="flex-row align-items-center">
           <Container>
             <Row
               className="justify-content-center"
               style={{ margin: '0%', height: '15%' }}>
               <Card
-                className="text-white bg-transparent py-5 d-md-down"
+                className="text-white bg-transparent d-md-down"
                 style={{ width: '59%' }}
                 style={{ backgroundColor: 'transparent', border: 0 }}>
                 <CardBody
@@ -183,6 +184,9 @@ class Guest extends Component {
                     src={logo}
                     onClick={() => this.props.history.push('landing')}
                     style={{ cursor: 'pointer' }}
+                    height={'220px'}
+                    width={'320px'}
+                    alt="milaap"
                   />
                 </CardBody>
               </Card>
