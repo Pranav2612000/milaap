@@ -20,7 +20,8 @@ export default function Message(props) {
         <div
           className={['bubble', `${isMine ? 'mine' : ''}`].join(' ')}
           title={friendlyTimestamp}>
-          {data.msg}
+          {/* {data.msg} */}
+          <div dangerouslySetInnerHTML={{ __html: data.msg }} />
         </div>
         <b>{isMine && data.sender}</b>
       </div>
