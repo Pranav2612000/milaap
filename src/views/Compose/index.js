@@ -30,7 +30,12 @@ export default function Compose(props) {
   function urlify(text) {
     var urlRegex = /(https?:\/\/[^\s]+)/g;
     return text.replace(urlRegex, function (url) {
-      const k = '<a href="' + url + '" style="color: #000000">' + url + '</a>';
+      const k =
+        '<a href="' +
+        url +
+        '" style="color: #000000" target="_blank">' +
+        url +
+        '</a>';
       return k;
     });
   }
