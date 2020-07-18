@@ -6,7 +6,7 @@
   /* border: 1px solid #eeeef1; */
   position: fixed;
   width: auto;
-  margin-left: 0em;
+  /* margin-left: 0em; */
   bottom: 0px;
   outline: none;
   height: 10vh;
@@ -21,6 +21,23 @@
   }
 }
 
+.emoji-button {
+  float: left;
+  border: 1px solid gray;
+  color: white;
+  border: 1px solid #8d8d8d;
+  background-color: white;
+  border-radius: 1.5rem;
+  font-size: 17px;
+  height: 30px;
+  width: auto;
+  cursor: pointer;
+  color: black;
+  align-self: center;
+  font-weight: bold;
+  /* padding-left: 0px; */
+  outline: no;
+}
 .compose-button {
   float: right;
   border: 1px solid grey;
@@ -34,8 +51,15 @@
   cursor: pointer;
   color: black;
   margin-left: 20px;
+  align-self: center;
   font-weight: bold;
   outline: none;
+}
+
+.emoji {
+  width: 20em;
+  height: 80vh;
+  padding-left: 0em;
 }
 
 .compose-input::placeholder {

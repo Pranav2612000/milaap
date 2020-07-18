@@ -22,6 +22,7 @@
     "chart.js": "^2.8.0",
     "classnames": "^2.2.6",
     "core-js": "^3.1.4",
+    "emoji-mart": "^3.0.0",
     "enzyme": "^3.11.0",
     "enzyme-adapter-react-16": "^1.14.0",
     "flag-icon-css": "^3.3.0",
