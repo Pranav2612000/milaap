@@ -128,12 +128,12 @@ export class Login extends Component {
           <Container>
             <Row
               className="justify-content-center"
-              style={{ margin: '0%', height: '15%'}}>
+              style={{ margin: '0%', height: '15%' }}>
               <Card
                 className="text-white bg-transparent d-md-down"
                 style={{
                   backgroundColor: 'transparent',
-                  border: 0,
+                  border: 0
                 }}>
                 <CardBody
                   className="text-center"

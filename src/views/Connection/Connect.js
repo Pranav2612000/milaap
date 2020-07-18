@@ -532,9 +532,9 @@ export function createVideoElement(self, stream, friendtkn, username) {
   video.id = friendtkn;
   video.height = '350';
   video.srcObject = stream;
-  video.autoplay = true;
   video.onclick = switchContext;
   video.playsinline = true;
+  video.autoplay = true;
   if (video.id == 'me-video') {
     video.muted = 'true';
   }
@@ -572,6 +572,8 @@ function changeStatusOfVideoElement(
       'https://dummyimage.com/1024x576/2f353a/ffffff.jpg&text=' + username;
     var isPlaying =
       video.currentTime > 0 && !video.paused && !video.ended && video.readyState > 2;
+    video.playsinline = true;
+    video.autoplay = true;
 
     if (!isPlaying) {
       video.play();

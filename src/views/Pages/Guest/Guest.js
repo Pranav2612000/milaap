@@ -37,7 +37,7 @@ class Guest extends Component {
 
   componentDidMount() {
     console.log(this.props.location);
-    if(this.props.location.room) {
+    if (this.props.location.room) {
       this.setState({ room: this.props.location.room });
       this.setState({ roomName: this.props.location.room });
     }
@@ -65,18 +65,27 @@ class Guest extends Component {
 
   handleSubmit = (e) => {
     e.preventDefault();
+    this.setState({
+      loading: true
+    });
     console.log(this.state.roomName);
-    if (this.state.roomName == undefined || this.state.roomName == '') {
-      alert('Enter a roomname to proceed');
+    if (this.state.name == undefined || this.state.name === '') {
+      alert('Enter a username to proceed');
       this.setState({
-        loading: true,
-        error: true
+        loading: false
       });
       return;
     }
 
     /* Get a valid token if user doesn't have one. */
     if (!localStorage.getItem('milaap-auth-token')) {
+      if (this.state.roomName == undefined || this.state.roomName == '') {
+        alert('Enter a roomname to proceed');
+        this.setState({
+          loading: false
+        });
+        return;
+      }
       console.log('exists');
       var reqData = {
         name: this.state.name,
@@ -84,8 +93,7 @@ class Guest extends Component {
         username: this.state.name
       };
       this.setState({
-        loading: true,
-        error: true
+        loading: true
       });
       this.props.getTokenForTempUser(reqData);
       // axios
@@ -194,7 +202,12 @@ class Guest extends Component {
                 style={{ backgroundColor: 'transparent', border: 0 }}>
                 <CardBody
                   className="text-center"
-                  style={{ backgroundColor: 'transparent', border: 0,margin: 0, padding: '0px !important' }}>
+                  style={{
+                    backgroundColor: 'transparent',
+                    border: 0,
+                    margin: 0,
+                    padding: '0px !important'
+                  }}>
                   <img
                     src={logo}
                     onClick={() => this.props.history.push('landing')}
@@ -256,7 +269,7 @@ class Guest extends Component {
                         )}
 
                         <Row className="justify-content-center">
-                          {this.state.loading && !this.state.error ? (
+                          {this.props.loading && !this.props.error ? (
                             <Button color="primary" className="px-4">
                               <Spinner
                                 animation={'grow'}
@@ -281,25 +294,25 @@ class Guest extends Component {
                         </Row>
                         <br />
                         {!this.props.loggedIn && (
-                        <>
-                          <Row className="justify-content-center">
+                          <>
+                            <Row className="justify-content-center">
                               <h2>OR</h2>
-                          </Row>
-                          <Row className="justify-content-center">
-                            <h5>If you already have an account, click Login!</h5>
-                          </Row>
-                          <Row className="justify-content-center">
-                            <Link to="/login">
-                              <Button
-                                color="primary"
-                                className="px-4"
-                                active
-                                tabIndex={-1}>
-                                Login
-                              </Button>
-                            </Link>
-                          </Row>
-                        </>
+                            </Row>
+                            <Row className="justify-content-center">
+                              <h5>If you already have an account, click Login!</h5>
+                            </Row>
+                            <Row className="justify-content-center">
+                              <Link to="/login">
+                                <Button
+                                  color="primary"
+                                  className="px-4"
+                                  active
+                                  tabIndex={-1}>
+                                  Login
+                                </Button>
+                              </Link>
+                            </Row>
+                          </>
                         )}
                       </Form>
                     </CardBody>
@@ -338,7 +351,7 @@ const mapStateToProps = (state) => {
     loggedIn: state.loginReducer.loggedIn,
     error: state.loginReducer.error,
     notifications: state.notifications,
-    loading: state.loading
+    loading: state.loginReducer.loading
   };
 };
 
