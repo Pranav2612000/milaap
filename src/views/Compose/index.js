@@ -118,7 +118,8 @@ export default function Compose(props) {
                 onSelect={addEmoji}
                 theme="dark"
                 title=""
-                emojiSize={24}></Picker>
+                emojiSize={24}
+                perLine={7}></Picker>
             </div>
           )}
         </div>

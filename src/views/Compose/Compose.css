@@ -57,7 +57,7 @@
 }
 
 .emoji {
-  width: 20em;
+  width: inherit;
   height: 80vh;
   padding-left: 0em;
 }
