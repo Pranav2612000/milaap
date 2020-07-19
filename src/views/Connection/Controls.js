@@ -187,9 +187,9 @@ class Controls extends Component {
             size="medium"
             disabled={!(self.state.inCall && !self.state.isScreenShareOn)}
             action={(element, next) => {
-              this.setState({ isScreenShareOn: true });
               this.inCallShareHandler();
               setTimeout(next, 2000);
+              this.setState({ isScreenShareOn: true });
             }}>
             <i className="icon-screen-desktop icons"></i>
             <span>Share Screen</span>
@@ -216,7 +216,7 @@ class Controls extends Component {
             // visible={!self.state.calls.length} //use this if we want it completely hidden until needed instead
             disabled={!self.state.inCall}
             action={(element, next) => {
-              this.setState({ inCall: false });
+              this.setState({ inCall: false, isScreenShareOn: false });
               //this.endCall(next);
               this.endCallHandler();
               next();

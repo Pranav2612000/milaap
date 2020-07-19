@@ -705,16 +705,19 @@ export async function getMyMediaStream(self, type, quality_index) {
       .catch((err) => {
         NotifStore.addNotification({
           title: 'Permission denied',
-          message: 'Browser refused to allow access!',
+          message: 'Browser refused to allow access your Screen!',
           type: 'danger',
           container: 'top-right',
           animationIn: ['animated', 'fadeIn'],
           animationOut: ['animated', 'fadeOut'],
           dismiss: {
-            duration: 3000,
+            duration: 3500,
             pauseOnHover: true
           }
         });
+        console.log(err);
+        console.log('NOOO SCREEEN SHAREEEEEEEEEEEEEEEEEE');
+        return err;
       });
   } else if (type === 'video') {
     // TODO: Add try catch to handle case when user denies access
@@ -734,13 +737,13 @@ export async function getMyMediaStream(self, type, quality_index) {
       .catch((err) => {
         NotifStore.addNotification({
           title: 'Permission denied',
-          message: 'Browser refused to allow access!',
+          message: 'Browser refused to allow access your camera!',
           type: 'danger',
           container: 'top-right',
           animationIn: ['animated', 'fadeIn'],
           animationOut: ['animated', 'fadeOut'],
           dismiss: {
-            duration: 3000,
+            duration: 3500,
             pauseOnHover: true
           }
         });
@@ -953,20 +956,22 @@ function deleteVideoElement(id) {
 
 /* function called when start screen share button pressed. sends request to share screen to all peers and shares screen when request granted. */
 export async function addScreenShareStream(self) {
-  getMyMediaStream(self, 'screen').then((media) => {
-    connectedPeers.forEach((val, index) => {
-      /* send request to share screen to all peers.*/
-      if (val.peer && !val.peer.destroyed && val.connected) {
-        try {
-          val.peer.send('sharing screen');
-          val.stream_to_be_sent = myScreenStreamObj;
-        } catch (err) {
-          console.log(err);
-          //alert('could not share screen to this peer');
+  getMyMediaStream(self, 'screen')
+    .then((media) => {
+      connectedPeers.forEach((val, index) => {
+        /* send request to share screen to all peers.*/
+        if (val.peer && !val.peer.destroyed && val.connected) {
+          try {
+            val.peer.send('sharing screen');
+            val.stream_to_be_sent = myScreenStreamObj;
+          } catch (err) {
+            console.log(err);
+            //alert('could not share screen to this peer');
+          }
         }
-      }
-    });
-  });
+      });
+    })
+    .catch((err) => {});
 }
 
 /* function called when stop screen share button pressed. */
