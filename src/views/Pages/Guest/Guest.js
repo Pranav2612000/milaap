@@ -69,8 +69,8 @@ class Guest extends Component {
       loading: true
     });
     console.log(this.state.roomName);
-    if (this.state.name == undefined || this.state.name === '') {
-      alert('Enter a username to proceed');
+    if (this.state.roomName == undefined || this.state.roomName == '') {
+      alert('Enter a roomname to proceed');
       this.setState({
         loading: false
       });
@@ -79,14 +79,14 @@ class Guest extends Component {
 
     /* Get a valid token if user doesn't have one. */
     if (!localStorage.getItem('milaap-auth-token')) {
-      if (this.state.roomName == undefined || this.state.roomName == '') {
-        alert('Enter a roomname to proceed');
+      console.log('exists');
+      if (this.state.name == undefined || this.state.name === '') {
+        alert('Enter a username to proceed');
         this.setState({
           loading: false
         });
         return;
       }
-      console.log('exists');
       var reqData = {
         name: this.state.name,
         roomName: this.state.roomName,
