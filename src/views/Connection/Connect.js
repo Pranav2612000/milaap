@@ -436,6 +436,20 @@ export async function toggleVideo(self) {
           'me' + '-video',
           'ME'
         );
+      })
+      .catch((err) => {
+        NotifStore.addNotification({
+          title: 'Permission denied',
+          message: 'Browser refused to allow access!',
+          type: 'danger',
+          container: 'top-right',
+          animationIn: ['animated', 'fadeIn'],
+          animationOut: ['animated', 'fadeOut'],
+          dismiss: {
+            duration: 3000,
+            pauseOnHover: true
+          }
+        });
       });
   }
 }
@@ -485,7 +499,20 @@ export async function toggleAudio(self) {
 
         /* Not sure whether changeStatusOfVideoElement() needs to be called here. */
       })
-      .catch((err) => console.log(err));
+      .catch((err) => {
+        NotifStore.addNotification({
+          title: 'Permission denied',
+          message: 'Browser refused to allow access!',
+          type: 'danger',
+          container: 'top-right',
+          animationIn: ['animated', 'fadeIn'],
+          animationOut: ['animated', 'fadeOut'],
+          dismiss: {
+            duration: 3000,
+            pauseOnHover: true
+          }
+        });
+      });
   }
 }
 
@@ -634,6 +661,20 @@ export async function changeCameraFacing(self, facing) {
         createVideoElement(self, stream, 'me' + '-video', 'ME');
       });
       myMediaStreamObj.getVideoTracks()[0].stop();
+    })
+    .catch((err) => {
+      NotifStore.addNotification({
+        title: 'Permission denied',
+        message: 'Browser refused to allow access!',
+        type: 'danger',
+        container: 'top-right',
+        animationIn: ['animated', 'fadeIn'],
+        animationOut: ['animated', 'fadeOut'],
+        dismiss: {
+          duration: 3000,
+          pauseOnHover: true
+        }
+      });
     });
 }
 
@@ -655,6 +696,20 @@ export async function getMyMediaStream(self, type, quality_index) {
         /* display my stream on screen. */
         createVideoElement(self, media, 'me' + '-screen', 'ME');
         return media;
+      })
+      .catch((err) => {
+        NotifStore.addNotification({
+          title: 'Permission denied',
+          message: 'Browser refused to allow access!',
+          type: 'danger',
+          container: 'top-right',
+          animationIn: ['animated', 'fadeIn'],
+          animationOut: ['animated', 'fadeOut'],
+          dismiss: {
+            duration: 3000,
+            pauseOnHover: true
+          }
+        });
       });
   } else if (type === 'video') {
     // TODO: Add try catch to handle case when user denies access
@@ -670,6 +725,20 @@ export async function getMyMediaStream(self, type, quality_index) {
         /* display my stream on screen. */
         createVideoElement(self, media, 'me' + '-video', 'ME');
         return media;
+      })
+      .catch((err) => {
+        NotifStore.addNotification({
+          title: 'Permission denied',
+          message: 'Browser refused to allow access!',
+          type: 'danger',
+          container: 'top-right',
+          animationIn: ['animated', 'fadeIn'],
+          animationOut: ['animated', 'fadeOut'],
+          dismiss: {
+            duration: 3000,
+            pauseOnHover: true
+          }
+        });
       });
   }
 }
