@@ -11,7 +11,7 @@ export default function Compose(props) {
   const [type, setType] = useState('');
 
   async function sendMessage() {
-    setToggle(!toggle);
+    if (toggle === true) setToggle(!toggle);
 
     // var text = document.getElementById('textMsg').innerHTML;
     // if (text.replace('/\n/g', '') === '') return;
