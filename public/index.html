@@ -45,6 +45,11 @@
       href="./img/logo.png"
       media="(device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)"
     />
+    <link
+      href="//fonts.googleapis.com/css?family=Proxima%20Nova:thin,extra-light,light,100,200,300,400,500,600,700,800"
+      rel="stylesheet"
+      type="text/css"
+    />
     <!--
       Notice the use of %PUBLIC_URL% in the tags above.
       It will be replaced with the URL of the `public` folder during the build.
@@ -72,15 +77,25 @@
     </script>
     <script src="socket.io/socket.io.js"></script>
   </head>
-  <body>
+  <body style="font-family: 'Proxima Nova';">
     <noscript>
       You need to enable JavaScript to run this app.
     </noscript>
+    <!--
+      Added for development purposes, remove and uncomment service worker registration part during final deployment
+    -->
     <script>
+      navigator.serviceWorker
+        .getRegistrations()
+        .then((registrations) =>
+          registrations.map((registration) => registration.unregister())
+        );
+    </script>
+    <!-- <script>
       'serviceWorker' in navigator
         ? window.addEventListener('load', function () {
             navigator.serviceWorker
-              .register('./worker.js')
+              .unregister('./worker.js')
               .then(
                 function (o) {
                   console.log('Worker registration successful', o.scope);
@@ -94,7 +109,7 @@
               });
           })
         : console.log('Service Worker is not supported by browser.');
-    </script>
+    </script> -->
     <div id="root"></div>
   </body>
 </html>

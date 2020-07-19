@@ -16,13 +16,16 @@ export default function Message(props) {
       {showTimestamp && <div className="timestamp bg-dark">{friendlyTimestamp}</div>}
 
       <div className="bubble-container">
-        <b className={['sendBy', `${isMine}`].join(' ')}>{!isMine && data.sender}</b>
         <div
           className={['bubble', `${isMine ? 'mine' : ''}`].join(' ')}
           title={friendlyTimestamp}>
-          {data.msg}
+          <b>{isMine && data.sender}</b>
+          <b className={['sendBy', `${isMine}`].join(' ')}>
+            {!isMine && data.sender}
+          </b>
+          {/* {data.msg} */}
+          <div dangerouslySetInnerHTML={{ __html: data.msg }} />
         </div>
-        <b>{isMine && data.sender}</b>
       </div>
     </div>
   );
