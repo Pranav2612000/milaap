@@ -1,12 +1,6 @@
 import React, { Component } from 'react';
-import { Link, Redirect } from 'react-router-dom';
+import { Redirect } from 'react-router-dom';
 import {
-  UncontrolledDropdown,
-  DropdownItem,
-  DropdownMenu,
-  DropdownToggle,
-  Nav,
-  NavItem,
   Button,
   Form,
   InputGroup,
@@ -17,8 +11,6 @@ import {
   ModalBody,
   ModalFooter,
   ModalHeader,
-  Card,
-  CardBody,
   Container,
   Row,
   Col
@@ -43,71 +35,60 @@ class Dashboard extends Component {
       friendid: '',
       roomName: ''
     };
-    this.toggle = this.toggle.bind(this);
-    this.handleFriendChange = this.handleFriendChange.bind(this);
-    this.handleRoomNameChange = this.handleRoomNameChange.bind(this);
-    this.addFriend = this.addFriend.bind(this);
   }
 
-  addFriend() {
+  addFriend = async () => {
     const reqData = {
       user: this.state.friendid,
       roomName: this.state.roomName
     };
-    axios
-      .post(`${global.config.backendURL}/api/room/createroom`, reqData, {
+    try {
+      await axios.post(`${global.config.backendURL}/api/room/createroom`, reqData, {
         headers: {
           'milaap-auth-token': localStorage.getItem('milaap-auth-token')
         }
-      })
-      .then((res) => {
-        this.toggle();
-        /* TODO: Replace with appropriate state handling, to add room without reloading. */
-        // window.location.reload();
-      })
-      .catch((err) => {
-        console.log(err);
-        /* TODO: Appropriate Error handling. */
-        alert('Room exists, try a different room');
       });
-  }
+      this.toggle();
+      /* TODO: Replace with appropriate state handling, to add room without reloading. */
+      // window.location.reload();
+    } catch (err) {
+      /* TODO: Appropriate Error handling. */
+      alert('Room exists, try a different room');
+    }
+  };
 
-  handleFriendChange(e) {
+  handleFriendChange = (e) => {
     this.setState({
       friendid: e.target.value
     });
-  }
+  };
 
-  handleRoomNameChange(e) {
+  handleRoomNameChange = (e) => {
     this.setState({
       roomName: e.target.value
     });
-  }
+  };
 
-  toggle() {
+  toggle = () => {
     this.setState({
       modal: !this.state.modal
     });
-  }
+  };
 
   loading = () => <div className="animated fadeIn pt-1 text-center">Loading...</div>;
 
   render() {
-    const { children, ...attributes } = this.props;
-    const showHamburger =
-      window.location.href.split('/').pop() !== 'dashboard' ? true : false;
-
     if (this.props.username === false) {
       return <Redirect to="/login" />;
     }
     return (
-      <React.Fragment>
+      <>
         <div className="text-center">
           <center>
             <br />
             <br />
             <h1 style={{ color: 'white', opacity: '0.5' }}>
-              Welcome {`${this.props.username}`} to Milaap!
+              {`Welcome to Milaap, ${this.props.username}!`}
             </h1>
             <br />
             <Container>
@@ -154,6 +135,7 @@ class Dashboard extends Component {
                   width="30%"
                   height="21.7%"
                   style={{ cursor: 'pointer' }}
+                  alt="milaap logo"
                 />
 
                 {/* 
@@ -231,7 +213,7 @@ class Dashboard extends Component {
             </Button>
           </ModalFooter>
         </Modal>
-      </React.Fragment>
+      </>
     );
   }
 }
@@ -239,12 +221,9 @@ class Dashboard extends Component {
 Dashboard.propTypes = propTypes;
 Dashboard.defaultProps = defaultProps;
 
-const mapStateToProps = (state) => {
-  console.log(state);
-  return {
-    username: state.loginReducer.username,
-    guests: state.roomReducer.guests
-  };
-};
+const mapStateToProps = (state) => ({
+  username: state.loginReducer.username,
+  guests: state.roomReducer.guests
+});
 
 export default connect(mapStateToProps)(Dashboard);

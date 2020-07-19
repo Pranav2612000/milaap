@@ -23,7 +23,10 @@ class Landing extends Component {
               </Link>
             </Col>
             <Col>
-              <a href="https://forms.gle/WPCZh2JDyNfBTCJ47" target="_blank">
+              <a
+                href="https://forms.gle/WPCZh2JDyNfBTCJ47"
+                target="_blank"
+                rel="noopener noreferrer">
                 <h5
                   style={{ color: 'white', textAlign: 'right', marginRight: '2%' }}>
                   Report a Bug

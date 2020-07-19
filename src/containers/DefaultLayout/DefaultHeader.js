@@ -7,20 +7,9 @@ import {
   DropdownMenu,
   DropdownToggle,
   Nav,
-  NavItem,
-  Button,
-  Form,
-  InputGroup,
-  InputGroupAddon,
-  InputGroupText,
-  Input,
-  Modal,
-  ModalBody,
-  ModalFooter,
-  ModalHeader
+  NavItem
 } from 'reactstrap';
 import PropTypes from 'prop-types';
-import axios from 'axios';
 
 import { AppAsideToggler, AppNavbarBrand, AppSidebarToggler } from '@coreui/react';
 import logo from '../../assets/img/brand/logo.png';
@@ -190,11 +179,9 @@ class DefaultHeader extends Component {
 DefaultHeader.propTypes = propTypes;
 DefaultHeader.defaultProps = defaultProps;
 
-const mapStateToProps = (state) => {
-  return {
-    username: state.loginReducer.username,
-    guests: state.roomReducer.guests
-  };
-};
+const mapStateToProps = (state) => ({
+  username: state.loginReducer.username,
+  guests: state.roomReducer.guests
+});
 
 export default connect(mapStateToProps)(DefaultHeader);

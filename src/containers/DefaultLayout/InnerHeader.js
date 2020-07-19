@@ -46,49 +46,43 @@ class DefaultHeader extends Component {
       friendid: '',
       roomName: ''
     };
-    this.toggle = this.toggle.bind(this);
-    this.handleFriendChange = this.handleFriendChange.bind(this);
-    this.handleRoomNameChange = this.handleRoomNameChange.bind(this);
-    this.addFriend = this.addFriend.bind(this);
   }
 
-  addFriend() {
+  addFriend = async () => {
     const reqData = {
       user: this.state.friendid,
       roomName: this.state.roomName
     };
-    axios
-      .post(reqData, `${global.config.backendURL}/api/user/adduser`, {
+    try {
+      await axios.post(reqData, `${global.config.backendURL}/api/user/adduser`, {
         headers: {
           'milaap-auth-token': localStorage.getItem('milaap-auth-token')
         }
-      })
-      .then((res) => {
-        this.toggle();
-        window.location.reload();
-      })
-      .catch((err) => {
-        console.log(err);
       });
-  }
+      this.toggle();
+      window.location.reload();
+    } catch {
+      console.log(err);
+    }
+  };
 
-  handleFriendChange(e) {
+  handleFriendChange = (e) => {
     this.setState({
       friendid: e.target.value
     });
-  }
+  };
 
-  handleRoomNameChange(e) {
+  handleRoomNameChange = (e) => {
     this.setState({
       roomName: e.target.value
     });
-  }
+  };
 
-  toggle() {
+  toggle = () => {
     this.setState({
       modal: !this.state.modal
     });
-  }
+  };
 
   render() {
     // eslint-disable-next-line

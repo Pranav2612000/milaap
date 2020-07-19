@@ -6,11 +6,11 @@ import {
   GOOGLE_USER
 } from './registerActionTypes';
 
-const initalState = {
+const initalRegisterState = {
   loading: false
 };
 
-export const registerReducer = (state = initalState, action) => {
+const registerReducer = (state = initalRegisterState, action) => {
   switch (action.type) {
     case REGISTER_REQUEST:
       return {

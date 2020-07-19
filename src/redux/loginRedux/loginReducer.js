@@ -6,16 +6,15 @@ import {
   REDIRECT_TO_JOIN
 } from './loginActionTypes';
 
-const initalState = {
+const initalLoginState = {
   loading: false,
   error: false,
-  username:
-    localStorage.getItem('username') == null
-      ? undefined
-      : localStorage.getItem('username')
+  username: localStorage.getItem('username')
+    ? localStorage.getItem('username')
+    : undefined
 };
 
-export const loginReducer = (state = initalState, action) => {
+const loginReducer = (state = initalLoginState, action) => {
   switch (action.type) {
     case LOGIN_REQUEST:
       return {

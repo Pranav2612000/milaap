@@ -7,54 +7,34 @@ import {
   SET_AUDIO_VIDEO_TO_INITIAL_STATE
 } from './userActionTypes';
 import axios from 'axios';
-import { loginSuccess } from '../loginRedux/loginAction';
-import Notifications, { success, error } from 'react-notification-system-redux';
-export const fetchUserRequest = () => {
-  return {
-    type: FETCH_USERS_REQUEST
-  };
-};
 
-export const fetchUserSuccess = (users) => {
-  return {
-    type: FETCH_USERS_SUCCESS,
-    payload: users
-  };
-};
+export const fetchUserRequest = () => ({
+  type: FETCH_USERS_REQUEST
+});
 
-export const fetchUserFailuer = (error) => {
-  return {
-    type: FETCH_USERS_FAILURE,
-    payload: error
-  };
-};
-export const toggleVideo = () => {
-  return {
-    type: TOGGLE_VIDEO
-  };
-};
-export const toggleAudio = () => {
-  return {
-    type: TOGGLE_AUDIO
-  };
-};
-export const setAudioVideoToInitialState = () => {
-  return {
-    type: SET_AUDIO_VIDEO_TO_INITIAL_STATE
-  };
-};
-export const fetchUsers = () => {
-  console.log('Called');
-  return function (dispatch) {
-    dispatch(fetchUserRequest());
-    axios
-      .get('https://jsonplaceholder.typicode.com/users')
-      .then((res) => {
-        console.log(res.data);
-        dispatch(fetchUserSuccess(res.data.map((user) => user.name)));
-      })
-      .catch((err) => {
-        dispatch(fetchUserFailuer(err));
-      });
-  };
+export const fetchUserSuccess = (users) => ({
+  type: FETCH_USERS_SUCCESS
+});
+
+export const fetchUserFailuer = (error) => ({
+  type: FETCH_USERS_FAILURE,
+  payload: error
+});
+export const toggleVideo = () => ({
+  type: TOGGLE_VIDEO
+});
+export const toggleAudio = () => ({
+  type: TOGGLE_AUDIO
+});
+export const setAudioVideoToInitialState = () => ({
+  type: SET_AUDIO_VIDEO_TO_INITIAL_STATE
+});
+export const fetchUsers = () => async (dispatch) => {
+  dispatch(fetchUserRequest());
+  try {
+    const res = await axios.get('https://jsonplaceholder.typicode.com/users');
+    dispatch(fetchUserSuccess(res.data.map((user) => user.name)));
+  } catch (err) {
+    dispatch(fetchUserFailuer(err));
+  }
 };

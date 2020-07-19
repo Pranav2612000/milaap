@@ -1,21 +1,20 @@
 import { INCREASE_COUNT, RESET_COUNT } from './messageActionTypes';
 
-const initalState = {
+const initalMessageState = {
   count: {}
 };
 
-export const messageReducer = (state = initalState, action) => {
+const messageReducer = (state = initalMessageState, action) => {
+  const newCount = { ...state.count };
   switch (action.type) {
     case INCREASE_COUNT:
-      var num = state.count[action.room] ? state.count[action.room] + 1 : 1;
-      var newCount = { ...state.count };
+      const num = state.count[action.room] ? state.count[action.room] + 1 : 1;
       newCount[action.room] = num;
       return {
         ...state,
         count: newCount
       };
     case RESET_COUNT:
-      var newCount = { ...state.count };
       newCount[action.room] = 0;
       return {
         ...state,

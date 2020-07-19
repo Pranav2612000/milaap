@@ -1,11 +1,9 @@
-import { Component } from 'react';
 import SimplePeer from 'simple-peer';
 import $ from 'jquery';
-import socketIOClient, { connect } from 'socket.io-client';
+import socketIOClient from 'socket.io-client';
 import { store as NotifStore } from 'react-notifications-component';
 import axios from 'axios';
 import { store } from '../../redux/store';
-import * as action from '../../redux/userRedux/userAction';
 import setMediaBitrate from './VideoCodecs';
 
 const videoQuality = [
@@ -20,8 +18,6 @@ var myScreenStreamObj = new MediaStream();
 var socket = socketIOClient(`${global.config.backendURL}`, {
   autoConnect: false
 });
-store.subscribe(getVideoState);
-store.subscribe(getAudioState);
 
 function getVideoState() {
   let state = store.getState();
@@ -35,7 +31,7 @@ function getAudioState() {
 
 function extractSocketID(element_id) {
   var cut_index = element_id.lastIndexOf('-video');
-  if (cut_index == -1) {
+  if (cut_index === -1) {
     return -1;
   }
   console.log(element_id.slice(0, cut_index));
@@ -54,12 +50,12 @@ function upgradeLocalStreamVideoQuality(stream) {
 
 function askToUpgradeStreamVideoQualityById(element_id) {
   var their_id = extractSocketID(element_id);
-  if (their_id == -1 || their_id == 'me') {
+  if (their_id === -1 || their_id === 'me') {
     return;
   }
   /* search through connected peers to get the appropriate peer. */
-  connectedPeers.forEach((val, index) => {
-    if (val.their_id == their_id) {
+  connectedPeers.forEach((val) => {
+    if (val.their_id === their_id) {
       /* ask the peer for better quality. */
       val.peer.send('i want more');
       console.log('asking for more');
@@ -82,7 +78,7 @@ function upgradeStreamVideoQuality(Peer) {
 
 export function degradeLocalStreamVideoQuality(stream) {
   try {
-    if (stream.getVideoTracks().length != 0) {
+    if (stream.getVideoTracks().length !== 0) {
       stream.getVideoTracks()[0].applyConstraints(videoQuality[3]);
     }
     return stream;
@@ -93,12 +89,12 @@ export function degradeLocalStreamVideoQuality(stream) {
 
 function askToDegradeStreamVideoQualityById(element_id) {
   var their_id = extractSocketID(element_id);
-  if (their_id == -1 || their_id == 'me') {
+  if (their_id === -1 || their_id === 'me') {
     return;
   }
   /* search through connected peers to get the appropriate peer. */
-  connectedPeers.forEach((val, index) => {
-    if (!val.peer.destroyed && val.their_id == their_id) {
+  connectedPeers.forEach((val) => {
+    if (!val.peer.destroyed && val.their_id === their_id) {
       try {
         /* ask the peer for better quality. */
         val.peer.send('reduce quality');
@@ -125,14 +121,18 @@ function degradeStreamVideoQuality(Peer) {
 
 function chooseVideoOrScreen(type) {
   var mediaStream;
-  if (type == 'video') {
-    console.log(myMediaStreamObj);
-    mediaStream = degradeLocalStreamVideoQuality(myMediaStreamObj);
-  } else if (type == 'screen') {
-    mediaStream = myScreenStreamObj;
-  } else {
-    mediaStream = null;
+  switch (type) {
+    case 'video':
+      console.log(myMediaStreamObj);
+      mediaStream = degradeLocalStreamVideoQuality(myMediaStreamObj);
+      return;
+    case 'screen':
+      mediaStream = myScreenStreamObj;
+      return;
+    default:
+      mediaStream = null;
   }
+
   console.log(mediaStream);
   return mediaStream;
 }
@@ -191,7 +191,7 @@ function clearMediaStream(stream) {
 export class Peer {
   constructor(stream, room, initiator, their_id, their_name, my_id, type) {
     /* Set default type to video. */
-    if (type == null) {
+    if (type === null) {
       type = 'video';
     }
     /* save constructor variable */
@@ -238,9 +238,9 @@ export class Peer {
     peer.on('connect', (data) => {
       this.connected = true;
       handleMemberJoined();
-      if (this.initiator == false) {
+      if (this.initiator === false) {
         /* if I am already sharing screen,share with the newly joined peer. */
-        if (myScreenStreamObj.getVideoTracks().length != 0) {
+        if (myScreenStreamObj.getVideoTracks().length !== 0) {
           console.log('sharing screen');
           this.peer.send('sharing screen');
           this.stream_to_be_sent = myScreenStreamObj;
@@ -254,7 +254,7 @@ export class Peer {
       this.sharing = 0; // Allow others to share screen
 
       // If screen shared is of type screen, don't add handlers
-      if (this.next_stream_type == 'screen') {
+      if (this.next_stream_type === 'screen') {
         createVideoElement(self, data, self.their_id + '-screen', self.their_name);
         return;
       }
@@ -279,27 +279,27 @@ export class Peer {
 
     /* called on receiving data. */
     peer.on('data', (data) => {
-      if (data == 'screen- go ahead') {
+      if (data === 'screen- go ahead') {
         //Handshake complete share screen
         this.peer.addStream(this.stream_to_be_sent);
       }
-      if (data == 'stop screen sharing') {
+      if (data === 'stop screen sharing') {
         // clear display of the stopped screen
         deleteVideoElement(this.their_id + '-screen');
       }
 
-      if (data == 'i want more') {
+      if (data === 'i want more') {
         console.log('no one is ever happy');
         upgradeStreamVideoQuality(this);
       }
-      if (data == 'reduce quality') {
+      if (data === 'reduce quality') {
         console.log('request for reducing video quality received');
         degradeStreamVideoQuality(this);
       }
 
       // Allow screen sharing only if currently no-one else wants to. */
-      if (this.sharing == 0) {
-        if (data == 'sharing screen') {
+      if (this.sharing === 0) {
+        if (data === 'sharing screen') {
           this.sharing = 1;
           this.next_stream_type = 'screen';
           this.peer.send('screen- go ahead');
@@ -315,7 +315,7 @@ export class Peer {
     deleteVideoElement(this.their_id + '-screen');
 
     /* Handles corner cases of num_retries being null. */
-    if (this.num_retries == null) {
+    if (this.num_retries === null) {
       return;
     }
 
@@ -336,12 +336,12 @@ export class Peer {
         //clearMediaStream(self.stream);
         return;
       }
-      if (this.type == 'video') {
+      if (this.type === 'video') {
         /* Reduce quality of current stream. */
         if (!this.stream) {
           return;
         }
-        if (this.stream.getVideoTracks().length != 0) {
+        if (this.stream.getVideoTracks().length !== 0) {
           this.stream
             .getVideoTracks()[0]
             .applyConstraints(videoQuality[this.num_retries]);
@@ -357,7 +357,7 @@ export class Peer {
           getSimplePeerConfObj(self.initiator, self.stream)
         );
         self.addEventListenersToPeer(self.peer);
-      } else if (this.type == 'screen') {
+      } else if (this.type === 'screen') {
         //this.stream.getVideoTracks()[0].applyConstraints(videoQuality[this.num_retries]);
 
         self.num_retries = self.num_retries + 1;
@@ -380,8 +380,8 @@ export async function toggleVideo(self) {
   var mic = getAudioState();
 
   if (!webCam) {
-    if (myMediaStreamObj.getVideoTracks().length != 0) {
-      connectedPeers.map((eachPeer) => {
+    if (myMediaStreamObj.getVideoTracks().length !== 0) {
+      connectedPeers.forEach((eachPeer) => {
         try {
           eachPeer.peer.removeTrack(
             myMediaStreamObj.getVideoTracks()[0],
@@ -405,7 +405,7 @@ export async function toggleVideo(self) {
         self,
         'video_off',
         myMediaStreamObj,
-        'me' + '-video',
+        'me-video',
         'ME',
         setNewMediaSource
       );
@@ -420,7 +420,7 @@ export async function toggleVideo(self) {
         /* We are here means, we are staring video, after stopping it, so add video track to all peers and locally. */
         if (connectedPeers) {
           /* Add to all peers. */
-          connectedPeers.map((eachPeer) => {
+          connectedPeers.forEach((eachPeer) => {
             try {
               eachPeer.peer.addTrack(stream.getVideoTracks()[0], myMediaStreamObj);
             } catch (err) {
@@ -436,7 +436,7 @@ export async function toggleVideo(self) {
           self,
           'video_on',
           myMediaStreamObj,
-          'me' + '-video',
+          'me-video',
           'ME'
         );
       })
@@ -463,7 +463,7 @@ export async function toggleAudio(self) {
   if (!mic) {
     if (connectedPeers) {
       /* Remove from all peers */
-      connectedPeers.map((eachPeer) => {
+      connectedPeers.forEach((eachPeer) => {
         try {
           eachPeer.peer.removeTrack(
             myMediaStreamObj.getAudioTracks()[0],
@@ -489,7 +489,7 @@ export async function toggleAudio(self) {
       .then((stream) => {
         /* Add to all peers. */
         if (connectedPeers) {
-          connectedPeers.map((eachPeer) => {
+          connectedPeers.forEach((eachPeer) => {
             try {
               eachPeer.peer.addTrack(stream.getAudioTracks()[0], myMediaStreamObj);
             } catch (err) {
@@ -504,7 +504,7 @@ export async function toggleAudio(self) {
 
         /* Not sure whether changeStatusOfVideoElement() needs to be called here. */
       })
-      .catch((err) => {
+      .catch(() => {
         NotifStore.addNotification({
           title: 'Permission denied',
           message: 'Browser refused to allow access!',
@@ -553,7 +553,7 @@ export function createVideoElement(self, stream, friendtkn, username) {
   /* Add button to mute a user. */
   audioIcon.classList.add('icon-volume-2', 'audio-icon');
   audioIcon.addEventListener('click', () => muteVideo(self, friendtkn));
-  if (friendtkn == 'me-video') audioIcon.style.display = 'none';
+  if (friendtkn === 'me-video') audioIcon.style.display = 'none';
 
   /* Add nametag below screen. */
   nameTag.classList.add('name-label');
@@ -567,7 +567,7 @@ export function createVideoElement(self, stream, friendtkn, username) {
   video.onclick = switchContext;
   video.playsinline = true;
   video.autoplay = true;
-  if (video.id == 'me-video') {
+  if (video.id === 'me-video') {
     video.muted = 'true';
   }
 
@@ -593,7 +593,7 @@ function changeStatusOfVideoElement(
   setNewMediaSource = false
 ) {
   //let video = $('#' + friendtkn);
-  if (status == 'video_off') {
+  if (status === 'video_off') {
     // this works for audio toggling too- name needs to be changed.
     const video = document.getElementById(friendtkn);
     if (!video) {
@@ -610,7 +610,7 @@ function changeStatusOfVideoElement(
     if (!isPlaying) {
       video.play();
     }
-  } else if (status == 'video_on') {
+  } else if (status === 'video_on') {
     const video = document.getElementById(friendtkn);
     if (!video) {
       return;
@@ -624,7 +624,7 @@ export function switchContext(e) {
   if (e.target) e = e.target;
   try {
     const context = document.getElementById('context');
-    if (e.srcObject == context.srcObject) return;
+    if (e.srcObject === context.srcObject) return;
     const username = e.nextElementSibling.innerText;
     context.style.display = 'inline';
     askToDegradeStreamVideoQualityById(context.className);
@@ -632,13 +632,13 @@ export function switchContext(e) {
     context.poster =
       'https://dummyimage.com/1024x576/2f353a/ffffff.jpg&text=' + username;
     context.srcObject = e.srcObject;
-    if (e.id == 'me-video') {
+    if (e.id === 'me-video') {
       context.muted = 'true';
     }
     console.log(e.srcObject.getAudioTracks(), e.srcObject.getVideoTracks());
     if (
-      e.srcObject.getAudioTracks.length != 0 ||
-      e.srcObject.getVideoTracks.length != 0
+      e.srcObject.getAudioTracks.length !== 0 ||
+      e.srcObject.getVideoTracks.length !== 0
     ) {
       context.play();
     }
@@ -656,18 +656,18 @@ export async function changeCameraFacing(self, facing) {
       audio: { echoCancellation: true, noiseSuppression: true }
     })
     .then((stream) => {
-      connectedPeers.map((eachPeer) => {
+      connectedPeers.forEach((eachPeer) => {
         eachPeer.peer.replaceTrack(
           myMediaStreamObj.getVideoTracks()[0],
           stream.getVideoTracks()[0],
           myMediaStreamObj
         );
-        deleteVideoElement('me' + '-video');
-        createVideoElement(self, stream, 'me' + '-video', 'ME');
+        deleteVideoElement('me-video');
+        createVideoElement(self, stream, 'me-video', 'ME');
       });
       myMediaStreamObj.getVideoTracks()[0].stop();
     })
-    .catch((err) => {
+    .catch(() => {
       NotifStore.addNotification({
         title: 'Permission denied',
         message: 'Browser refused to allow access!',
@@ -685,7 +685,7 @@ export async function changeCameraFacing(self, facing) {
 
 /* function to get mediastream by asking for permission from user. */
 export async function getMyMediaStream(self, type, quality_index) {
-  if (quality_index == null) {
+  if (quality_index === null) {
     quality_index = 0;
   }
   if (type === 'screen') {
@@ -699,7 +699,7 @@ export async function getMyMediaStream(self, type, quality_index) {
         myScreenStreamObj = media;
 
         /* display my stream on screen. */
-        createVideoElement(self, media, 'me' + '-screen', 'ME');
+        createVideoElement(self, media, 'me-screen', 'ME');
         return media;
       })
       .catch((err) => {
@@ -731,7 +731,7 @@ export async function getMyMediaStream(self, type, quality_index) {
         myMediaStreamObj = media;
 
         /* display my stream on screen. */
-        createVideoElement(self, media, 'me' + '-video', 'ME');
+        createVideoElement(self, media, 'me-video', 'ME');
         return media;
       })
       .catch((err) => {
@@ -773,7 +773,7 @@ export function startCall(self, roomName, type) {
 
   socket.on('signalling', (data, from_id) => {
     connectedPeers.forEach((val) => {
-      if (val.their_id == from_id && !val.peer.destroyed) {
+      if (val.their_id === from_id && !val.peer.destroyed) {
         val.peer.signal(data);
       }
     });
@@ -806,7 +806,7 @@ function createConnections(self, roomName, type) {
           //Remove previous connections with their_id
           /*
           connectedPeers.forEach((val, index) => {
-            if (val && val.their_id == their_id) {
+            if (val && val.their_id===their_id) {
               val.ended = true;
               val.peer.destroy('Call Ended');
             }
@@ -851,10 +851,10 @@ function createConnections(self, roomName, type) {
 
               /* emit startconn to create Peer at remote to handle sdp setting up. */
               socket.emit('startconn', their_id, my_id, my_name, (resp) => {
-                var my_id = socket.id;
+                // var my_id = socket.id;
                 //var peer = new Peer(true, self.state.myMediaStreamObj, self.state.roomName, true, their_id, my_id);
               });
-              var my_id = socket.id;
+              my_id = socket.id;
 
               /* create a new Peer with initiator = true and add it to record. */
               var peer = new Peer(
@@ -877,24 +877,19 @@ function createConnections(self, roomName, type) {
 }
 
 /* function to send request to backend to clean database after ending call. */
-function sendRequestToEndCall(self) {
+async function sendRequestToEndCall(self) {
   const reqData = {
     roomName: self.state.roomName
   };
-  axios
-    .post(`${global.config.backendURL}/api/room/exitstreamsimple`, reqData, {
+  await axios.post(
+    `${global.config.backendURL}/api/room/exitstreamsimple`,
+    reqData,
+    {
       headers: {
         'milaap-auth-token': localStorage.getItem('milaap-auth-token')
       }
-    })
-    .then((res) => {
-      console.log('exited');
-      return;
-    })
-    .catch((err) => {
-      console.log(err);
-      return;
-    });
+    }
+  );
 }
 
 /* function called when endcall is pressed. */
@@ -934,7 +929,7 @@ function deleteAllVideoElements() {
 /* function to clear context. */
 function clearContext() {
   const context = document.getElementById('context');
-  if (context != null) {
+  if (context) {
     context.src = null;
     context.srcObject = null;
     context.style.display = 'none';

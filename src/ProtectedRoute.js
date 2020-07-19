@@ -3,34 +3,33 @@ import { Route, Redirect } from 'react-router-dom';
 import axios from 'axios';
 import * as action from './redux/loginRedux/loginAction';
 import { connect } from 'react-redux';
-function getRoomFromLocation(locationString) {
+const getRoomFromLocation = (locationString) => {
   let room = '';
   const lastslash = locationString.lastIndexOf('/');
   room = locationString.slice(lastslash + 1);
   return room;
-}
+};
 const ProtectedRoute = (props) => {
   const { component: Component, ...rest } = props;
   const [credentialsValid, setCredentialsValid] = useState(false);
   const [validated, setValidated] = useState(false);
-  var token = localStorage.getItem('milaap-auth-token');
+
   useEffect(() => {
-    console.log(props.location);
     const verifyToken = async () => {
-      token = localStorage.getItem('milaap-auth-token');
-      await axios
-        .post(`${global.config.backendURL}/api/user/verify`, {
-          headers: { 'milaap-auth-token': token }
-        })
-        .then((resp) => {
-          setCredentialsValid(resp.data.res);
-          setValidated(true);
-        })
-        .catch((err) => {
-          //   alert(err);
-          setCredentialsValid(false);
-          setValidated(true);
-        });
+      const token = localStorage.getItem('milaap-auth-token');
+      try {
+        const { data } = await axios.post(
+          `${global.config.backendURL}/api/user/verify`,
+          {
+            headers: { 'milaap-auth-token': token }
+          }
+        );
+        setCredentialsValid(data.res);
+        setValidated(true);
+      } catch {
+        setCredentialsValid(false);
+        setValidated(true);
+      }
     };
     verifyToken();
   }, []);
@@ -42,11 +41,10 @@ const ProtectedRoute = (props) => {
   } else if (!credentialsValid && validated) {
     props.logout();
     localStorage.clear();
-    if (props.location.pathname == '/') {
+    if (props.location.pathname === '/') {
       return <Redirect to="/landing" />;
     }
-    var roomName = getRoomFromLocation(props.location.pathname);
-    console.log(roomName);
+    const roomName = getRoomFromLocation(props.location.pathname);
     return (
       <Redirect
         to={{
@@ -59,15 +57,11 @@ const ProtectedRoute = (props) => {
     return <div className="animated fadeIn pt-1 text-center">Loading...</div>;
   }
 };
-const mapStateToProps = (state) => {
-  return {
-    loggedIn: state.loginReducer.loggedIn
-  };
-};
+const mapStateToProps = (state) => ({
+  loggedIn: state.loginReducer.loggedIn
+});
 
-const mapDispatchToProps = (dispatch) => {
-  return {
-    logout: () => dispatch(action.logout())
-  };
-};
+const mapDispatchToProps = (dispatch) => ({
+  logout: () => dispatch(action.logout())
+});
 export default connect(mapStateToProps, mapDispatchToProps)(ProtectedRoute);

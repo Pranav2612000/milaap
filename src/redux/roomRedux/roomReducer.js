@@ -4,12 +4,12 @@ import {
   ENTER_ROOM_FAILURE
 } from './roomActionTypes';
 
-const initalState = {
+const initalRoomState = {
   loading: false,
   guests: []
 };
 
-export const roomReducer = (state = initalState, action) => {
+const roomReducer = (state = initalRoomState, action) => {
   switch (action.type) {
     case ENTER_ROOM_REQUEST:
       return {

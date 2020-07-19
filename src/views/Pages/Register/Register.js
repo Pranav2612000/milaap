@@ -31,47 +31,42 @@ export class Register extends Component {
       loading: false,
       error: false
     };
-    this.handleUsernameChange = this.handleUsernameChange.bind(this);
-    this.handlePasswordChange = this.handlePasswordChange.bind(this);
-    this.handleRepasswordChange = this.handleRepasswordChange.bind(this);
-    this.handleSubmit = this.handleSubmit.bind(this);
   }
 
-  componentDidUpdate = () => {
-    if (this.props.error) this.state.error = true;
-    return;
-  };
-  handleUsernameChange(e) {
+  componentDidUpdate() {
+    if (this.props.error) this.setState({ error: true });
+  }
+  handleUsernameChange = (e) => {
     this.setState({
       username: e.target.value
     });
-  }
+  };
 
-  handlePasswordChange(e) {
+  handlePasswordChange = (e) => {
     this.setState({
       password: e.target.value
     });
-  }
+  };
 
-  handleRepasswordChange(e) {
+  handleRepasswordChange = (e) => {
     this.setState({
       repassword: e.target.value
     });
-  }
+  };
 
-  handleSubmit(e) {
+  handleSubmit = (e) => {
     e.preventDefault();
     this.setState({
       loading: true,
       error: false
     });
     this.props.register(this.state.username, this.state.password);
-  }
+  };
 
   render() {
     return (
       <>
-        {this.props.registered === true && (
+        {this.props.registered && (
           <Redirect to={{ pathname: '/login', register: true }} />
         )}
         <div className="app flex-row align-items-center">
@@ -85,8 +80,7 @@ export class Register extends Component {
               style={{ margin: '0%', height: '15%' }}>
               <Card
                 className="text-white bg-transparent d-md-down"
-                style={{ width: '59%' }}
-                style={{ backgroundColor: 'transparent', border: 0 }}>
+                style={{ backgroundColor: 'transparent', border: 0, width: '59%' }}>
                 <CardBody
                   className="text-center"
                   style={{ backgroundColor: 'transparent', border: 0 }}>
@@ -136,12 +130,9 @@ export class Register extends Component {
                           onChange={this.handlePasswordChange}
                         />
                       </InputGroup>
-                      {this.state.match ? (
-                        <></>
-                      ) : (
+                      {!this.state.match && (
                         <h6 style={{ color: 'red' }}>Passwords Don't Match</h6>
                       )}
-
                       <InputGroup className="mb-4">
                         <InputGroupAddon addonType="prepend">
                           <InputGroupText>
@@ -190,19 +181,14 @@ export class Register extends Component {
     );
   }
 }
-const mapStateToProps = (state) => {
-  console.log(state);
-  return {
-    registered: state.registerReducer.registered,
-    error: state.registerReducer.error,
-    notifications: state.notifications
-  };
-};
+const mapStateToProps = (state) => ({
+  registered: state.registerReducer.registered,
+  error: state.registerReducer.error,
+  notifications: state.notifications
+});
 
-const mapDispatchToProps = (dispatch) => {
-  return {
-    register: (user, password) => dispatch(action.register(user, password))
-  };
-};
+const mapDispatchToProps = (dispatch) => ({
+  register: (user, password) => dispatch(action.register(user, password))
+});
 
 export default connect(mapStateToProps, mapDispatchToProps)(Register);

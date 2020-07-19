@@ -30,7 +30,7 @@ class MessageList extends Component {
     socket.on('newMessage', (data) => {
       if (
         this.props.roomName !== 'dashboard' &&
-        this.props.roomName == data['room'] &&
+        this.props.roomName === data['room'] &&
         this.state.messages !== undefined &&
         this.state.MY_USER_ID !== data['sender']
       )
@@ -45,7 +45,7 @@ class MessageList extends Component {
       });
     }
 
-    var div = document.querySelector('#message-list');
+    const div = document.querySelector('#message-list');
     div.scrollIntoView(false);
     // window.scrollTo(0, document.querySelector('.message-list').scrollHeight);
   }
@@ -77,13 +77,8 @@ class MessageList extends Component {
   fetchMessages = (change = false, data) => {
     let messages = this.state.messages;
     delete data['room'];
-    if (
-      messages !== undefined &&
-      messages !== null &&
-      data !== undefined &&
-      data !== null
-    ) {
-      var msg = messages;
+    if (messages && data) {
+      const msg = messages;
       msg.push(data);
       this.setState(
         {
@@ -93,7 +88,7 @@ class MessageList extends Component {
           const current = msg[msg.length - 1];
           const isMine = current.sender === this.state.MY_USER_ID;
           if (!isMine) {
-            var sound = document.getElementsByClassName('audio-element')[0];
+            const sound = document.getElementsByClassName('audio-element')[0];
             if (sound.duration > 0 && !sound.paused) {
               sound.pause();
               sound.currentTime = 0;
@@ -161,7 +156,7 @@ class MessageList extends Component {
           endsSequence = false;
         }
       }
-      if (messageCount == 1) endsSequence = false;
+      if (messageCount === 1) endsSequence = false;
       tempMessages.push(
         <Message
           key={i}
@@ -182,10 +177,9 @@ class MessageList extends Component {
   updateMsg = (msgObject) => {
     let newMsgs = [msgObject];
     let newFormattedMsg = this.formatMsgs(newMsgs, true);
-    newMsgs =
-      this.state.messages !== undefined && this.state.messages !== null
-        ? this.state.messages.concat(newFormattedMsg)
-        : newFormattedMsg;
+    newMsgs = this.state.messages
+      ? this.state.messages.concat(newFormattedMsg)
+      : newFormattedMsg;
     this.setState({
       messages: newMsgs
     });
@@ -231,16 +225,11 @@ class MessageList extends Component {
   }
 }
 
-const mapStateToProps = (state) => {
-  return {
-    username: state.loginReducer.username,
-    count: state.messageReducer.count
-  };
-};
-const mapDispatchToProps = (dispatch) => {
-  return {
-    increaseMessageCount: (roomName) =>
-      dispatch(action.increaseMessageCount(roomName))
-  };
-};
+const mapStateToProps = (state) => ({
+  username: state.loginReducer.username,
+  count: state.messageReducer.count
+});
+const mapDispatchToProps = (dispatch) => ({
+  increaseMessageCount: (roomName) => dispatch(action.increaseMessageCount(roomName))
+});
 export default connect(mapStateToProps, mapDispatchToProps)(MessageList);

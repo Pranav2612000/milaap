@@ -14,35 +14,31 @@ import {
 } from 'reactstrap';
 import './DefaultLayout.css';
 import classNames from 'classnames';
-import { AppSwitch } from '@coreui/react';
 import MessageView from '../../views/MessageList/index';
 import Controls from '../../views/Connection/Controls';
 import MemberList from '../../views/Widgets/MemberList';
 
-function getRoomFromLocation(locationString) {
+const getRoomFromLocation = (locationString) => {
   let room = '';
-  const lastslash = locationString.lastIndexOf('/');
-  room = locationString.slice(lastslash + 1);
+  const lastSlash = locationString.lastIndexOf('/');
+  room = locationString.slice(lastSlash + 1);
   return room;
-}
+};
 
 class DefaultAside extends Component {
   constructor(props) {
     super(props);
-    let roomName = getRoomFromLocation(this.props.location.pathname);
-    this.toggle = this.toggle.bind(this);
     this.state = {
       activeTab: '1',
       change: false,
-      roomName: roomName,
+      roomName: getRoomFromLocation(this.props.location.pathname),
       roomType: 'Public',
       path: props.location.pathname
     };
-    this.getRoomInfo = this.getRoomInfo.bind(this);
   }
 
   componentDidUpdate(prevProps) {
-    if (this.props.roomName != prevProps.roomName) {
+    if (this.props.roomName !== prevProps.roomName) {
       this.setState({
         roomName: this.props.roomName,
         path: this.props.location.pathname
@@ -69,22 +65,20 @@ class DefaultAside extends Component {
     });
   };
 
-  getRoomInfo(roomName) {
+  getRoomInfo = (roomName) => {
     console.log('nothing to say.');
     return;
-  }
+  };
 
-  toggle(tab) {
+  toggle = (tab) => {
     if (this.state.activeTab !== tab) {
       this.setState({
         activeTab: tab
       });
     }
-  }
+  };
 
   render() {
-    // eslint-disable-next-line
-    const { children, ...attributes } = this.props;
     return (
       <React.Fragment>
         {this.props.loading === false && this.props.error === 'NOROOM' && (
@@ -111,9 +105,9 @@ class DefaultAside extends Component {
 
               <span id="badge" class="badge badge-primary">
                 {this.props.count[this.state.roomName] === 0 ||
-                this.props.count[this.state.roomName] == undefined
-                  ? ''
-                  : this.props.count[this.state.roomName]}
+                this.props.count[this.state.roomName]
+                  ? this.props.count[this.state.roomName]
+                  : ''}
               </span>
             </NavLink>
           </NavItem>
@@ -202,18 +196,14 @@ class DefaultAside extends Component {
   }
 }
 
-const mapStateToProps = (state) => {
-  return {
-    count: state.messageReducer.count,
-    error: state.roomReducer.error,
-    loading: state.roomReducer.loading
-  };
-};
-const mapDispatchToProps = (dispatch) => {
-  return {
-    resetMessageCount: (roomName) => dispatch(action.resetMessageCount(roomName))
-  };
-};
+const mapStateToProps = (state) => ({
+  count: state.messageReducer.count,
+  error: state.roomReducer.error,
+  loading: state.roomReducer.loading
+});
+const mapDispatchToProps = (dispatch) => ({
+  resetMessageCount: (roomName) => dispatch(action.resetMessageCount(roomName))
+});
 
 export default connect(
   mapStateToProps,

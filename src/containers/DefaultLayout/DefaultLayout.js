@@ -21,7 +21,7 @@ import routes from '../../routes';
 
 const socket = socketIOClient(`${global.config.backendURL}/`);
 const DefaultHeader = React.lazy(() => import('./DefaultHeader'));
-function getGroupElements(rooms) {
+const getGroupElements = (rooms) => {
   const groupElements = [];
   if (rooms === undefined) {
     return {};
@@ -35,76 +35,72 @@ function getGroupElements(rooms) {
     groupElements.push(groupElem);
   });
   return groupElements;
-}
+};
 
 class DefaultLayout extends Component {
   getRooms = async () => {
     const token = localStorage.getItem('milaap-auth-token');
     const reqHeader = { 'milaap-auth-token': token };
-    await axios
-      .post(
+    try {
+      const res = await axios.post(
         `${global.config.backendURL}/api/user/getrooms`,
         {},
         {
           headers: reqHeader
         }
-      )
-      .then((res) => {
-        if (res.status === 201) {
-          this.setState({
-            navigation: {
-              items: [
-                {
-                  title: true,
-                  name: 'Rooms',
-                  icon: 'icon-puzzle'
-                },
-                {
-                  icon: 'icon-user',
-                  name: 'Login To View Rooms',
-                  url: '/login'
-                }
-              ]
-            }
-          });
-          return;
-        }
-        var rooms = res.data.rooms;
-        this.setState({ rooms: rooms });
-        const GroupList = getGroupElements(rooms);
+      );
+      if (res.status === 201) {
         this.setState({
           navigation: {
             items: [
               {
                 title: true,
                 name: 'Rooms',
-                icon: 'icon-puzzle',
-                children: [
-                  {
-                    name: 'No Messages Yet.',
-                    icon: 'icon-puzzle',
-                    badge: {
-                      variant: 'info',
-                      text: 'Add'
-                    },
-                    class: ''
-                  }
-                ]
+                icon: 'icon-puzzle'
               },
-              ...GroupList
+              {
+                icon: 'icon-user',
+                name: 'Login To View Rooms',
+                url: '/login'
+              }
             ]
           }
         });
-      })
-      .catch((err) => {
-        console.log(err);
+        return;
+      }
+      const rooms = res.data.rooms;
+      const GroupList = getGroupElements(rooms);
+      this.setState({
+        rooms,
+        navigation: {
+          items: [
+            {
+              title: true,
+              name: 'Rooms',
+              icon: 'icon-puzzle',
+              children: [
+                {
+                  name: 'No Messages Yet.',
+                  icon: 'icon-puzzle',
+                  badge: {
+                    variant: 'info',
+                    text: 'Add'
+                  },
+                  class: ''
+                }
+              ]
+            },
+            ...GroupList
+          ]
+        }
       });
+    } catch (err) {
+      console.log(err);
+    }
   };
 
   constructor(props) {
     super(props);
-    var rooms;
-    const GroupList = [];
     this.state = {
       rooms: [],
       userToken: localStorage.getItem('milaap-auth-token'),
@@ -127,13 +123,11 @@ class DefaultLayout extends Component {
               }
             ]
           },
-          GroupList
+          []
         ]
       }
     };
-    if (this.state.userToken === null) {
-      return;
-    }
+    if (!this.state.userToken) return;
     this.getRooms();
   }
 
@@ -147,10 +141,7 @@ class DefaultLayout extends Component {
   }
 
   componentDidMount() {
-    if (
-      this.props.location.state !== undefined &&
-      this.props.location.state !== null
-    ) {
+    if (this.props.location.state) {
       store.addNotification({
         title: `Hi ${this.props.location.state}`,
         message: 'Welcome to Dashboard',
@@ -172,7 +163,7 @@ class DefaultLayout extends Component {
 
   render() {
     //TODO: Also check if the token is valid.
-    if (localStorage.getItem('milaap-auth-token') === null) {
+    if (!localStorage.getItem('milaap-auth-token')) {
       if (this.props.location.pathname.match('/rooms/')) {
         var room = this.props.location.pathname.split('/')[2];
         return <Redirect to={{ pathname: '/join', room: room }} />;
@@ -233,14 +224,9 @@ class DefaultLayout extends Component {
     );
   }
 }
-const mapStateToProps = (state) => {
-  return {};
-};
 
-const mapDispatchToProps = (dispatch) => {
-  return {
-    logout: () => dispatch(actions.logout())
-  };
-};
+const mapDispatchToProps = (dispatch) => ({
+  logout: () => dispatch(actions.logout())
+});
 
-export default connect(mapStateToProps, mapDispatchToProps)(DefaultLayout);
+export default connect(null, mapDispatchToProps)(DefaultLayout);
