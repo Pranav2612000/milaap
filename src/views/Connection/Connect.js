@@ -607,7 +607,6 @@ export function switchContext(e) {
     if (e.id == 'me-video') {
       context.muted = 'true';
     }
-    console.log(e.srcObject.getAudioTracks(), e.srcObject.getVideoTracks());
     if (
       e.srcObject.getAudioTracks.length != 0 ||
       e.srcObject.getVideoTracks.length != 0

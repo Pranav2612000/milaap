@@ -89,6 +89,7 @@ class Controls extends Component {
       this.state.recording ? this.stopRecordHandler() : this.startRecordHandler();
       this.setState({ recording: !this.state.recording });
     });
+    contextOptions.children[4].disabled = !this.state.inCall;
   };
   submitVideoHandler() {
     startCall(this, this.state.roomName, 'video');

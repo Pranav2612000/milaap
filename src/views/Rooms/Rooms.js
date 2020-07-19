@@ -131,7 +131,7 @@ class Room extends Component {
                 <button
                   id="record"
                   style={{
-                    backgroundColor: 'red',
+                    backgroundColor: this.props.recording ? 'red' : 'green',
                     margin: '15px',
                     borderWidth: '1px',
                     borderColor: 'transparent',
