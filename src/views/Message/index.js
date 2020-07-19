@@ -1,10 +1,12 @@
 import React from 'react';
 import moment from 'moment';
 import './Message.css';
+import parse from 'html-react-parser';
 
 export default function Message(props) {
   function urlify(text) {
-    var urlRegex = /(https?:\/\/[^\s]+)/g;
+    const expression = /(https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|www\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9]+\.[^\s]{2,}|www\.[a-zA-Z0-9]+\.[^\s]{2,})/gi;
+    const urlRegex = new RegExp(expression);
     return text.replace(urlRegex, function (url) {
       const k =
         '<a href="' +
@@ -35,8 +37,7 @@ export default function Message(props) {
           <b className={['sendBy', `${isMine}`].join(' ')}>
             {!isMine && data.sender}
           </b>
-          {/* {data.msg} */}
-          <div dangerouslySetInnerHTML={{ __html: urlify(data.msg) }} />
+          <div>{parse(urlify(data.msg))}</div>
         </div>
       </div>
     </div>
