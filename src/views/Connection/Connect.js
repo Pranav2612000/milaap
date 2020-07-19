@@ -221,6 +221,7 @@ export class Peer {
 
     peer.on('error', (err) => {
       this.error = err;
+      this.close();
     });
 
     peer.on('close', (_) => {
@@ -387,6 +388,7 @@ export async function toggleVideo(self) {
             myMediaStreamObj
           );
         } catch (err) {
+          console.log(eachPeer);
           console.log(err);
           //alert('could not share screen to this peer');
         }
@@ -423,6 +425,7 @@ export async function toggleVideo(self) {
               eachPeer.peer.addTrack(stream.getVideoTracks()[0], myMediaStreamObj);
             } catch (err) {
               console.log(err);
+              console.log(eachPeer);
               //alert('could not share screen to this peer');
             }
           });
@@ -468,6 +471,7 @@ export async function toggleAudio(self) {
           );
         } catch (err) {
           console.log(err);
+          console.log(eachPeer);
         }
       });
       /* Remove locally. */
@@ -490,6 +494,7 @@ export async function toggleAudio(self) {
               eachPeer.peer.addTrack(stream.getAudioTracks()[0], myMediaStreamObj);
             } catch (err) {
               console.log(err);
+              console.log(eachPeer);
               //alert('could not share screen to this peer');
             }
           });
