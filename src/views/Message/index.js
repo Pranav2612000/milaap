@@ -8,15 +8,20 @@ export default function Message(props) {
     const expression = /(https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|www\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9]+\.[^\s]{2,}|www\.[a-zA-Z0-9]+\.[^\s]{2,})/gi;
     const urlRegex = new RegExp(expression);
     return text.replace(urlRegex, function (url) {
+      let hurl = url;
+      if (!url.includes('http://') && !url.includes('https://')) {
+        hurl = 'https://' + url;
+      }
       const k =
         '<a href="' +
-        url +
-        '" style="color: #000000" target="_blank">' +
+        hurl +
+        '" style="color: #000000" target="_blank" rel="noopener noreferrer">' +
         url +
         '</a>';
       return k;
     });
   }
+
   const { data, isMine, startsSequence, endsSequence, showTimestamp } = props;
   const friendlyTimestamp = moment(data.timestamp).format('LLLL');
   return (
