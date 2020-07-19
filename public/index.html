@@ -76,11 +76,21 @@
     <noscript>
       You need to enable JavaScript to run this app.
     </noscript>
+    <!--
+      Added for development purposes, remove and uncomment service worker registration part during final deployment
+    -->
     <script>
+      navigator.serviceWorker
+        .getRegistrations()
+        .then((registrations) =>
+          registrations.map((registration) => registration.unregister())
+        );
+    </script>
+    <!-- <script>
       'serviceWorker' in navigator
         ? window.addEventListener('load', function () {
             navigator.serviceWorker
-              .register('./worker.js')
+              .unregister('./worker.js')
               .then(
                 function (o) {
                   console.log('Worker registration successful', o.scope);
@@ -94,7 +104,7 @@
               });
           })
         : console.log('Service Worker is not supported by browser.');
-    </script>
+    </script> -->
     <div id="root"></div>
   </body>
 </html>
