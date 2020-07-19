@@ -770,7 +770,7 @@ export function startCall(self, roomName, type) {
 
   socket.on('signalling', (data, from_id) => {
     connectedPeers.forEach((val) => {
-      if (val.their_id == from_id && !val.destroyed) {
+      if (val.their_id == from_id && !val.peer.destroyed) {
         val.peer.signal(data);
       }
     });
