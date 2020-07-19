@@ -9,7 +9,7 @@ export default function Compose(props) {
     // if (text.replace('/\n/g', '') === '') return;
     if (msg === '' || msg.replace(/(\r\n|\n|\r)/gm, '') === '') return;
     const reqData = {
-      msg: msg,
+      msg: urlify(msg),
       roomName: props.roomName
     };
     setMsg('');
@@ -27,6 +27,19 @@ export default function Compose(props) {
         console.log(err);
       });
   }
+  function urlify(text) {
+    var urlRegex = /(https?:\/\/[^\s]+)/g;
+    return text.replace(urlRegex, function (url) {
+      const k =
+        '<a href="' +
+        url +
+        '" style="color: #000000" target="_blank">' +
+        url +
+        '</a>';
+      return k;
+    });
+  }
+
   const addEmoji = (e) => {
     let emoji = e.native;
     setMsg(msg + emoji);
