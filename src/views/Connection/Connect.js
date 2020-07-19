@@ -333,7 +333,7 @@ export class Peer {
        * again, the remote seems to be down. */
       if (this.num_retries > 3) {
         /* Stop the current streams (if)being streamed. */
-        clearMediaStream(self.stream);
+        //clearMediaStream(self.stream);
         return;
       }
       if (this.type == 'video') {
