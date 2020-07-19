@@ -3,6 +3,18 @@ import moment from 'moment';
 import './Message.css';
 
 export default function Message(props) {
+  function urlify(text) {
+    var urlRegex = /(https?:\/\/[^\s]+)/g;
+    return text.replace(urlRegex, function (url) {
+      const k =
+        '<a href="' +
+        url +
+        '" style="color: #000000" target="_blank">' +
+        url +
+        '</a>';
+      return k;
+    });
+  }
   const { data, isMine, startsSequence, endsSequence, showTimestamp } = props;
   const friendlyTimestamp = moment(data.timestamp).format('LLLL');
   return (
@@ -24,7 +36,7 @@ export default function Message(props) {
             {!isMine && data.sender}
           </b>
           {/* {data.msg} */}
-          <div dangerouslySetInnerHTML={{ __html: data.msg }} />
+          <div dangerouslySetInnerHTML={{ __html: urlify(data.msg) }} />
         </div>
       </div>
     </div>
