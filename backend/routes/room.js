@@ -156,7 +156,7 @@ router.post('/enterroom', auth, async (req, res) => {
         */
   try {
     const room = await rooms.findOne({ roomName });
-    if (!room) return res.status(200).json({ err: 'NOROOM' });
+    if (!room) return res.status(400).json({ err: 'NOROOM' });
 
     /* Check if username is in room.users */
     let i = -1;

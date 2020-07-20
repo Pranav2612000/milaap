@@ -34,6 +34,7 @@ export class Register extends Component {
   }
 
   componentDidUpdate() {
+    if (this.state.error) return;
     if (this.props.error) this.setState({ error: true });
   }
   handleUsernameChange = (e) => {
