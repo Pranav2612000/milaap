@@ -29,7 +29,7 @@ export const enterRoomSuccess = (room, roomObj) => ({
 
 export const enterRoomFailure = (error) => ({
   type: ENTER_ROOM_FAILURE,
-  error: error
+  error
 });
 
 export const enterRoom = (room) => async (dispatch) => {
@@ -45,17 +45,18 @@ export const enterRoom = (room) => async (dispatch) => {
         }
       }
     );
-    if (res.data.err === 'UEXISTS') {
+
+    dispatch(enterRoomSuccess(reqData.roomName, res.data));
+  } catch (err) {
+    if (err.reponse.data.err === 'UEXISTS') {
       localStorage.removeItem('milaap-auth-token');
       dispatch(redirectToJoinPage());
       dispatch(enterRoomFailure('UEXISTS'));
-    } else if (res.data.err === 'NOROOM') {
+    } else if (err.reponse.data.err === 'NOROOM') {
       dispatch(enterRoomFailure('NOROOM'));
     } else {
-      dispatch(enterRoomSuccess(reqData.roomName, res.data));
+      dispatch(enterRoomFailure(err));
+      dispatch(Notifications.error(notificationOpts));
     }
-  } catch (err) {
-    dispatch(enterRoomFailure(err));
-    dispatch(Notifications.error(notificationOpts));
   }
 };

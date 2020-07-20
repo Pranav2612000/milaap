@@ -8,7 +8,8 @@ router.post('/', async (req, res) => {
   try {
     const user = await users.findOne({ username: username });
     if (user) {
-      return res.status(200).json({ err: 'UEXIST' });
+      res.status(409).json({ err: 'UEXIST' });
+      return;
     }
     const saltRounds = 10;
     bcrypt.genSalt(saltRounds, (err, salt) => {

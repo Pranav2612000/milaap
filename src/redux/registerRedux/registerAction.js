@@ -61,23 +61,17 @@ export const register = (username, password, google = false) => async (dispatch)
   const reqData = { username, password };
   dispatch(registerRequest());
   try {
-    const res = await axios.post(
-      `${global.config.backendURL}/api/register/`,
-      reqData
-    );
-    if (res.data.err === 'UEXIST' && google === true) {
-      dispatch(googleUser());
-      return;
-    }
-    if (res.data.err === 'UEXIST') {
-      dispatch(usernameExists(res.data.err));
-      dispatch(Notifications.error(unameNotificationOpts));
-      return;
-    }
+    await axios.post(`${global.config.backendURL}/api/register/`, reqData);
     dispatch(registerSuccess());
   } catch (err) {
-    console.log(err);
-    dispatch(registerFailure(err));
-    dispatch(Notifications.error(failureNotificationOpts));
+    if (err.response.data.err === 'UEXIST' && google === true) {
+      dispatch(googleUser());
+    } else if (err.response.data.err === 'UEXIST') {
+      dispatch(usernameExists(err.response.data.err));
+      dispatch(Notifications.error(unameNotificationOpts));
+    } else {
+      dispatch(registerFailure(err));
+      dispatch(Notifications.error(failureNotificationOpts));
+    }
   }
 };
