@@ -27,7 +27,6 @@
     "enzyme-adapter-react-16": "^1.14.0",
     "flag-icon-css": "^3.3.0",
     "font-awesome": "^4.7.0",
-    "html-react-parser": "^0.13.0",
     "jest": "^26.0.1",
     "jquery": "^3.5.1",
     "node-sass": "^4.14.1",
