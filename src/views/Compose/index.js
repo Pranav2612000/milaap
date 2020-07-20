@@ -3,7 +3,6 @@ import './Compose.css';
 import axios from 'axios';
 import 'emoji-mart/css/emoji-mart.css';
 import { Picker } from 'emoji-mart';
-import { Modal } from 'reactstrap';
 
 export default function Compose(props) {
   const [msg, setMsg] = useState('');
@@ -11,33 +10,32 @@ export default function Compose(props) {
   const [type, setType] = useState('');
 
   async function sendMessage() {
-    if (toggle === true) setToggle(!toggle);
+    if (toggle) setToggle(!toggle);
 
-    // var text = document.getElementById('textMsg').innerHTML;
-    // if (text.replace('/\n/g', '') === '') return;
     if (msg === '' || msg.replace(/(\r\n|\n|\r)/gm, '') === '') return;
     const reqData = {
       msg: msg,
       roomName: props.roomName
     };
     setMsg('');
-    axios
-      .post(`${global.config.backendURL}/api/room/sendmessage`, reqData, {
-        headers: {
-          'milaap-auth-token': localStorage.getItem('milaap-auth-token')
+    try {
+      const res = await axios.post(
+        `${global.config.backendURL}/api/room/sendmessage`,
+        reqData,
+        {
+          headers: {
+            'milaap-auth-token': localStorage.getItem('milaap-auth-token')
+          }
         }
-      })
-      .then((res) => {
-        props.callback(res.data.msg);
-        setMsg('');
-      })
-      .catch((err) => {
-        console.log(err);
-      });
+      );
+      props.callback(res.data.msg);
+      setMsg('');
+    } catch (err) {
+      console.log(err);
+    }
   }
 
   function stoggle() {
-    // console.log(toggle);
     setToggle(!toggle);
     setType(type === '' ? '-relative' : '');
   }
@@ -46,6 +44,7 @@ export default function Compose(props) {
     let emoji = e.native;
     setMsg(msg + emoji);
   };
+
   return (
     <>
       <div className={`compose bg-dark`} style={{ borderTop: 'white solid 1px' }}>

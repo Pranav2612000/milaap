@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
-import { Link, Redirect } from 'react-router-dom';
-import { Button, Card, CardBody, CardGroup, Col, Container, Row } from 'reactstrap';
+import { Link } from 'react-router-dom';
+import { Card, CardBody, Col, Container, Row } from 'reactstrap';
 import logo from '../../../assets/img/brand/logo.png';
 
 class Privacy extends Component {
@@ -24,7 +24,10 @@ class Privacy extends Component {
               </Link>
             </Col>
             <Col>
-              <a href="https://forms.gle/WPCZh2JDyNfBTCJ47" target="_blank">
+              <a
+                href="https://forms.gle/WPCZh2JDyNfBTCJ47"
+                target="_blank"
+                rel="noopener noreferrer">
                 <h5
                   style={{ color: 'white', textAlign: 'right', marginRight: '2%' }}>
                   Report a Bug
@@ -49,9 +52,7 @@ class Privacy extends Component {
                   <img
                     src={logo}
                     onClick={() => this.props.history.push('landing')}
-                    style={{ cursor: 'pointer' }}
-                    height={'20px'}
-                    height={'120px'}
+                    style={{ cursor: 'pointer', height: '120px' }}
                     className="mx-auto"
                     alt="milaap"
                   />

@@ -36,7 +36,6 @@ class Guest extends Component {
   }
 
   componentDidMount() {
-    console.log(this.props.location);
     if (this.props.location.room) {
       this.setState({ room: this.props.location.room });
       this.setState({ roomName: this.props.location.room });
@@ -69,7 +68,7 @@ class Guest extends Component {
       loading: true
     });
     console.log(this.state.roomName);
-    if (this.state.roomName == undefined || this.state.roomName == '') {
+    if (this.state.roomName === undefined || this.state.roomName === '') {
       alert('Enter a roomname to proceed');
       this.setState({
         loading: false
@@ -80,14 +79,14 @@ class Guest extends Component {
     /* Get a valid token if user doesn't have one. */
     if (!localStorage.getItem('milaap-auth-token')) {
       console.log('exists');
-      if (this.state.name == undefined || this.state.name === '') {
+      if (this.state.name === undefined || this.state.name === '') {
         alert('Enter a username to proceed');
         this.setState({
           loading: false
         });
         return;
       }
-      var reqData = {
+      const reqData = {
         name: this.state.name,
         roomName: this.state.roomName,
         username: this.state.name
@@ -345,15 +344,12 @@ class Guest extends Component {
     );
   }
 }
-const mapStateToProps = (state) => {
-  console.log(state);
-  return {
-    loggedIn: state.loginReducer.loggedIn,
-    error: state.loginReducer.error,
-    notifications: state.notifications,
-    loading: state.loginReducer.loading
-  };
-};
+const mapStateToProps = (state) => ({
+  loggedIn: state.loginReducer.loggedIn,
+  error: state.loginReducer.error,
+  notifications: state.notifications,
+  loading: state.loginReducer.loading
+});
 
 const mapDispatchToProps = (dispatch) => {
   return {

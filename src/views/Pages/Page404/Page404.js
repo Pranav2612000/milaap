@@ -1,23 +1,8 @@
 import React, { Component } from 'react';
-import {
-  Button,
-  Col,
-  Container,
-  Input,
-  InputGroup,
-  InputGroupAddon,
-  InputGroupText,
-  Row
-} from 'reactstrap';
+import { Button, Col, Container, Row } from 'reactstrap';
 import logo from '../../../assets/img/brand/logo.png';
 
 class Page404 extends Component {
-  constructor(props) {
-    super(props);
-  }
-  backtoHome = () => {
-    console.log('here');
-  };
   render() {
     return (
       <div className="app flex-row align-items-center">

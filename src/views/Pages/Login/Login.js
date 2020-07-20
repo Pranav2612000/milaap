@@ -37,7 +37,6 @@ export class Login extends Component {
 
   componentDidMount() {
     if (this.props.location.register === true) {
-      console.log(this.props.location);
       this.setState({ fromRegister: true });
       store.addNotification({
         title: 'Successfully Registered',
@@ -56,9 +55,10 @@ export class Login extends Component {
     localStorage.removeItem('milaap-auth-token');
   }
 
-  componentDidUpdate(prevProps) {
+  componentDidUpdate() {
     //if(this.props.error
-    if (this.props.error) this.state.error = true;
+    if (this.state.error) return;
+    if (this.props.error) this.setState({ error: true });
     return;
   }
 
@@ -282,15 +282,12 @@ export class Login extends Component {
   }
 }
 
-const mapStateToProps = (state) => {
-  console.log(state);
-  return {
-    loggedIn: state.loginReducer.loggedIn,
-    error: state.loginReducer.error,
-    notifications: state.notifications,
-    loading: state.loading
-  };
-};
+const mapStateToProps = (state) => ({
+  loggedIn: state.loginReducer.loggedIn,
+  error: state.loginReducer.error,
+  notifications: state.notifications,
+  loading: state.loading
+});
 
 const mapDispatchToProps = (dispatch) => {
   return {

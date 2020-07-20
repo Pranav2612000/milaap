@@ -11,5 +11,5 @@ const userLoginSchema = new Schema({
     required: true
   }
 });
-var userLogins = mongoose.model('userLogins', userLoginSchema);
+const userLogins = mongoose.model('userLogins', userLoginSchema);
 module.exports = userLogins;

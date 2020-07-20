@@ -27,14 +27,14 @@ export default function Message(props) {
   }
   const { data, isMine, startsSequence, endsSequence, showTimestamp } = props;
   const friendlyTimestamp = moment(data.timestamp).format('LLLL');
+  const classes = [
+    'message',
+    `${isMine ? 'mine' : ''}`,
+    `${startsSequence ? 'start' : ''}`,
+    `${endsSequence ? 'end' : ''}`
+  ].join(' ');
   return (
-    <div
-      className={[
-        'message',
-        `${isMine ? 'mine' : ''}`,
-        `${startsSequence ? 'start' : ''}`,
-        `${endsSequence ? 'end' : ''}`
-      ].join(' ')}>
+    <div className={classes}>
       {showTimestamp && <div className="timestamp bg-dark">{friendlyTimestamp}</div>}
 
       <div className="bubble-container">

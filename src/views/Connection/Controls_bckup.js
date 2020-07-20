@@ -86,8 +86,6 @@ class Controls extends Component {
   }
 
   componentDidUpdate(prevProps) {
-    console.log(prevProps);
-    console.log(this.props.roomName);
     if (this.props.roomName !== prevProps.roomName) {
       this.setState({
         roomName: this.props.roomName
@@ -796,16 +794,13 @@ videos.empty();
     );
   }
 }
-const mapStateToProps = (state) => {
-  return {
-    video: state.userReducer.video,
-    username: state.loginReducer.username
-  };
-};
+const mapStateToProps = (state) => ({
+  video: state.userReducer.video,
+  username: state.loginReducer.username
+});
 
-const mapDispatchToProps = (dispatch) => {
-  return {
-    toggleVideo: () => dispatch(actions.toggleVideo())
-  };
-};
+const mapDispatchToProps = (dispatch) => ({
+  toggleVideo: () => dispatch(actions.toggleVideo())
+});
+
 export default connect(mapStateToProps, mapDispatchToProps)(Controls);

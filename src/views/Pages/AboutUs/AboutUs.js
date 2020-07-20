@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
-import { Link, Redirect } from 'react-router-dom';
-import { Button, Card, CardBody, CardGroup, Col, Container, Row } from 'reactstrap';
+import { Link } from 'react-router-dom';
+import { Card, CardBody, Col, Container, Row } from 'reactstrap';
 import logo from '../../../assets/img/brand/logo.png';
 
 class AboutUs extends Component {
@@ -24,7 +24,10 @@ class AboutUs extends Component {
               </Link>
             </Col>
             <Col>
-              <a href="https://forms.gle/WPCZh2JDyNfBTCJ47" target="_blank">
+              <a
+                href="https://forms.gle/WPCZh2JDyNfBTCJ47"
+                target="_blank"
+                rel="noopener noreferrer">
                 <h5
                   style={{ color: 'white', textAlign: 'right', marginRight: '2%' }}>
                   Report a Bug
@@ -105,7 +108,8 @@ class AboutUs extends Component {
                       width: '100%',
                       color: ' light grey'
                     }}
-                    target="_blank">
+                    target="_blank"
+                    rel="noopener noreferrer">
                     here
                   </a>
                 </h4>

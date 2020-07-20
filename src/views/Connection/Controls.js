@@ -13,7 +13,7 @@ import {
   stopScreenShare
 } from '../Connection/Connect';
 import { Container, Row } from 'reactstrap';
-import $ from 'jquery';
+
 import './Controls.css';
 
 class Controls extends Component {
@@ -29,11 +29,6 @@ class Controls extends Component {
       facing: 'user',
       addOptionsCalled: false
     };
-    this.submitVideoHandler = this.submitVideoHandler.bind(this);
-    this.submitScreenHandler = this.submitScreenHandler.bind(this);
-    this.endCallHandler = this.endCallHandler.bind(this);
-    this.inCallShareHandler = this.inCallShareHandler.bind(this);
-    this.changeCamera = this.changeCamera.bind(this);
   }
 
   componentWillUnmount() {
@@ -51,14 +46,14 @@ class Controls extends Component {
     }
   }
 
-  changeCamera() {
+  changeCamera = () => {
     if (!this.state.inCall) return;
     const facing = this.state.facing === 'user' ? 'environment' : 'user';
     changeCameraFacing(this, facing);
     this.setState({
       facing: facing
     });
-  }
+  };
   addOptions = () => {
     const contextOptions = document.getElementById('contextOptions');
     contextOptions.children[0].addEventListener('click', () => {
@@ -81,7 +76,7 @@ class Controls extends Component {
       this.endCallHandler();
     });
   };
-  submitVideoHandler() {
+  submitVideoHandler = () => {
     startCall(this, this.state.roomName, 'video');
     if (!this.state.addOptionsCalled) {
       this.setState({
@@ -89,19 +84,19 @@ class Controls extends Component {
       });
       this.addOptions();
     }
-  }
+  };
 
-  submitScreenHandler() {
+  submitScreenHandler = () => {
     startCall(this, this.state.roomName, 'screen');
-  }
-  inCallShareHandler() {
+  };
+  inCallShareHandler = () => {
     addScreenShareStream(this);
-  }
+  };
 
-  endCallHandler() {
+  endCallHandler = () => {
     this.props.setAudioVideoToInitialState();
     endCall(this);
-  }
+  };
 
   render() {
     const self = this;
@@ -225,7 +220,7 @@ class Controls extends Component {
             <span> End Call</span>
           </AwesomeButtonProgress>
         </Row>
-        {`${global.config.environment}` == 'development' && (
+        {`${global.config.environment}` === 'development' && (
           <Row className="justify-content-center text-center">
             <AwesomeButtonProgress
               type="primary"
@@ -246,20 +241,15 @@ class Controls extends Component {
     );
   }
 }
-const mapStateToProps = (state) => {
-  return {
-    video: state.userReducer.video,
-    audio: state.userReducer.audio,
-    username: state.loginReducer.username
-  };
-};
+const mapStateToProps = (state) => ({
+  video: state.userReducer.video,
+  audio: state.userReducer.audio,
+  username: state.loginReducer.username
+});
 
-const mapDispatchToProps = (dispatch) => {
-  return {
-    toggleVideo: () => dispatch(actions.toggleVideo()),
-    toggleAudio: () => dispatch(actions.toggleAudio()),
-    setAudioVideoToInitialState: () =>
-      dispatch(actions.setAudioVideoToInitialState())
-  };
-};
+const mapDispatchToProps = (dispatch) => ({
+  toggleVideo: () => dispatch(actions.toggleVideo()),
+  toggleAudio: () => dispatch(actions.toggleAudio()),
+  setAudioVideoToInitialState: () => dispatch(actions.setAudioVideoToInitialState())
+});
 export default connect(mapStateToProps, mapDispatchToProps)(Controls);

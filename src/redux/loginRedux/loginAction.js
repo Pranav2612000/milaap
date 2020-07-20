@@ -32,31 +32,23 @@ const notificationOpts = {
   autoDismiss: 2
 };
 
-export const loginRequest = () => {
-  return {
-    type: LOGIN_REQUEST
-  };
-};
+export const loginRequest = () => ({
+  type: LOGIN_REQUEST
+});
 
-export const loginSuccess = (username) => {
-  return {
-    type: LOGIN_SUCCESS,
-    username: username
-  };
-};
+export const loginSuccess = (username) => ({
+  type: LOGIN_SUCCESS,
+  username: username
+});
 
-export const loginFailure = (error) => {
-  return {
-    type: LOGIN_FAILURE,
-    error: error
-  };
-};
+export const loginFailure = (error) => ({
+  type: LOGIN_FAILURE,
+  error: error
+});
 
-export const redirectToJoinPage = () => {
-  return {
-    type: REDIRECT_TO_JOIN
-  };
-};
+export const redirectToJoinPage = () => ({
+  type: REDIRECT_TO_JOIN
+});
 
 export const logout = () => {
   localStorage.clear();
@@ -65,60 +57,51 @@ export const logout = () => {
   };
 };
 
-export const login = (username, password) => {
-  var reqData = {
-    username: username,
-    password: password
-  };
-  return function (dispatch) {
-    dispatch(loginRequest());
-    axios
-      .post(`${global.config.backendURL}/api/login`, reqData)
-      .then((res) => {
-        localStorage.setItem('milaap-auth-token', res.data.token);
-        localStorage.setItem('username', username);
-        dispatch(loginSuccess(username));
-      })
-      .catch((err) => {
-        dispatch(loginFailure(err));
-        dispatch(Notifications.error(notificationOpts));
-      });
-  };
+export const login = (username, password) => async (dispatch) => {
+  const reqData = { username, password };
+  dispatch(loginRequest());
+  try {
+    const res = await axios.post(`${global.config.backendURL}/api/login`, reqData);
+    localStorage.setItem('milaap-auth-token', res.data.token);
+    localStorage.setItem('username', username);
+    dispatch(loginSuccess(username));
+  } catch (err) {
+    dispatch(loginFailure(err));
+    dispatch(Notifications.error(notificationOpts));
+  }
 };
 
-export const getTokenForTempUser = (reqData) => {
-  return function (dispatch) {
-    dispatch(loginRequest());
-    axios
-      .post(`${global.config.backendURL}/api/user/gettokenfortempuser`, reqData)
-      .then(async (res) => {
-        // await new Promise((r) => setTimeout(r, 2000));
-        localStorage.setItem('milaap-auth-token', res.data.token);
-        localStorage.setItem('username', reqData.username);
-        dispatch(loginSuccess(reqData.username));
-      })
-      .catch((err) => {
-        dispatch(loginFailure(err));
-        if (err && err.response?.status == 400) {
-          dispatch(
-            Notifications.error({
-              title: 'Invalid Room',
-              message: 'Room Not Found',
-              position: 'tr',
-              autoDismiss: 2
-            })
-          );
-        }
-        if (err && err.response?.status == 401) {
-          dispatch(
-            Notifications.error({
-              title: 'Username already taken',
-              message: 'Try some other name',
-              position: 'tr',
-              autoDismiss: 3
-            })
-          );
-        }
-      });
-  };
+export const getTokenForTempUser = (reqData) => async (dispatch) => {
+  dispatch(loginRequest());
+  try {
+    const res = await axios.post(
+      `${global.config.backendURL}/api/user/gettokenfortempuser`,
+      reqData
+    );
+    localStorage.setItem('milaap-auth-token', res.data.token);
+    localStorage.setItem('username', reqData.username);
+    dispatch(loginSuccess(reqData.username));
+  } catch (err) {
+    dispatch(loginFailure(err));
+    if (err && err.response?.status === 400) {
+      dispatch(
+        Notifications.error({
+          title: 'Invalid Room',
+          message: 'Room Not Found',
+          position: 'tr',
+          autoDismiss: 2
+        })
+      );
+    }
+    if (err && err.response?.status === 401) {
+      dispatch(
+        Notifications.error({
+          title: 'Username already taken',
+          message: 'Try some other name',
+          position: 'tr',
+          autoDismiss: 3
+        })
+      );
+    }
+  }
 };

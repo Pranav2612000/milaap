@@ -35,10 +35,6 @@ class MemberList extends Component {
       newmember: '',
       modal: false
     };
-    this.toggle = this.toggle.bind(this);
-    this.addMember = this.addMember.bind(this);
-    this.handleNewMemberChange = this.handleNewMemberChange.bind(this);
-    this.shareLink = this.shareLink.bind(this);
     /*
     socket.on('userJoined', (data) => {
       if (this.state.roomName !== 'dashboard') {
@@ -55,7 +51,7 @@ class MemberList extends Component {
     */
   }
 
-  shareLink() {
+  shareLink = () => {
     const link = document.querySelector('link[rel=canonical]')
       ? document.querySelector('link[rel=canonical]').href
       : document.location.href;
@@ -80,43 +76,45 @@ class MemberList extends Component {
         });
       });
     }
-  }
+  };
 
-  toggle() {
+  toggle = () => {
     this.setState({
       modal: !this.state.modal
     });
-  }
+  };
 
-  addMember() {
+  addMember = async () => {
     const reqData = {
       username: this.state.newmember,
       roomName: this.props.roomName
     };
-    axios
-      .post(`${global.config.backendURL}/api/room/addusertoroom`, reqData, {
-        headers: {
-          'milaap-auth-token': localStorage.getItem('milaap-auth-token')
+    try {
+      const res = await axios.post(
+        `${global.config.backendURL}/api/room/addusertoroom`,
+        reqData,
+        {
+          headers: {
+            'milaap-auth-token': localStorage.getItem('milaap-auth-token')
+          }
         }
-      })
-      .then((res) => {
-        if (res.status == 200) {
-          this.toggle();
-          this.setState({
-            users: [...this.state.users, reqData.username]
-          });
-        }
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  }
+      );
+      if (res.status === 200) {
+        this.toggle();
+        this.setState({
+          users: [...this.state.users, reqData.username]
+        });
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  };
 
-  handleNewMemberChange(e) {
+  handleNewMemberChange = (e) => {
     this.setState({
       newmember: e.target.value
     });
-  }
+  };
 
   componentDidUpdate(prevProps) {
     if (this.props.users !== prevProps.users) {
@@ -233,10 +231,8 @@ class MemberList extends Component {
   }
 }
 
-const mapStateToProps = (state) => {
-  return {
-    username: state.loginReducer.username
-  };
-};
+const mapStateToProps = (state) => ({
+  username: state.loginReducer.username
+});
 
 export default connect(mapStateToProps)(MemberList);

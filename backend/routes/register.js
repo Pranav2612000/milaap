@@ -1,45 +1,33 @@
 const router = require('express').Router();
 const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
-const mongoose = require('mongoose');
-const config = require('config');
 const userLogins = require('../models/UserLogin.model');
 const users = require('../models/User.model');
 
 router.post('/', async (req, res) => {
-  const username = req.body.username;
-  const password = req.body.password;
-
-  users.findOne({ username: username }, function (err, user) {
-    if (err) {
-      return res.status(400).json({ err: 'Error Creating Room.' });
-    }
-    if (!user) {
-      const saltRounds = 10;
-      bcrypt.genSalt(saltRounds, (err, salt) => {
-        bcrypt.hash(password, salt, (err, hash) => {
-          console.log(hash);
-          var user = new userLogins({ username: username, password: hash });
-          user.save((err) => {
-            if (err) {
-              return res.status(400).json({ err: 'Error Registering User' });
-            }
-            var userdata = new users({ username: username });
-            userdata.save((errr) => {
-              if (errr) {
-                return res.status(400).json({ err: 'Error Registering User' });
-              } else {
-                return res.status(200).json({ msg: 'Registered Successfully' });
-              }
-            });
-          });
-        });
-      });
-      console.log(username);
-      console.log(password);
-    } else {
+  const { username, password } = req.body;
+  try {
+    const user = await users.findOne({ username: username });
+    if (user) {
       return res.status(200).json({ err: 'UEXIST' });
     }
-  });
+    const saltRounds = 10;
+    bcrypt.genSalt(saltRounds, (err, salt) => {
+      if (err) return res.status(500).json({ err: 'Error Generating salt' });
+      bcrypt.hash(password, salt, async (err, hash) => {
+        if (err) return res.status(500).json({ err: 'Error in hashing' });
+        const user = new userLogins({ username, password: hash });
+        try {
+          await user.save();
+          const userdata = new users({ username });
+          await userdata.save();
+        } catch (err) {
+          return res.status(400).json({ err: 'Error Registering User' });
+        }
+        return res.status(200).json({ msg: 'Registered Successfully' });
+      });
+    });
+  } catch (err) {
+    return res.status(400).json({ err: 'Error Creating Room.' });
+  }
 });
 module.exports = router;

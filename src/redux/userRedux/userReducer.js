@@ -7,7 +7,7 @@ import {
   SET_AUDIO_VIDEO_TO_INITIAL_STATE
 } from './userActionTypes';
 
-const initalState = {
+const initalUserState = {
   loading: false,
   users: [],
   error: '',
@@ -15,7 +15,7 @@ const initalState = {
   audio: true
 };
 
-export const userReducer = (state = initalState, action) => {
+const userReducer = (state = initalUserState, action) => {
   switch (action.type) {
     case FETCH_USERS_REQUEST:
       return {
@@ -54,3 +54,5 @@ export const userReducer = (state = initalState, action) => {
       return state;
   }
 };
+
+export default userReducer;

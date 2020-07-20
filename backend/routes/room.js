@@ -1,44 +1,38 @@
 const router = require('express').Router();
-const jwt = require('jsonwebtoken');
-const mongoose = require('mongoose');
-const config = require('config');
-const rooms = require('../models/Rooms.model');
-const userLogins = require('../models/UserLogin.model');
-const users = require('../models/User.model');
-const shortid = require('shortid');
-var io = require('../index');
-const auth = require('../middleware/auth');
 const cron = require('cron').CronJob;
+
+const rooms = require('../models/Rooms.model');
+const users = require('../models/User.model');
+const io = require('../index');
+const auth = require('../middleware/auth');
+
 //Create a new room
 /* TODO: Modify the function rollback changes on failure*/
 
 //Run this function as a chron job every x hours
-function cleanDB() {
+const cleanDB = async () => {
   const now = new Date();
-  // console.log(now);
-  rooms.find({ lastreq: { $lt: now } }, (err, room) => {
-    room.map((val, index) => {
+  try {
+    const room = await rooms.find({ lastreq: { $lt: now } });
+    room.map(async (val) => {
       const data = val.toObject();
-      //Getting the time since last join call by a user in room (in hours)
-      let timeSinceLastCall = (now - data.lastreq) / 36e5;
-      let clearoutTime = 12; // Set the time (in hours) after which the guest and online array need to be cleaned
-      console.log(timeSinceLastCall);
+      const timeSinceLastCall = (now - data.lastreq) / 36e5;
+      const clearoutTime = 12; // Set the time (in hours) after which the guest and online array need to be cleaned
       if (timeSinceLastCall > clearoutTime) {
-        rooms.updateOne(
+        await rooms.updateOne(
           { roomName: data.roomName },
-          { $set: { onlineSimple: [], guests: [] } },
-          (err, res) => {
-            if (err) console.log(err);
-          }
+          { $set: { onlineSimple: [], guests: [] } }
         );
       }
     });
-  });
-}
+  } catch (err) {
+    console.log(err);
+  }
+};
 
 //This part runs the CronJob
 //Currently runs every 12 hours(1 AM and 1PM)
-var job = new cron(
+const job = new cron(
   '0 1,13 * * *',
   function () {
     console.log('Running CronJob');
@@ -52,191 +46,100 @@ var job = new cron(
 job.start();
 
 router.post('/createroom', auth, async (req, res) => {
-  const host = req.user.id;
-  const roomName = req.body.roomName;
-  // cleanDB();
+  const { id: host } = req.user;
+  const { roomName } = req.body;
+
   // Create and save new room
-  rooms.findOne({ roomName: roomName }, function (err, room) {
-    if (err) {
-      return res.status(400).json({ err: 'Error Creating Room' });
-    }
-    if (!room) {
-      // Create a new room
-      room = new rooms({
-        roomName: roomName,
-        users: [host],
-        guests: []
-      });
-      room.save((err) => {
-        if (err) {
-          return res.status(400).json({ err: 'Error Creating Room' });
-        } else {
-          console.log(room);
-          io.emit('newRoom', req.data);
-          // Add roomname to host
-          users.updateOne(
-            { username: host },
-            { $addToSet: { rooms: roomName } },
-            function (err, result) {
-              if (err) {
-                res.send(err);
-                return;
-              } else {
-                console.log('here');
-                return res.status(200).json({ msg: 'Room Created successfully' });
-              }
-            }
-          );
-        }
-      });
-    } else {
-      // Another room with this name exists.
+  try {
+    const room = await rooms.findOne({ roomName });
+    if (room) {
       res.status(403).json({ msg: 'Another Room with same name already exists' });
       return;
     }
-  });
+
+    // Create a new room
+    room = new rooms({
+      roomName: roomName,
+      users: [host],
+      guests: []
+    });
+    await room.save();
+    io.emit('newRoom', req.data);
+    await users.updateOne({ username: host }, { $addToSet: { rooms: roomName } });
+    return res.status(200).json({ msg: 'Room Created successfully' });
+  } catch (err) {
+    return res.status(400).json({ err: 'Error Creating Room' });
+  }
 });
 
 router.post('/addusertoroom', auth, async (req, res) => {
-  const host = req.user.id;
-  const roomName = req.body.roomName;
-  const user = req.body.username;
-  console.log(user);
-  rooms.findOne({ roomName: roomName }, async function (err, room) {
-    if (err) {
-      return res.status(400).json({ err: 'Error Creating Room' });
-    }
-    if (!room) {
-      return res.status(405).json({ msg: 'Room Not Found' });
-    } else {
-      await users.findOne({ username: user }, async function (errr, user_found) {
-        if (errr) {
-          return res.status(400).json({ err: 'Error. Try again.' });
-        }
-        if (!user_found) {
-          return res.status(400).json({ err: "User doesn't exits" });
-        }
+  const { roomName, username: user } = req.body;
 
-        //TODO: Check if host has admin access to room.
-        await users.updateOne(
-          { username: user },
-          { $addToSet: { rooms: roomName } },
-          function (err, result) {
-            if (err) {
-              return res.send(err);
-            } else {
-              console.log('Updated Successfully');
-            }
-          }
-        );
+  try {
+    const room = await rooms.findOne({ roomName });
+    if (!room) return res.status(405).json({ msg: 'Room Not Found' });
 
-        var userArray = room._doc.users;
-        if (userArray === undefined) {
-          userArray = [];
-        }
-        if (userArray.includes(user)) {
-          return res.status(400).json({ err: 'User Already has access.' });
-        }
-        userArray.push(user);
-        room.markModified('users');
-        room.save((err) => {
-          if (err) {
-            return res.status(400).json({ err: 'Error Adding user' });
-          } else {
-            io.emit('userJoined', req.body);
-            // io.emit('newRoom', req.data);
-            console.log('User Added Successfully');
-            return res.status(200).json({ msg: 'User Added successfully' });
-          }
-        });
-      });
+    const userFound = await users.findOne({ username: user });
+    if (!userFound) return res.status(400).json({ err: "User doesn't exits" });
+    await users.updateOne({ username: user }, { $addToSet: { rooms: roomName } });
+
+    const userArray = room._doc.users || [];
+
+    if (userArray.includes(user)) {
+      return res.status(400).json({ err: 'User Already has access.' });
     }
-  });
+    userArray.push(user);
+    room.markModified('users');
+    try {
+      await room.save();
+      io.emit('userJoined', req.body);
+      console.log('User Added Successfully');
+      return res.status(200).json({ msg: 'User Added successfully' });
+    } catch {
+      return res.status(400).json({ err: 'Error Adding user' });
+    }
+  } catch {
+    return res.status(400).json({ err: 'Error Creating Room' });
+  }
 });
 
 router.post('/sendmessage', auth, async (req, res) => {
-  const sender = req.user.id;
-  const msg = req.body.msg;
-  const roomName = req.body.roomName;
-  console.log('user', req.user);
-  rooms.findOne({ roomName: roomName }, function (err, room) {
-    if (err) {
-      return res.status(400).json({ err: 'Error. Try again.' });
-    }
-    if (!room) {
-      return res.status(400).json({ err: 'Error. Incorrect roomname.' });
-    }
-    console.log({ ...room });
-    let msgArray = room._doc.msgArray;
-    let msgObject;
-    if (msgArray == undefined) {
-      msgArray = [];
-      msgObject = {
-        msg: msg,
-        sender: sender,
-        id: 0
-      };
-    } else {
-      msgObject = {
-        msg: msg,
-        sender: sender,
-        id: msgArray[msgArray.length - 1].id + 1
-      };
-    }
+  const { id: sender } = req.user;
+  const { msg, roomName } = req.body;
+  try {
+    const room = await rooms.findOne({ roomName: roomName });
+    if (!room) return res.status(400).json({ err: 'Error. Incorrect roomname.' });
+
+    const msgArray = room._doc.msgArray || [];
+    const msgObject = {
+      msg: msg,
+      sender: sender,
+      id: msgArray.length === 0 ? 0 : msgArray[msgArray.length - 1].id + 1
+    };
+
     //Use RabbitMQ for improvements.
     if (msgArray.length > 20) {
       //If number of messages is greater than 20, pop the oldest one.
       //We store only the latest 20 messages for now.
-
-      //msgArray.shift();
-      rooms.updateOne({ roomName: roomName }, { $pop: { msgArray: -1 } }, function (
-        err,
-        result
-      ) {
-        if (err) {
-          res.send(err);
-          return;
-        } else {
-          //res.send(result);
-        }
-      });
+      await rooms.updateOne({ roomName: roomName }, { $pop: { msgArray: -1 } });
     }
-    //msgArray.push(msgObject);
-    //Add the new message to the message array everytime irrespective of the number of messages.
-    rooms.updateOne(
-      { roomName: roomName },
-      { $push: { msgArray: msgObject } },
-      function (err, result) {
-        if (err) {
-          res.send(err);
-          return;
-        } else {
-          //res.send(result);
-        }
-      }
-    );
+    await rooms.updateOne({ roomName }, { $push: { msgArray: msgObject } });
     room._doc.msgArray = msgArray;
-    console.log(room);
-    room.save((err) => {
-      if (err) {
-        return res.status(400).json({ err: 'Error Updating Room' });
-      } else {
-        //the data being sent will be chnaged later as per requirements
-        //console.log('Room and All Messages : ', msgObject, roomName);
-        msgObject['room'] = roomName;
-        io.emit('newMessage', msgObject);
-        return res.status(200).json({ status: 'Success', msg: msgObject });
-      }
-    });
-  });
+    await room.save();
+    msgObject['room'] = roomName;
+    io.emit('newMessage', msgObject);
+    return res.status(200).json({ status: 'Success', msg: msgObject });
+  } catch {
+    return res.status(400).json({ err: 'Error. Try again.' });
+  }
 });
 
 /* Can only enter the room if the room object has this user's id.
  * Returns a complete list of users, currently online users, messages etc.
  * */
 router.post('/enterroom', auth, async (req, res) => {
-  const roomName = req.body.roomName;
-  const username = req.user.id;
+  const { roomName } = req.body;
+  const { id: username } = req.user;
 
   /*
     Also need to send sender id here
@@ -251,62 +154,48 @@ router.post('/enterroom', auth, async (req, res) => {
                 /* We may store previous ids in a room and use them again, but for now creating a
                  * new id every time a user enters a room. //
         */
-  rooms.findOne({ roomName: roomName }, function (err, room) {
-    if (err) {
-      return res.status(400).json({ err: 'Error. Try again.' });
-    }
-    if (!room) {
-      return res.status(200).json({ err: 'NOROOM' });
-    }
+  try {
+    const room = await rooms.findOne({ roomName });
+    if (!room) return res.status(200).json({ err: 'NOROOM' });
+
     /* Check if username is in room.users */
-    var i = -1;
-    var userExists = false;
-    if (room._doc.users == undefined) {
-      room._doc.users = [];
-    }
+    let i = -1;
+    let userExists = false;
+    room._doc.users = room._doc.users || [];
     room._doc.users.forEach((val, index) => {
-      if (val == username) {
+      if (val === username) {
         i = index;
         userExists = true;
       }
     });
-    if (i == -1) {
-      console.log('not found in users.');
-    }
-    /* Check if username in in room.tempusers. */
 
-    if (userExists == false) {
-      if (room._doc.guests == undefined) {
-        room._doc.guests = [];
-      }
+    /* Check if username in in room.tempusers. */
+    if (userExists === false) {
+      room._doc.guests = room._doc.guests || [];
       room._doc.guests.forEach((val, index) => {
-        if (val == username) {
+        if (val === username) {
           i = index;
           userExists = true;
         }
       });
-      if (i == -1) {
-        console.log('not found in guests too.');
+      if (i === -1) {
         /* If uesername not found, add it to temp users. */
-        var guestArray = room._doc.guests;
+        const guestArray = room._doc.guests;
         guestArray.push(username);
         room._doc.guests = guestArray;
         room.markModified('guests');
-        room.save((err) => {
-          if (err) {
-            console.log('Error Adding user');
-            return res.status(400).json({ err: 'Error adding user.' });
-          } else {
-            console.log(room._doc.guests);
-            console.log('Guest User Added successfully');
-            return res.status(200).json({
-              msg: 'Success',
-              msgs: room._doc.msgArray,
-              users: room._doc.users,
-              guests: room._doc.guests
-            });
-          }
-        });
+        try {
+          await room.save();
+          return res.status(200).json({
+            msg: 'Success',
+            msgs: room._doc.msgArray,
+            users: room._doc.users,
+            guests: room._doc.guests
+          });
+        } catch (err) {
+          console.log('Error Adding user');
+          return res.status(400).json({ err: 'Error adding user.' });
+        }
       } else {
         return res.status(200).json({
           msg: 'Success',
@@ -326,372 +215,309 @@ router.post('/enterroom', auth, async (req, res) => {
         guests: room._doc.guests
       });
     }
-  });
+  } catch (error) {
+    return res.status(400).json({ err: 'Error. Try again.' });
+  }
 });
 
 router.post('/getActive', auth, async (req, res) => {
-  const roomName = req.body.roomName;
-  rooms.findOne({ roomName: roomName }, function (err, room) {
-    if (err) {
-      return res.status(400).json({ err: 'Error. Try again.' });
-    }
-    if (!room) {
-      return res.status(400).json({ err: 'Error. Incorrect roomname.' });
-    }
+  const { roomName } = req.body;
+  try {
+    const room = rooms.findOne({ roomName: roomName });
+    if (!room) return res.status(400).json({ err: 'Error. Incorrect roomname.' });
     return res.status(200).json({ msg: 'Success', active: room._doc.online || [] });
-  });
+  } catch {
+    return res.status(400).json({ err: 'Error. Try again.' });
+  }
 });
 
 router.post('/getmsgs', auth, async (req, res) => {
-  const roomName = req.body.roomName;
-  let lastMsgId = req.body.lastMsgId; // requesting for id 0, should send msg with id 0
-  if (lastMsgId == undefined) {
-    lastMsgId = 0;
-  }
+  const { roomName } = req.body;
+  let lastMsgId = req.body.lastMsgId || 0; // requesting for id 0, should send msg with id 0
   lastMsgId = parseInt(lastMsgId);
-  // console.clear()
-  console.log(lastMsgId);
-  rooms.findOne({ roomName: roomName }, function (err, room) {
-    if (err) {
-      return res.status(400).json({ err: 'Error. Try again.' });
-    }
-    if (!room) {
-      return res.status(400).json({ err: 'Error. Incorrect roomname.' });
-    }
+
+  try {
+    const room = rooms.findOne({ roomName: roomName });
+    if (!room) return res.status(400).json({ err: 'Error. Incorrect roomname.' });
+
     let msgArray = room._doc.msgArray;
-    if (msgArray == undefined) {
+    if (!msgArray) {
       msgArray = [];
       return res.status(200).json({ msg: 'Success', msgs: msgArray });
     }
     if (lastMsgId === -1) {
       return res.status(200).json({ msg: 'Success', msgs: msgArray });
     }
-    // let reqIndex = 0;
-    // let i;
-    // for (i = 0; i < msgArray.length; i++) {
-    //   if (msgArray[i].id >= lastMsgId) {
-    //     break;
-    //   }
-    //   reqIndex++;
-    // }
-    // let newMsgArray = msgArray.splice(reqIndex);
     return res.status(200).json({ msg: 'Success', msgs: room._doc.msgArray });
-    // return res.status(200).json({ msg: "Success", msgs: newMsgArray });
-  });
+  } catch {
+    return res.status(400).json({ err: 'Error. Try again.' });
+  }
 });
 
 router.post('/exitstream', auth, async (req, res) => {
-  const roomName = req.body.roomName;
-  const username = req.user.id;
-  var idToBeDestroyed = [];
-  rooms.findOne({ roomName: roomName }, function (err, room) {
-    if (err) {
-      return res.status(400).json({ err: 'Error. Try again.' });
-    }
+  const { roomName } = req.body;
+  const { id: username } = req.user;
+  const idToBeDestroyed = [];
+
+  try {
+    const room = await rooms.findOne({ roomName });
     if (!room) {
       return res.status(400).json({ err: 'Error. Incorrect roomname.' });
     }
-    let onlineArray = room._doc.online;
-    if (onlineArray == undefined) {
-      onlineArray = [];
+    const onlineArray = room._doc.online || [];
+    if (onlineArray.length === 0) {
       return res.status(200).json({
         msg: 'Already exited',
         online: onlineArray,
-        idToBeDestroyed: idToBeDestroyed
+        idToBeDestroyed
       });
     }
-    var indicesToBeDeleted = []; // TODO: A peer can be present only 2 times- for audio, video
+    const indicesToBeDeleted = []; // TODO: A peer can be present only 2 times- for audio, video
     //so this can be optimized to stop if we get two elements.
+
     onlineArray.forEach((val, index) => {
-      if (val.username == username) {
+      if (val.username === username) {
         //indexToBeDeleted = index;
         indicesToBeDeleted.unshift(index);
         idToBeDestroyed.unshift(val.tkn);
       }
     });
-    console.log(indicesToBeDeleted);
-    console.log(onlineArray);
-    if (indicesToBeDeleted == []) {
+    if (indicesToBeDeleted.length === 0) {
       return res.status(200).json({
         msg: 'Already exited',
         online: onlineArray,
-        idToBeDestroyed: idToBeDestroyed
+        idToBeDestroyed
       });
     } else {
-      indicesToBeDeleted.forEach((val, index) => {
+      indicesToBeDeleted.forEach((val) => {
         onlineArray.splice(val, 1);
-        console.log(onlineArray);
       });
-      console.log(onlineArray);
       room._doc.online = onlineArray;
       room.markModified('online');
-      //console.log(room);
-      room.save((err) => {
-        if (err) {
-          return res.status(400).json({ err: 'Error Exiting Video' });
-        } else {
-          io.emit('userExit', req.body);
-          return res.status(200).json({
-            msg: 'Room Exited successfully',
-            online: onlineArray,
-            idToBeDestroyed: idToBeDestroyed
-          });
-        }
+      await room.save();
+      io.emit('userExit', req.body);
+      return res.status(200).json({
+        msg: 'Room Exited successfully',
+        online: onlineArray,
+        idToBeDestroyed: idToBeDestroyed
       });
     }
-  });
+  } catch {
+    return res.status(400).json({ err: 'Error. Try again.' });
+  }
 });
 
 router.post('/goonline', auth, async (req, res) => {
-  const tkn = req.body.tkn;
-  const roomName = req.body.roomName;
-  const username = req.user.id;
-  const type = req.body.type;
-  console.log(req.body);
-  rooms.findOne({ roomName: roomName }, function (err, room) {
-    if (err) {
-      console.log('error 1');
-      return res.status(400).json({ err: 'Error. Try again.' });
-    }
-    if (!room) {
-      console.log('error 2');
-      return res.status(400).json({ err: 'Error. Incorrect roomname.' });
-    }
-    let onlineArray = room.online;
-    let onlinePersonObj = {};
-    onlinePersonObj.username = username;
-    onlinePersonObj.tkn = tkn;
-    onlinePersonObj.type = type;
+  const { tkn, roomName, type } = req.body;
+  const { id: username } = req.user;
+
+  try {
+    const room = await rooms.findOne({ roomName });
+    if (!room) return res.status(400).json({ err: 'Error. Incorrect roomname.' });
+
+    const onlineArray = room.online;
+    const onlinePersonObj = {
+      username,
+      tkn,
+      type
+    };
+
     //First person online
-    if (room._doc.online == undefined) {
-      //Update online array and return;
-      rooms.updateOne(
-        { roomName: roomName },
-        { $addToSet: { online: onlinePersonObj } },
-        function (err, result) {
-          if (err) {
-            return res.status(400).json({ err: err });
-          } else {
-            io.emit('userOnline', req.body);
-            return res
-              .status(200)
-              .json({ msg: 'Waiting for others', connected: 1, type: type });
-          }
-        }
-      );
+    if (room.online === undefined) {
+      // Update online array and return;
+      try {
+        await rooms.updateOne(
+          { roomName },
+          { $addToSet: { online: onlinePersonObj } }
+        );
+        io.emit('userOnline', req.body);
+        return res
+          .status(200)
+          .json({ msg: 'Waiting for others', connected: 1, type });
+      } catch (err) {
+        return res.status(400).json({ err: err });
+      }
     } else {
-      let onlineArray = room._doc.online;
-      var indexOfCurrentUser = -1;
+      let indexOfCurrentUser = -1;
       onlineArray.forEach((val, index) => {
-        if (val.username == username && val.type == type) {
+        if (val.username === username && val.type === type) {
           indexOfCurrentUser = index;
         }
       });
-      if (indexOfCurrentUser != -1) {
+      if (indexOfCurrentUser !== -1) {
         //Return the current entry in array.
         onlineArray[indexOfCurrentUser].tkn = tkn;
         room._doc.online = onlineArray;
         room.markModified('online');
-        room.save((err) => {
-          if (err) {
-            return res.status(400).json({ err: 'Error Exiting Video' });
-          } else {
-            io.emit('userOnline', req.body);
-            return res.status(200).json({
-              msg: 'Waiting for others',
-              connected: onlineArray.length,
-              online: onlineArray,
-              changePeer: false,
-              peerId: onlineArray[indexOfCurrentUser].tkn,
-              type: type
-            });
-          }
+        await room.save();
+        io.emit('userOnline', req.body);
+        return res.status(200).json({
+          msg: 'Waiting for others',
+          connected: onlineArray.length,
+          online: onlineArray,
+          changePeer: false,
+          peerId: onlineArray[indexOfCurrentUser].tkn,
+          type: type
         });
       } else {
-        rooms.updateOne(
-          { roomName: roomName },
-          { $addToSet: { online: onlinePersonObj } },
-          function (err, result) {
-            if (err) {
-              return res.status(400).json({ err: err });
-            } else {
-              io.emit('userOnline', req.body);
-              return res.status(200).json({
-                msg: 'Waiting for others',
-                connected: onlineArray.length + 1,
-                online: onlineArray,
-                type: type
-              });
-            }
-          }
-        );
+        try {
+          await rooms.updateOne(
+            { roomName: roomName },
+            { $addToSet: { online: onlinePersonObj } }
+          );
+          io.emit('userOnline', req.body);
+          return res.status(200).json({
+            msg: 'Waiting for others',
+            connected: onlineArray.length + 1,
+            online: onlineArray,
+            type: type
+          });
+        } catch (err) {
+          return res.status(400).json({ err: err });
+        }
       }
     }
-  });
+  } catch {
+    return res.status(400).json({ err: 'Error. Try again.' });
+  }
 });
 
 router.post('/goonlinesimple', auth, async (req, res) => {
-  const id = req.body.id;
-  const roomName = req.body.roomName;
-  const username = req.user.id;
-  const type = req.body.type;
-  console.log(req.body);
-  rooms.findOne({ roomName: roomName }, function (err, room) {
-    if (err) {
-      console.log('error 1');
-      return res.status(400).json({ err: 'Error. Try again.' });
-    }
+  const { id: username, roomName, type } = req.body;
+
+  try {
+    const room = await rooms.findOne({ roomName });
     if (!room) {
       console.log('error 2');
       return res.status(400).json({ err: 'Error. Incorrect roomname.' });
     }
     let onlineArray = room.onlineSimple;
-    let onlinePersonObj = {};
-    onlinePersonObj.username = username;
-    onlinePersonObj.id = id;
-    onlinePersonObj.type = type;
+    let onlinePersonObj = { id: username, username, type };
+
     //First person online
-    if (room._doc.onlineSimple == undefined) {
+    if (!room._doc.onlineSimple) {
+      try {
+        await rooms.updateOne(
+          { roomName: roomName },
+          {
+            $addToSet: { onlineSimple: onlinePersonObj },
+            $set: {
+              lastreq: new Date()
+            }
+          }
+        );
+        io.emit('userOnline', req.body);
+        return res.status(200).json({
+          msg: 'Waiting for others',
+          connected: 1,
+          type: type,
+          online: []
+        });
+      } catch (err) {
+        return res.status(400).json({ err });
+      }
       //Update online array and return;
-      rooms.updateOne(
-        { roomName: roomName },
-        {
-          $addToSet: { onlineSimple: onlinePersonObj },
-          $set: {
-            lastreq: new Date()
-          }
-        },
-        function (err, result) {
-          if (err) {
-            return res.status(400).json({ err: err });
-          } else {
-            io.emit('userOnline', req.body);
-            return res.status(200).json({
-              msg: 'Waiting for others',
-              connected: 1,
-              type: type,
-              online: []
-            });
-          }
-        }
-      );
     } else {
-      let onlineArray = room._doc.onlineSimple;
-      var indexOfCurrentUser = -1;
+      let indexOfCurrentUser = -1;
       onlineArray.forEach((val, index) => {
-        if (val.username == username && val.type == type) {
+        if (val.username === username && val.type === type) {
           indexOfCurrentUser = index;
         }
       });
-      if (indexOfCurrentUser != -1) {
+      if (indexOfCurrentUser !== -1) {
         //Return the current entry in array.
         onlineArray[indexOfCurrentUser].id = id;
         room._doc.onlineSimple = onlineArray;
         room.markModified('onlineSimple');
-        room.save((err) => {
-          if (err) {
-            return res.status(400).json({ err: 'Error Exiting Video' });
-          } else {
-            io.emit('userOnline', req.body);
-            return res.status(200).json({
-              msg: 'Waiting for others',
-              connected: onlineArray.length,
-              online: onlineArray,
-              changePeer: false,
-              type: type
-            });
-          }
+        await room.save();
+        io.emit('userOnline', req.body);
+        return res.status(200).json({
+          msg: 'Waiting for others',
+          connected: onlineArray.length,
+          online: onlineArray,
+          changePeer: false,
+          type: type
         });
       } else {
-        rooms.updateOne(
-          { roomName: roomName },
-          {
-            $addToSet: {
-              onlineSimple: onlinePersonObj
-            },
-            $set: {
-              lastreq: new Date()
+        try {
+          await rooms.updateOne(
+            { roomName: roomName },
+            {
+              $addToSet: {
+                onlineSimple: onlinePersonObj
+              },
+              $set: {
+                lastreq: new Date()
+              }
             }
-          },
-          function (err, result) {
-            if (err) {
-              return res.status(400).json({ err: err });
-            } else {
-              io.emit('userOnline', req.body);
-              return res.status(200).json({
-                msg: 'Waiting for others',
-                connected: onlineArray.length + 1,
-                online: onlineArray,
-                type: type
-              });
-            }
-          }
-        );
+          );
+
+          io.emit('userOnline', req.body);
+          return res.status(200).json({
+            msg: 'Waiting for others',
+            connected: onlineArray.length + 1,
+            online: onlineArray,
+            type: type
+          });
+        } catch (err) {
+          return res.status(400).json({ err });
+        }
       }
     }
-  });
+  } catch (error) {
+    return res.status(400).json({ err: 'Error. Try again.' });
+  }
 });
 
 router.post('/exitstreamsimple', auth, async (req, res) => {
-  const roomName = req.body.roomName;
-  const username = req.user.id;
-  var idToBeDestroyed = [];
-  rooms.findOne({ roomName: roomName }, function (err, room) {
-    if (err) {
-      return res.status(400).json({ err: 'Error. Try again.' });
-    }
-    if (!room) {
-      return res.status(400).json({ err: 'Error. Incorrect roomname.' });
-    }
-    let onlineArray = room._doc.onlineSimple;
-    if (onlineArray == undefined) {
-      onlineArray = [];
+  const { roomName } = req.body;
+  const { id: username } = req.user;
+  const idToBeDestroyed = [];
+  try {
+    const room = await rooms.findOne({ roomName });
+    if (!room) return res.status(400).json({ err: 'Error. Incorrect roomname.' });
+    const onlineArray = room._doc.onlineSimple || [];
+    if (onlineArray.length === 0) {
       return res.status(200).json({
         msg: 'Already exited',
         online: onlineArray,
         idToBeDestroyed: idToBeDestroyed
       });
     }
-    var indicesToBeDeleted = []; // TODO: A peer can be present only 2 times- for audio, video
+    const indicesToBeDeleted = []; // TODO: A peer can be present only 2 times- for audio, video
     //so this can be optimized to stop if we get two elements.
     onlineArray.forEach((val, index) => {
-      if (val.username == username) {
+      if (val.username === username) {
         //indexToBeDeleted = index;
         indicesToBeDeleted.unshift(index);
         idToBeDestroyed.unshift(val.tkn);
       }
     });
-    console.log(indicesToBeDeleted);
-    console.log(onlineArray);
-    if (indicesToBeDeleted == []) {
+
+    if (indicesToBeDeleted.length === 0) {
       return res.status(200).json({
         msg: 'Already exited',
         online: onlineArray,
         idToBeDestroyed: idToBeDestroyed
       });
     } else {
-      indicesToBeDeleted.forEach((val, index) => {
+      indicesToBeDeleted.forEach((val) => {
         onlineArray.splice(val, 1);
-        console.log(onlineArray);
       });
-      console.log(onlineArray);
+
       room._doc.onlineSimple = onlineArray;
       room.markModified('onlineSimple');
-      //console.log(room);
-      room.save((err) => {
-        if (err) {
-          return res.status(400).json({ err: 'Error Exiting Video' });
-        } else {
-          io.emit('userExit', req.body);
-          return res.status(200).json({
-            msg: 'Room Exited successfully',
-            online: onlineArray,
-            idToBeDestroyed: idToBeDestroyed
-          });
-        }
+      await room.save();
+      io.emit('userExit', req.body);
+      return res.status(200).json({
+        msg: 'Room Exited successfully',
+        online: onlineArray,
+        idToBeDestroyed: idToBeDestroyed
       });
     }
-  });
+  } catch (error) {
+    return res.status(400).json({ err: 'Error. Try again.' });
+  }
 });
 
 module.exports = router;

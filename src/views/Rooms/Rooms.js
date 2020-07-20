@@ -3,14 +3,12 @@ import './Room.css';
 import { store } from 'react-notifications-component';
 import { connect } from 'react-redux';
 import { Container, Row } from 'reactstrap';
-import * as action from '../../redux/roomRedux/roomAction';
-import * as userAction from '../../redux/userRedux/userAction';
+import * as roomAction from '../../redux/roomRedux/roomAction';
 import DefaultAside from '../../containers/DefaultLayout/DefaultAside';
 import video_slash from '../../assets/video_slash.png';
 import video from '../../assets/video.webp';
 import endcall from '../../assets/endcall.png';
 import flip from '../../assets/flip.png';
-import mic from '../../assets/mic.png';
 
 class Room extends Component {
   constructor(props) {
@@ -75,7 +73,11 @@ class Room extends Component {
                     borderRadius: '50px',
                     padding: '10px'
                   }}>
-                  <img src={flip} style={{ height: '2.5em', width: '2.5em' }} />
+                  <img
+                    src={flip}
+                    style={{ height: '2.5em', width: '2.5em' }}
+                    alt="flip"
+                  />
                 </button>
                 <button
                   id="end"
@@ -110,9 +112,14 @@ class Room extends Component {
                     <img
                       src={video_slash}
                       style={{ height: '2.5em', width: '2.5em' }}
+                      alt="videoSlash"
                     />
                   ) : (
-                    <img src={video} style={{ height: '2.5em', width: '2.5em' }} />
+                    <img
+                      src={video}
+                      style={{ height: '2.5em', width: '2.5em' }}
+                      alt="video"
+                    />
                   )}
                 </button>
                 <button
@@ -125,7 +132,11 @@ class Room extends Component {
                     borderRadius: '50px',
                     padding: '10px'
                   }}>
-                  <img src={endcall} style={{ height: '2.5em', width: '2.5em' }} />
+                  <img
+                    src={endcall}
+                    style={{ height: '2.5em', width: '2.5em' }}
+                    alt="end"
+                  />
                 </button>
               </div>
               {/* </Row> */}
@@ -147,22 +158,18 @@ class Room extends Component {
   }
 }
 
-const mapStateToProps = (state) => {
-  return {
-    roomName: state.roomReducer.currentRoom,
-    guests: state.roomReducer.guests,
-    users: state.roomReducer.users,
-    msgs: state.roomReducer.msgs,
-    loading: state.roomReducer.loading,
-    webCam: state.userReducer.video,
-    audio: state.userReducer.audio
-  };
-};
+const mapStateToProps = (state) => ({
+  roomName: state.roomReducer.currentRoom,
+  guests: state.roomReducer.guests,
+  users: state.roomReducer.users,
+  msgs: state.roomReducer.msgs,
+  loading: state.roomReducer.loading,
+  webCam: state.userReducer.video,
+  audio: state.userReducer.audio
+});
 
-const mapDispatchToProps = (dispatch) => {
-  return {
-    enterRoom: (room) => dispatch(action.enterRoom(room))
-  };
-};
+const mapDispatchToProps = (dispatch) => ({
+  enterRoom: (room) => dispatch(roomAction.enterRoom(room))
+});
 
 export default connect(mapStateToProps, mapDispatchToProps)(Room);
