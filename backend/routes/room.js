@@ -45,6 +45,24 @@ const job = new cron(
 
 job.start();
 
+router.delete('/', auth, async (req, res) => {
+  const { id: username } = req.user;
+  const { roomName } = req.body;
+
+  try {
+    const room = await rooms.findOne({ roomName });
+    if (!room) return res.status(404).json({ msg: 'Room does not exist' });
+
+    if (!room.users.includes(username)) {
+      return res.status(403).json({ msg: "Don't have access to this feature" });
+    }
+    await rooms.deleteOne({ roomName });
+    res.sendStatus(200);
+  } catch (err) {
+    return res.status(400).json({ err: 'Error Deleting Room' });
+  }
+});
+
 router.post('/createroom', auth, async (req, res) => {
   const { id: host } = req.user;
   const { roomName } = req.body;
