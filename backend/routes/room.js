@@ -50,16 +50,30 @@ router.delete('/', auth, async (req, res) => {
   const { roomName } = req.body;
 
   try {
-    const room = await rooms.findOne({ roomName });
+    let room = await rooms.findOne({ roomName });
+    room = room.toObject();
+
     if (!room) return res.status(404).json({ msg: 'Room does not exist' });
 
     if (!room.users.includes(username)) {
       return res.status(403).json({ msg: "Don't have access to this feature" });
     }
+    const promises = [];
+    room.users.forEach((user) => {
+      promises.push(
+        users.updateOne({ username: user }, { $pull: { rooms: roomName } })
+      );
+    });
+    room.guests.forEach((user) => {
+      promises.push(
+        users.updateOne({ username: user }, { $pull: { rooms: roomName } })
+      );
+    });
+    await Promise.all(promises);
     await rooms.deleteOne({ roomName });
     res.sendStatus(200);
   } catch (err) {
-    return res.status(400).json({ err: 'Error Deleting Room' });
+    return res.status(400).json(err);
   }
 });
 
