@@ -53,8 +53,8 @@ class Room extends Component {
 
   render() {
     return (
-      <div class="app-body" id="inner-aside-container">
-        <main class="main">
+      <div className="app-body" id="inner-aside-container">
+        <main className="main">
           <br />
           <Container className="room">
             <div
@@ -151,6 +151,7 @@ class Room extends Component {
             users={this.props.users}
             guests={this.props.guests}
             loading={this.props.loading}
+            isUser={this.props.isUser}
           />
         </aside>
       </div>

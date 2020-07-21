@@ -143,7 +143,7 @@ class MemberList extends Component {
               <button type="button" className="btn btn-pill btn-secondary">
                 <i
                   style={{ cursor: 'pointer' }}
-                  class="fa fa-user-plus"
+                  className="fa fa-user-plus"
                   onClick={this.toggle}>
                   {' '}
                   Invite

@@ -103,7 +103,7 @@ class DefaultAside extends Component {
               }}>
               <i className="icon-speech"></i>
 
-              <span id="badge" class="badge badge-primary">
+              <span id="badge" className="badge badge-primary">
                 {this.props.count[this.state.roomName] === 0 ||
                 this.props.count[this.state.roomName]
                   ? this.props.count[this.state.roomName]

@@ -100,7 +100,7 @@ class DefaultHeader extends Component {
           {this.props.guests && !this.props.guests.includes(this.props.username) && (
             <NavItem className="ml-0 px-2">
               <NavLink to="/dashboard" className="nav-link">
-                <button type="button" class="btn btn-pill btn-secondary">
+                <button type="button" className="btn btn-pill btn-secondary">
                   Home
                 </button>
               </NavLink>

@@ -26,7 +26,7 @@ const getGroupElements = (rooms) => {
   if (rooms === undefined) {
     return {};
   }
-  rooms.forEach((item, index) => {
+  rooms.forEach((item) => {
     const groupElem = {};
     groupElem.name = item;
     groupElem.url = '/rooms/' + item;
