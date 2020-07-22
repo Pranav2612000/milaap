@@ -22,18 +22,15 @@ import routes from '../../routes';
 const socket = socketIOClient(`${global.config.backendURL}/`);
 const DefaultHeader = React.lazy(() => import('./DefaultHeader'));
 const getGroupElements = (rooms) => {
-  const groupElements = [];
-  if (rooms === undefined) {
-    return {};
-  }
-  rooms.forEach((item) => {
-    const groupElem = {};
-    groupElem.name = item;
-    groupElem.url = '/rooms/' + item;
-    groupElem.icon = 'icon-screen-desktop';
-    groupElem.state = true;
-    groupElements.push(groupElem);
-  });
+  if (rooms === undefined) return {};
+
+  const groupElements = rooms.map((item) => ({
+    name: item,
+    url: `/rooms/${item}`,
+    icon: 'icon-screen-desktop',
+    state: true
+  }));
+
   return groupElements;
 };
 

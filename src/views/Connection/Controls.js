@@ -2,6 +2,8 @@ import React, { Component } from 'react';
 import { AwesomeButtonProgress } from 'react-awesome-button';
 import 'react-awesome-button/dist/styles.css';
 import * as actions from '../../redux/userRedux/userAction';
+import { deleteRoom as deleteRoomAction } from '../../redux/roomRedux/roomAction';
+import { store } from 'react-notifications-component';
 import { connect } from 'react-redux';
 import {
   toggleVideo,
@@ -15,11 +17,13 @@ import {
 import { Container, Row } from 'reactstrap';
 
 import './Controls.css';
+import { Redirect } from 'react-router-dom';
 
 class Controls extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      redirect: false,
       myPeers: [],
       roomName: this.props.roomName,
       isMuted: false,
@@ -101,28 +105,32 @@ class Controls extends Component {
   render() {
     const self = this;
     return (
-      <Container>
-        <br />
-        <Row className="justify-content-center text-center">
-          <h4>Room: {`${this.props.roomName}`}</h4>
-        </Row>
-        <br />
-        <Row className="justify-content-center text-center">
-          <AwesomeButtonProgress
-            type="primary"
-            size="medium"
-            disabled={self.state.inCall}
-            action={(element, next) => {
-              this.setState({ inCall: true });
-              this.submitVideoHandler();
-              next();
-              //this.joinCall(next);
-            }}>
-            {/*<i className="icon-screen-desktop icons"></i>*/}
-            <span> Join Call</span>
-          </AwesomeButtonProgress>
-        </Row>
-        {/* <Row>
+      <>
+        {this.state.redirect ? (
+          <Redirect to="/" />
+        ) : (
+          <Container>
+            <br />
+            <Row className="justify-content-center text-center">
+              <h4>Room: {`${this.props.roomName}`}</h4>
+            </Row>
+            <br />
+            <Row className="justify-content-center text-center">
+              <AwesomeButtonProgress
+                type="primary"
+                size="medium"
+                disabled={self.state.inCall}
+                action={(element, next) => {
+                  this.setState({ inCall: true });
+                  this.submitVideoHandler();
+                  next();
+                  //this.joinCall(next);
+                }}>
+                {/*<i className="icon-screen-desktop icons"></i>*/}
+                <span> Join Call</span>
+              </AwesomeButtonProgress>
+            </Row>
+            {/* <Row>
           <AwesomeButtonProgress
             type="primary"
             size="medium"
@@ -149,7 +157,7 @@ class Controls extends Component {
             <span>UnMute</span>
           </AwesomeButtonProgress>
           </Row>*/}
-        {/* <Row className="justify-content-center text-center">
+            {/* <Row className="justify-content-center text-center">
           <AwesomeButtonProgress
             type="primary"
             size="medium"
@@ -176,80 +184,131 @@ class Controls extends Component {
             <span>Webcam Off</span>
           </AwesomeButtonProgress>
         </Row> */}
-        <Row className="justify-content-center text-center">
-          <AwesomeButtonProgress
-            type="primary"
-            size="medium"
-            disabled={!(self.state.inCall && !self.state.isScreenShareOn)}
-            action={(element, next) => {
-              this.inCallShareHandler();
-              setTimeout(next, 2000);
-              this.setState({ isScreenShareOn: true });
-            }}>
-            <i className="icon-screen-desktop icons"></i>
-            <span>Share Screen</span>
-          </AwesomeButtonProgress>
-        </Row>
-        <Row className="justify-content-center text-center">
-          <AwesomeButtonProgress
-            type="primary"
-            size="medium"
-            disabled={!(self.state.inCall && self.state.isScreenShareOn)}
-            action={(element, next) => {
-              this.setState({ isScreenShareOn: false });
-              stopScreenShare(self);
-              setTimeout(next, 2000);
-            }}>
-            <i className="icon-screen-desktop icons"></i>
-            <span>Stop Screen</span>
-          </AwesomeButtonProgress>
-        </Row>
-        <Row className="justify-content-center text-center">
-          <AwesomeButtonProgress
-            type="primary"
-            size="medium"
-            // visible={!self.state.calls.length} //use this if we want it completely hidden until needed instead
-            disabled={!self.state.inCall}
-            action={(element, next) => {
-              this.setState({ inCall: false, isScreenShareOn: false });
-              //this.endCall(next);
-              this.endCallHandler();
-              next();
-            }}>
-            <i className="icon-call-end icons"></i>
-            <span> End Call</span>
-          </AwesomeButtonProgress>
-        </Row>
-        {`${global.config.environment}` === 'development' && (
-          <Row className="justify-content-center text-center">
-            <AwesomeButtonProgress
-              type="primary"
-              size="medium"
-              disabled={self.state.inCall}
-              action={(element, next) => {
-                this.submitScreenHandler();
-                this.setState({ inCall: true });
-                next();
-              }}>
-              <i className="icon-screen-desktop icons"></i>
-              <span>Share Screen</span>
-            </AwesomeButtonProgress>
-          </Row>
+            <Row className="justify-content-center text-center">
+              <AwesomeButtonProgress
+                type="primary"
+                size="medium"
+                disabled={!(self.state.inCall && !self.state.isScreenShareOn)}
+                action={(element, next) => {
+                  this.inCallShareHandler();
+                  setTimeout(next, 2000);
+                  this.setState({ isScreenShareOn: true });
+                }}>
+                <i className="icon-screen-desktop icons"></i>
+                <span>Share Screen</span>
+              </AwesomeButtonProgress>
+            </Row>
+            <Row className="justify-content-center text-center">
+              <AwesomeButtonProgress
+                type="primary"
+                size="medium"
+                disabled={!(self.state.inCall && self.state.isScreenShareOn)}
+                action={(element, next) => {
+                  this.setState({ isScreenShareOn: false });
+                  stopScreenShare(self);
+                  setTimeout(next, 2000);
+                }}>
+                <i className="icon-screen-desktop icons"></i>
+                <span>Stop Screen</span>
+              </AwesomeButtonProgress>
+            </Row>
+            <Row className="justify-content-center text-center">
+              <AwesomeButtonProgress
+                type="primary"
+                size="medium"
+                // visible={!self.state.calls.length} //use this if we want it completely hidden until needed instead
+                disabled={!self.state.inCall}
+                action={(element, next) => {
+                  this.setState({ inCall: false, isScreenShareOn: false });
+                  //this.endCall(next);
+                  this.endCallHandler();
+                  next();
+                }}>
+                <i className="icon-call-end icons"></i>
+                <span> End Call</span>
+              </AwesomeButtonProgress>
+            </Row>
+            {this.props.isUser && (
+              <Row className="justify-content-center text-center">
+                <AwesomeButtonProgress
+                  type="secondary"
+                  size="large"
+                  // visible={!self.state.calls.length} //use this if we want it completely hidden until needed instead
+                  action={(element, next) => {
+                    try {
+                      this.props.deleteRoom(this.props.room);
+
+                      store.addNotification({
+                        title: 'Room Deleted',
+                        message: 'Successfully Deleted',
+                        type: 'info',
+                        container: 'top-right',
+                        animationIn: ['animated', 'fadeIn'],
+                        animationOut: ['animated', 'fadeOut'],
+                        dismiss: {
+                          duration: 3000,
+                          pauseOnHover: true
+                        }
+                      });
+                      this.setState({ redirect: true });
+                    } catch (err) {
+                      store.addNotification({
+                        title: 'Error',
+                        message: 'Error in deleting',
+                        type: 'warning',
+                        container: 'top-right',
+                        animationIn: ['animated', 'fadeIn'],
+                        animationOut: ['animated', 'fadeOut'],
+                        dismiss: {
+                          duration: 3000,
+                          pauseOnHover: true
+                        }
+                      });
+                    }
+                    next();
+                  }}>
+                  {/* <i className="icon-call-end icons"></i> */}
+                  <span>Delete Room</span>
+                </AwesomeButtonProgress>
+              </Row>
+            )}
+            {`${global.config.environment}` === 'development' && (
+              <Row className="justify-content-center text-center">
+                <AwesomeButtonProgress
+                  type="primary"
+                  size="medium"
+                  disabled={self.state.inCall}
+                  action={(element, next) => {
+                    this.submitScreenHandler();
+                    this.setState({ inCall: true });
+                    next();
+                  }}>
+                  <i className="icon-screen-desktop icons"></i>
+                  <span>Share Screen</span>
+                </AwesomeButtonProgress>
+              </Row>
+            )}
+            <br />
+          </Container>
         )}
-        <br />
-      </Container>
+      </>
     );
   }
 }
 const mapStateToProps = (state) => ({
   video: state.userReducer.video,
   audio: state.userReducer.audio,
-  username: state.loginReducer.username
+  isUser:
+    state.roomReducer.users &&
+    state.loginReducer.username &&
+    state.roomReducer.users.includes(state.loginReducer.username),
+  room: state.roomReducer.currentRoom
 });
 
 const mapDispatchToProps = (dispatch) => ({
   toggleVideo: () => dispatch(actions.toggleVideo()),
   toggleAudio: () => dispatch(actions.toggleAudio()),
-  setAudioVideoToInitialState: () => dispatch(actions.setAudioVideoToInitialState())
+  setAudioVideoToInitialState: () => dispatch(actions.setAudioVideoToInitialState()),
+  deleteRoom: (room) => dispatch(deleteRoomAction(room))
 });
 export default connect(mapStateToProps, mapDispatchToProps)(Controls);

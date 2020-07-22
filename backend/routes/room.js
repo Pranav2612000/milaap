@@ -64,15 +64,12 @@ router.delete('/', auth, async (req, res) => {
         users.updateOne({ username: user }, { $pull: { rooms: roomName } })
       );
     });
-    room.guests.forEach((user) => {
-      promises.push(
-        users.updateOne({ username: user }, { $pull: { rooms: roomName } })
-      );
-    });
     await Promise.all(promises);
     await rooms.deleteOne({ roomName });
+    io.emit('newRoom', {});
     res.sendStatus(200);
   } catch (err) {
+    console.log(err);
     return res.status(400).json(err);
   }
 });
@@ -90,16 +87,19 @@ router.post('/createroom', auth, async (req, res) => {
     }
 
     // Create a new room
-    room = new rooms({
+    const newRoom = new rooms({
       roomName: roomName,
       users: [host],
       guests: []
     });
-    await room.save();
+
+    await newRoom.save();
     io.emit('newRoom', req.data);
     await users.updateOne({ username: host }, { $addToSet: { rooms: roomName } });
+
     return res.status(200).json({ msg: 'Room Created successfully' });
   } catch (err) {
+    console.log(err);
     return res.status(400).json({ err: 'Error Creating Room' });
   }
 });
