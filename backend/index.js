@@ -20,6 +20,7 @@ app.options('*', cors());
 
 const http = require('http').Server(app);
 const io = require('socket.io')(http);
+module.exports = io;
 // io.origins("http://localhost:3000")
 
 io.sockets.on('connection', (client) => {
@@ -45,8 +46,6 @@ app.get('/', (req, res) => res.send('Hello World!'));
 
 // While deploying/local testing uncomment this line and change peerServer throughout the application to use our peerServer.
 const peerServer = PeerServer({ port: 9000, path: '/peerserver' });
-
-module.exports = io;
 
 http.listen(port, () => {
   console.log(`Server listening on port ${port}`);

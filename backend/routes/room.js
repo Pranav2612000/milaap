@@ -45,6 +45,35 @@ const job = new cron(
 
 job.start();
 
+router.delete('/', auth, async (req, res) => {
+  const { id: username } = req.user;
+  const { roomName } = req.body;
+
+  try {
+    let room = await rooms.findOne({ roomName });
+    room = room.toObject();
+
+    if (!room) return res.status(404).json({ msg: 'Room does not exist' });
+
+    if (!room.users.includes(username)) {
+      return res.status(403).json({ msg: "Don't have access to this feature" });
+    }
+    const promises = [];
+    room.users.forEach((user) => {
+      promises.push(
+        users.updateOne({ username: user }, { $pull: { rooms: roomName } })
+      );
+    });
+    await Promise.all(promises);
+    await rooms.deleteOne({ roomName });
+    io.emit('newRoom', {});
+    res.sendStatus(200);
+  } catch (err) {
+    console.log(err);
+    return res.status(400).json(err);
+  }
+});
+
 router.post('/createroom', auth, async (req, res) => {
   const { id: host } = req.user;
   const { roomName } = req.body;
@@ -58,16 +87,19 @@ router.post('/createroom', auth, async (req, res) => {
     }
 
     // Create a new room
-    room = new rooms({
+    const newRoom = new rooms({
       roomName: roomName,
       users: [host],
       guests: []
     });
-    await room.save();
+
+    await newRoom.save();
     io.emit('newRoom', req.data);
     await users.updateOne({ username: host }, { $addToSet: { rooms: roomName } });
+
     return res.status(200).json({ msg: 'Room Created successfully' });
   } catch (err) {
+    console.log(err);
     return res.status(400).json({ err: 'Error Creating Room' });
   }
 });

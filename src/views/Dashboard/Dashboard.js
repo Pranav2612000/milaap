@@ -99,7 +99,7 @@ class Dashboard extends Component {
                     !this.props.guests.includes(this.props.username) && (
                       <button
                         type="button"
-                        class="btn btn-pill btn-secondary"
+                        className="btn btn-pill btn-secondary"
                         onClick={this.toggle}>
                         Create Room
                       </button>
@@ -108,7 +108,7 @@ class Dashboard extends Component {
                 <Col className="justify-content-center">
                   <button
                     type="button"
-                    class="btn btn-pill btn-secondary"
+                    className="btn btn-pill btn-secondary"
                     onClick={() => {
                       this.props.history.push('/join');
                     }}>

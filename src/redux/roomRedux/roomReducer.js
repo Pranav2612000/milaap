@@ -1,7 +1,8 @@
 import {
   ENTER_ROOM_REQUEST,
   ENTER_ROOM_SUCCESS,
-  ENTER_ROOM_FAILURE
+  ENTER_ROOM_FAILURE,
+  LEAVE_ROOM
 } from './roomActionTypes';
 
 const initalRoomState = {
@@ -35,6 +36,14 @@ const roomReducer = (state = initalRoomState, action) => {
         ...state,
         loading: false,
         error: action.error
+      };
+    case LEAVE_ROOM:
+      return {
+        ...state,
+        currentRoom: undefined,
+        msgs: undefined,
+        users: undefined,
+        guests: undefined
       };
     default:
       return state;

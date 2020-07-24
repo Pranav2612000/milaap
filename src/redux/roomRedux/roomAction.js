@@ -1,13 +1,14 @@
 import {
   ENTER_ROOM_REQUEST,
   ENTER_ROOM_SUCCESS,
-  ENTER_ROOM_FAILURE
+  ENTER_ROOM_FAILURE,
+  LEAVE_ROOM
 } from './roomActionTypes';
 import { redirectToJoinPage } from '../loginRedux/loginAction';
 import axios from 'axios';
 import Notifications from 'react-notification-system-redux';
 
-const notificationOpts = {
+const errorNotificationOpts = {
   // uid: 'once-please', // you can specify your own uid if required
   title: 'Error',
   message: 'Please try again with a different username',
@@ -17,6 +18,10 @@ const notificationOpts = {
 
 export const enterRoomRequest = () => ({
   type: ENTER_ROOM_REQUEST
+});
+
+export const leaveRoom = () => ({
+  type: LEAVE_ROOM
 });
 
 export const enterRoomSuccess = (room, roomObj) => ({
@@ -56,7 +61,22 @@ export const enterRoom = (room) => async (dispatch) => {
       dispatch(enterRoomFailure('NOROOM'));
     } else {
       dispatch(enterRoomFailure(err));
-      dispatch(Notifications.error(notificationOpts));
+      dispatch(Notifications.error(errorNotificationOpts));
     }
+  }
+};
+
+export const deleteRoom = (room) => async (dispatch) => {
+  const reqData = { roomName: room };
+  try {
+    await axios.delete(`${global.config.backendURL}/api/room/`, {
+      headers: {
+        'milaap-auth-token': localStorage.getItem('milaap-auth-token')
+      },
+      data: reqData
+    });
+    dispatch(leaveRoom());
+  } catch (err) {
+    throw err;
   }
 };

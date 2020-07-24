@@ -64,9 +64,9 @@ export const register = (username, password, google = false) => async (dispatch)
     await axios.post(`${global.config.backendURL}/api/register/`, reqData);
     dispatch(registerSuccess());
   } catch (err) {
-    if (err.response.data.err === 'UEXIST' && google === true) {
+    if (err.response?.data?.err === 'UEXIST' && google === true) {
       dispatch(googleUser());
-    } else if (err.response.data.err === 'UEXIST') {
+    } else if (err.response?.data?.err === 'UEXIST') {
       dispatch(usernameExists(err.response.data.err));
       dispatch(Notifications.error(unameNotificationOpts));
     } else {
