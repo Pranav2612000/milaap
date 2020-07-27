@@ -165,6 +165,7 @@ Distributed under the MIT License. See `LICENSE` for more information.
 - [Anup Nair](https://github.com/AnupNair08)
 - [Naman Modi](https://github.com/naman-modi)
 - [Savan Nahar](https://github.com/savannahar68)
+- [Yash Shah](https://yashshah1.github.io/)
 
 <!-- ACKNOWLEDGEMENTS
 
