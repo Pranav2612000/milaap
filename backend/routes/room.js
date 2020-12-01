@@ -423,7 +423,7 @@ router.post('/goonlinesimple', auth, async (req, res) => {
       console.log('error 2');
       return res.status(400).json({ err: 'Error. Incorrect roomname.' });
     }
-    let onlineArray = room.onlineSimple;
+    let onlineArray = room._doc.onlineSimple;
     let onlinePersonObj = { id: username, username, type };
 
     //First person online
