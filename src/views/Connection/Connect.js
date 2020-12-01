@@ -881,15 +881,19 @@ async function sendRequestToEndCall(self) {
   const reqData = {
     roomName: self.state.roomName
   };
-  await axios.post(
-    `${global.config.backendURL}/api/room/exitstreamsimple`,
-    reqData,
-    {
-      headers: {
-        'milaap-auth-token': localStorage.getItem('milaap-auth-token')
+  try {
+    await axios.post(
+      `${global.config.backendURL}/api/room/exitstreamsimple`,
+      reqData,
+      {
+        headers: {
+          'milaap-auth-token': localStorage.getItem('milaap-auth-token')
+        }
       }
-    }
-  );
+    );
+  } catch (err) {
+    console.log(err);
+  }
 }
 
 /* function called when endcall is pressed. */
