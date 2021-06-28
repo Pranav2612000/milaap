@@ -37,7 +37,8 @@ class Dashboard extends Component {
     };
   }
 
-  addFriend = async () => {
+  addFriend = async (e) => {
+    e.preventDefault();
     const reqData = {
       user: this.state.friendid,
       roomName: this.state.roomName
@@ -185,9 +186,9 @@ class Dashboard extends Component {
           isOpen={this.state.modal}
           toggle={this.toggle}
           className={this.props.className}>
-          <ModalHeader toggle={this.toggle}>Create Room</ModalHeader>
-          <ModalBody>
-            <Form>
+          <Form onSubmit={this.addFriend}>
+            <ModalHeader toggle={this.toggle}>Create Room</ModalHeader>
+            <ModalBody>
               <InputGroup className="mb-3">
                 <InputGroupAddon addonType="prepend">
                   <InputGroupText>
@@ -202,16 +203,16 @@ class Dashboard extends Component {
                   onChange={this.handleRoomNameChange}
                 />
               </InputGroup>
-            </Form>
-          </ModalBody>
-          <ModalFooter>
-            <Button color="primary" onClick={this.addFriend}>
-              Add
-            </Button>{' '}
-            <Button color="secondary" onClick={this.toggle}>
-              Cancel
-            </Button>
-          </ModalFooter>
+            </ModalBody>
+            <ModalFooter>
+              <Button color="primary" onClick={this.addFriend}>
+                Add
+              </Button>{' '}
+              <Button color="secondary" onClick={this.toggle}>
+                Cancel
+              </Button>
+            </ModalFooter>
+          </Form>
         </Modal>
       </>
     );
