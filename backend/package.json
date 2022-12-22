@@ -17,7 +17,7 @@
     "cron": "^1.8.2",
     "express": "^4.17.1",
     "http": "0.0.1-security",
-    "jsonwebtoken": "^8.5.1",
+    "jsonwebtoken": "^9.0.0",
     "mongoose": "^5.9.13",
     "node-cron": "^2.0.3",
     "peer": "^0.5.3",
